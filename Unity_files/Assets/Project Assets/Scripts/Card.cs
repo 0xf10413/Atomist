@@ -8,6 +8,7 @@ using UnityEngine.UI;
 /// Contient le type de carte, ainsi que le nombre de cartes possédées par le joueur
 /// </summary>
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 
 public class Card {
@@ -32,17 +33,18 @@ public class Card {
 		cardImg.AddComponent<Image>();
 		cardImg.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Cards/" + name);
 
-		// Ajout d'un événement au clic de la souris (ça marche pas en fait)
+		// Ajout d'un événement au clic de la souris
 		EventTrigger.Entry entry = new EventTrigger.Entry();
 		entry.eventID = EventTriggerType.PointerDown;
 		entry.callback = new EventTrigger.TriggerEvent();
 		UnityEngine.Events.UnityAction<BaseEventData> callback =
 			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				Main.Write("aaa");
+				Main.Write(elementName);
 			});
 		entry.callback.AddListener(callback);
-		// La ligne qui crash, je l'ai mise en commentaire...
-		//cardImg.GetComponent<Image>().gameObject.AddComponent<EventTrigger>().delegates.Add(entry);
+		cardImg.AddComponent<EventTrigger>();
+		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
+		cardImg.GetComponent<EventTrigger>().delegates.Add(entry);
 
 		cardImg.transform.SetParent(Main.context.gameObject.transform.Find ("Canvas/Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
