@@ -5,12 +5,12 @@ using System.Collections.Generic;
 public class Player {
 	
 	int energy { get; set; }
-	Hand hand = new Hand(); // Liste des cartes du joueur
+	Deck deck = new Deck(); // Liste des cartes du joueur
 
 	public Player () {
-		hand.AddCard ("aluminium"); // Ajout de la carte "aluminium"
-		hand.AddCard ("oxygene"); // Ajout de la carte "oxygene"
-		hand.AddCard ("helium"); // Ajout de la carte "helium"
-		hand.AddCard ("oxygene"); // Ajout de la carte "oxygene"
+		deck.AddCard (Main.elements[0]); // Ajout de la carte "aluminium"
+		deck.AddCard (Main.elements[1]); // Ajout de la carte "argon"
+		deck.AddCard (Main.elements[2]); // Ajout de la carte "azote"
+		deck.AddCard (Main.elements[1]); // Ajout de la carte "argon"
 	}
 }

@@ -1,0 +1,22 @@
+[
+	{
+		"reagents" : [["H",2],"O"],
+		"infos" : "Eau (H20)",
+		"type" : "Eau"
+	},
+	{
+		"reagents" : ["Na","O","H"],
+		"infos" : "Alliage de sodium + Eau",
+		"type" : "Explosion"
+	},
+	{
+		"reagents" : ["Rb","H","O"],
+		"infos" : "Rubidium + Eau (RbH20)",
+		"type" : "Explosion"
+	},
+	{
+		"reagents" : [["N",2],["H",8],["Cr",2],["O",7]],
+		"infos" : "Dichromate d'amonium ((NH4)2 Cr2O7)",
+		"type" : "Feu"
+	}
+]

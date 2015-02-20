@@ -1,0 +1,34 @@
+[
+	{
+		"name" : "Aluminium",
+		"symbol" : "Al",
+		"atomicNumber" : 13,
+		"family" : "Métal Pauvre",
+		"file" : "aluminium",
+		"energy" : 3
+	},
+	{
+		"name" : "Argon",
+		"symbol" : "Ar",
+		"atomicNumber" : 18,
+		"family" : "Gaz Noble",
+		"file" : "argon",
+		"energy" : 0
+	},
+	{
+		"name" : "Azote",
+		"symbol" : "N",
+		"atomicNumber" : 7,
+		"family" : "Non-Métal",
+		"file" : "azote",
+		"energy" : 7
+	},
+	{
+		"name" : "Carbone",
+		"symbol" : "C",
+		"atomicNumber" : 6,
+		"family" : "Non-Métal",
+		"file" : "carbone",
+		"energy" : 2
+	},
+]

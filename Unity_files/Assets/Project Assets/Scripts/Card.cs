@@ -12,72 +12,141 @@ using System.Collections.Generic;
 
 
 public class Card {
+	
+	public Element element { get; set; }
+	static float w = 132, h = 209, y = 0; // Longueur, largeur et hauteur de la carte
+	private float x;
+	private int N; // Nombre de cartes
 
+	private int _nbSelected = 0;
+	public int nbSelected {
+		get {return _nbSelected;}
+		set {if ((value >= 0) && (value <= N)) {_nbSelected = value; updateText();}}
+	}
+	
 	private GameObject cardImg; // L'image de la carte
 	private GameObject infosNb; // Le texte affichant le nombre de cartes de ce type
-
-	public string elementName { get; private set;}
-	int _nbCards;
+	private GameObject cardSelected; // Image affichée lorsque la carte est sélectionnée
+	private GameObject cardPreview; // La carte affichée en "grand" au survol de la souris
+	
 	public int nbCards {
-		get {return _nbCards;}
-		set {_nbCards = value; updateText();}
+		get {return N;}
+		set {N = value; updateText();}
 	}
+	
 	/// <summary>
 	/// Constructeur de la carte
 	/// </summary>
-	/// <param name="name">Le nom de la carte</param>
+	/// <param name="element">Le nom de la carte</param>
+	public Card (Element element) : this(element,1) {
+	}
+	
+	/// <summary>
+	/// Constructeur de la carte
+	/// </summary>
+	/// <param name="element">Le nom de la carte</param>
 	/// <param name="nb">Le nombre de cartes de ce types possédées initialement par le joueur</param>
-	public Card (string name, int nb) {
+	public Card (Element nElement, int nb) {
 		cardImg = new GameObject ();
-		cardImg.name = "Carte"; // Nom de l'objet (celui qui apparait dans la hiérarchie)
+		cardImg.name = "Card(s) "+ nElement.symbole; // Nom de l'objet (celui qui apparait dans la hiérarchie)
 		cardImg.AddComponent<Image>();
-		cardImg.GetComponent<Image>().sprite = Resources.Load<Sprite>("Images/Cards/" + name);
-
-		// Ajout d'un événement au clic de la souris
-		EventTrigger.Entry entry = new EventTrigger.Entry();
-		entry.eventID = EventTriggerType.PointerDown;
-		entry.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> callback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				Main.Write(elementName);
-			});
-		entry.callback.AddListener(callback);
+		cardImg.GetComponent<Image> ().sprite = nElement.cardRessource;
+		
 		cardImg.AddComponent<EventTrigger>();
 		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
-		cardImg.GetComponent<EventTrigger>().delegates.Add(entry);
 
+		// Ajout d'un événement de sélection de la carte au clic de la souris
+		EventTrigger.Entry clicEvent = new EventTrigger.Entry();
+		clicEvent.eventID = EventTriggerType.PointerDown;
+		clicEvent.callback = new EventTrigger.TriggerEvent();
+		UnityEngine.Events.UnityAction<BaseEventData> clicCallback =
+			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
+				if (_nbSelected == N) {
+					nbSelected = 0;
+					Object.Destroy(cardSelected);
+				}
+				else {
+					if (_nbSelected == 0) {
+						// Ajout de l'élément de sélection (cadre bleu)
+						cardSelected = new GameObject();
+						cardSelected.name = "Card Selected";
+						cardSelected.transform.parent = cardImg.transform;
+						cardSelected.AddComponent<Image> ();
+						cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
+						cardSelected.GetComponent<Image> ().GetComponent<RectTransform>().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
+						cardSelected.GetComponent<Image> ().GetComponent<RectTransform>().localPosition = new Vector2 (0,0); // Position
+						infosNb.transform.SetParent(infosNb.transform.parent);
+					}
+					nbSelected++;
+				}
+			});
+		clicEvent.callback.AddListener(clicCallback);
+		cardImg.GetComponent<EventTrigger>().delegates.Add(clicEvent);
+
+		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
+		EventTrigger.Entry overEvent = new EventTrigger.Entry();
+		overEvent.eventID = EventTriggerType.PointerEnter;
+		overEvent.callback = new EventTrigger.TriggerEvent();
+		UnityEngine.Events.UnityAction<BaseEventData> overCallback =
+			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
+				// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
+				if (cardPreview == null) {
+					cardPreview = new GameObject();
+					cardPreview.name = "Card Preview";
+					cardPreview.transform.SetParent(Main.context.gameObject.transform.Find ("Canvas/BoardGame"));
+					cardPreview.AddComponent<Image> ();
+					cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
+					cardPreview.GetComponent<Image> ().GetComponent<RectTransform>().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
+					cardPreview.GetComponent<Image> ().GetComponent<RectTransform>().localPosition = new Vector2 (0,0); // Position
+				}
+			});
+		overEvent.callback.AddListener(overCallback);
+		cardImg.AddComponent<EventTrigger>();
+		cardImg.GetComponent<EventTrigger>().delegates.Add(overEvent);
+		
+		// Ajout d'un événement de déprévisualisation de la carte à la sortie de la souris
+		EventTrigger.Entry outEvent = new EventTrigger.Entry();
+		outEvent.eventID = EventTriggerType.PointerExit;
+		outEvent.callback = new EventTrigger.TriggerEvent();
+		UnityEngine.Events.UnityAction<BaseEventData> outCallback =
+			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
+				// Suppression de la prévisualisation de la carte
+				Object.Destroy(cardPreview);
+				cardPreview = null;
+			});
+		outEvent.callback.AddListener(outCallback);
+		cardImg.AddComponent<EventTrigger>();
+		cardImg.GetComponent<EventTrigger>().delegates.Add(outEvent);
+		
 		cardImg.transform.SetParent(Main.context.gameObject.transform.Find ("Canvas/Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
 		RectTransform imgParams = cardImg.GetComponent<Image> ().GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
-		imgParams.sizeDelta = new Vector2 (72,209*Screen.height/Screen.width); // Taille
-
+		imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
+		
 		infosNb = new GameObject ();
-		infosNb.name = "Nb cartes";
+		infosNb.name = "Nb cards";
 		infosNb.AddComponent<Text> ();
 		infosNb.transform.SetParent(cardImg.gameObject.transform);
+		infosNb.GetComponent<Text> ().horizontalOverflow = HorizontalWrapMode.Overflow;
+		infosNb.GetComponent<Text> ().verticalOverflow = VerticalWrapMode.Overflow;
+		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (1,1); // Taille
 		infosNb.GetComponent<Text> ().font = (Font)Resources.GetBuiltinResource (typeof(Font), "Arial.ttf");
 		infosNb.GetComponent<Text> ().fontSize = 25;
 		infosNb.GetComponent<Text> ().fontStyle = FontStyle.Bold;
-		infosNb.GetComponent<Text> ().color = Color.yellow;
-		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (27,-96*Screen.height/Screen.width);
+		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (30f,-96f*Screen.height/Screen.width);
 		infosNb.GetComponent<Text> ().alignment = TextAnchor.MiddleCenter;
-		elementName = name;
+
+		element = nElement;
 		nbCards = nb;
 	}
-
-	/// <summary>
-	/// Place la carte à la bonne position sur l'écran
-	/// </summary>
-	/// <param name="position">L'id de la position (0 si c'est la 1re carte du joueur, 1 si c'est la 2e, etc)</param>
-	public void replace(int position) {
+	
+	public void updateX(float posX) {
+		x = posX;
 		RectTransform imgParams = cardImg.GetComponent<Image> ().GetComponent<RectTransform> ();
-		float x1 = -152; // Abcisse 1re carte, déterminée "à l'arrache" avec Unity
-		float x2 = -99; // Abcisse 2e carte
-		float yc = 0; // Ordonnée de toutes les cartes
-		imgParams.localPosition = new Vector2 (x1 + (x2-x1)*position, yc); // attention, c'est l'attribut "localPosition" et non "position" qui contient les coordonnées
+		imgParams.localPosition = new Vector2 (x,y); // attention, c'est l'attribut "localPosition" et non "position" qui contient les coordonnées
 	}
-
 	public void updateText() {
-		infosNb.GetComponent<Text> ().text = "×" + _nbCards;
+		infosNb.GetComponent<Text> ().color = (nbSelected>0) ? Color.cyan : Color.yellow;
+		infosNb.GetComponent<Text> ().text = (N>1) ? ((nbSelected>0) ? nbSelected+"/"+N:("×" + N)):"";
 	}
 }
