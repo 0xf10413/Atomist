@@ -93,7 +93,7 @@ public class Card {
 				if (cardPreview == null) {
 					cardPreview = new GameObject();
 					cardPreview.name = "Card Preview";
-					cardPreview.transform.SetParent(Main.context.gameObject.transform.Find ("Canvas/BoardGame"));
+					cardPreview.transform.SetParent(Main.context.gameObject.transform.Find ("PlayerScreen/BoardGame"));
 					cardPreview.AddComponent<Image> ();
 					cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
 					cardPreview.GetComponent<Image> ().GetComponent<RectTransform>().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
@@ -118,7 +118,7 @@ public class Card {
 		cardImg.AddComponent<EventTrigger>();
 		cardImg.GetComponent<EventTrigger>().delegates.Add(outEvent);
 		
-		cardImg.transform.SetParent(Main.context.gameObject.transform.Find ("Canvas/Cards List"));
+		cardImg.transform.SetParent(Main.context.gameObject.transform.Find ("PlayerScreen/Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
 		RectTransform imgParams = cardImg.GetComponent<Image> ().GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
 		imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
