@@ -12,7 +12,7 @@ public class Element {
 	public int atomicNumber { get; set;} // Numéro atomique (Ex : 11)
 	public string family { get; set; } // Le nom de la famille (Ex : Alcalin)
 	public Sprite cardRessource { get; set; } // Ressource graphique de la carte
-	public int bindIngEnergy { get; set; } // Energie de liaison
+	public int bindingEnergy { get; set; } // Energie de liaison
 
 	/// <summary>
 	/// Constructeur de l'élément
@@ -27,6 +27,6 @@ public class Element {
 		atomicNumber = atomicNB;
 		family = nFamily;
 		cardRessource = Resources.Load<Sprite>("Images/Cards/" + fileName);
-		bindIngEnergy = nEnergy;
+		bindingEnergy = nEnergy;
 	}
 }

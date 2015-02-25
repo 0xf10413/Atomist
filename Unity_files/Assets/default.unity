@@ -754,10 +754,10 @@ RectTransform:
   - {fileID: 173150790}
   m_Father: {fileID: 1626709379}
   m_RootOrder: 2
-  m_AnchorMin: {x: .5, y: .5}
-  m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 206, y: -68}
-  m_SizeDelta: {x: 360, y: 265}
+  m_AnchorMin: {x: .541750014, y: .0994355977}
+  m_AnchorMax: {x: .868000031, y: .61500001}
+  m_AnchoredPosition: {x: 42.5, y: -6}
+  m_SizeDelta: {x: 99, y: 41}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1483345652
 MonoBehaviour:

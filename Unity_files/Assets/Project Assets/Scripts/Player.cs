@@ -6,6 +6,7 @@ public class Player {
 	
 	int energy { get; set; }
 	Deck deck = new Deck(); // Liste des cartes du joueur
+    List<Penalty> penalties; // Liste des pénalités du joueur (gaz moutarde, ...)
 
 	public Player () {
 		deck.AddCard (Main.elements[0]); // Ajout de la carte "aluminium"

@@ -13,6 +13,8 @@ public class Main : MonoBehaviour {
 	public static List<Element> elements;
 	
 	public static List<Player> players = new List<Player>(); // La liste des joueurs
+    public static List<Reaction> reactions = new List<Reaction>(); // liste des réactions
+    public static List<Obstacle> obstacles = new List<Obstacle>(); // liste des obtacles
 	public static int turnID = 0; // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
 	
 	/**
