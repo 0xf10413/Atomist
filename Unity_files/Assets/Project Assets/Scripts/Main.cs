@@ -35,7 +35,6 @@ public class Main : MonoBehaviour {
         SimpleJSON.JSONArray reactionsInfos = loadJSONFile("reactions").AsArray;
         foreach (SimpleJSON.JSONNode r in reactionsInfos) {
             List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
-            Write (null == r["reagents"]);
             foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
             {
                 rList.Add (new KeyValuePair<Element, int> (elements.Find(n => (n.symbole == elt[0])), elt[1].AsInt));
@@ -45,7 +44,7 @@ public class Main : MonoBehaviour {
                 rt = new ReactionType (r["type"]);
                 reactionTypes.Add (rt);
             }
-            reactions.Add (new Reaction (r["reaction"], r["products"], rList, rt));
+            reactions.Add (new Reaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
         }
 
 		players.Add (new Player ());

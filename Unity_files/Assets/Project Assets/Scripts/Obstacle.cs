@@ -9,6 +9,7 @@ public class Obstacle
 {
     public string name { get; private set; } // Le nom de l'obstacle (e.g. "Feu")
     public Sprite obstacleResource { get; private set; } // Ressource graphique
+    public ReactionType weakness { get; private set; } // Le type de réaction permettant de le détruire
 
     /// <summary>
     /// Constructeur de l'obstacle.

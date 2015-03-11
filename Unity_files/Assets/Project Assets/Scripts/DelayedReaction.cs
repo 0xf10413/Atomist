@@ -14,7 +14,8 @@ public class DelayedReaction : Reaction {
     /// <param name="tProducts">Un texte contenant les produits</param>
     /// <param name="lReagents">Une liste de réactifs sous la forme ((H,2),(O,1))</param>
     /// <param name="nType">Le type de réaction</param>
-	public DelayedReaction(string tReagents, string tProducts, List<KeyValuePair<Element,int>> lReagents, ReactionType nType) : base(tReagents,tProducts,lReagents,nType) {
+	public DelayedReaction(string tReagents, string tProducts, List<KeyValuePair<Element,int>> lReagents, ReactionType nType, int cCost, int gGain) : 
+        base(tReagents,tProducts,lReagents,nType, cCost, gGain) {
 	}
 
 	public void inflige(Player cible) {
