@@ -7,10 +7,10 @@ using System.Collections.Generic;
 /// </summary>
 public class Reaction {
 
-	string reagents  { get; set; } // Texte contenant les réactifs
-	string products  { get; set; } // Texte contenant les produits
-	List<KeyValuePair<Element,int>> reagentsList  { get; set; } // Liste de couples (élément, stoechiométrie)
-	ReactionType type { get; set; } // Type de réaction (glace, feu, etc)
+	public string reagents  { private set; get; } // Texte contenant les réactifs
+	public string products  { private set; get; } // Texte contenant les produits
+	public List<KeyValuePair<Element,int>> reagentsList  { private get; set; } // Liste de couples (élément, stoechiométrie)
+	public ReactionType type { private set; get; } // Type de réaction (glace, feu, etc)
     
     /// <summary>
     /// Constructeur de la réaction

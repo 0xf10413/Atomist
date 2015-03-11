@@ -3,18 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 
 /**
+ * <summary>
  * La classe principale
- * Contient l'ensemble des variables globales ainsi que les fonctions à appeler à chaque frame
+ * Contient l'ensemble des variables globales ainsi que les fonctions à appeler à chaque frame.</summary>
  **/
 public class Main : MonoBehaviour {
 
 	public static Main context;
-	
-	public static List<Element> elements;
+
+    public static List<Element> elements { private set; get; } // Liste des éléments, fixée au démarrage
+    public static List<Reaction> reactions { private set; get; } // Liste des réaction, fixée au démarrage
 	
 	public static List<Player> players = new List<Player>(); // La liste des joueurs
-    public static List<Reaction> reactions = new List<Reaction>(); // liste des réactions
     public static List<Obstacle> obstacles = new List<Obstacle>(); // liste des obtacles
+    public static List<ReactionType> reactionTypes = new List<ReactionType> (); // liste des types de réaction
 	public static int turnID = 0; // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
 	
 	/**
@@ -24,10 +26,28 @@ public class Main : MonoBehaviour {
 	void Start () {
 		context = this;
 		elements = new List<Element> ();
-		SimpleJSON.JSONArray elemetnsInfos = loadJSONFile("elements").AsArray;
-		foreach (SimpleJSON.JSONNode elementInfos in elemetnsInfos) {
+        reactions = new List<Reaction> ();
+		SimpleJSON.JSONArray elementsInfos = loadJSONFile("elements").AsArray;
+		foreach (SimpleJSON.JSONNode elementInfos in elementsInfos) {
 			elements.Add(new Element(elementInfos["name"],elementInfos["symbol"], elementInfos["atomicNumber"].AsInt, elementInfos["family"], elementInfos["file"], elementInfos["energy"].AsInt));
 		}
+
+        SimpleJSON.JSONArray reactionsInfos = loadJSONFile("reactions").AsArray;
+        foreach (SimpleJSON.JSONNode r in reactionsInfos) {
+            List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
+            Write (null == r["reagents"]);
+            foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
+            {
+                rList.Add (new KeyValuePair<Element, int> (elements.Find(n => (n.symbole == elt[0])), elt[1].AsInt));
+            }
+            ReactionType rt = reactionTypes.Find (n => n.name == r["type"]);
+            if (null == rt) {
+                rt = new ReactionType (r["type"]);
+                reactionTypes.Add (rt);
+            }
+            reactions.Add (new Reaction (r["reaction"], r["products"], rList, rt));
+        }
+
 		players.Add (new Player ());
 	}
 

@@ -1,22 +1,20 @@
 [
 	{
-		"reagents" : [["H",2],"O"],
-		"infos" : "Eau (H20)",
-		"type" : "Eau"
+		"reagents" : [["H",2],["O",1]],
+		"reaction": "2H+O",
+		"products" : "H2O",
+		"infos" : "Eau (H2O)",
+		"type" : "Eau",
+		"cost" : 4,
+		"gain" : 5
 	},
 	{
-		"reagents" : ["Na","O","H"],
+		"reagents" : [["Na",1],["O",1],["H",1]],
+		"reaction" : "Na+O+H",
+		"products" : "Na+ + HO-",
 		"infos" : "Alliage de sodium + Eau",
-		"type" : "Explosion"
-	},
-	{
-		"reagents" : ["Rb","H","O"],
-		"infos" : "Rubidium + Eau (RbH20)",
-		"type" : "Explosion"
-	},
-	{
-		"reagents" : [["N",2],["H",8],["Cr",2],["O",7]],
-		"infos" : "Dichromate d'amonium ((NH4)2 Cr2O7)",
-		"type" : "Feu"
+		"type" : "Explosion",
+		"cost" : 4,
+		"gain" : 5
 	}
 ]
