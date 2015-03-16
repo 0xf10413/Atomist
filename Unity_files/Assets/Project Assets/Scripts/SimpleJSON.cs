@@ -158,6 +158,17 @@ namespace SimpleJSON
                 Value = (value)?"true":"false";
             }
         }
+        public virtual string AsString
+        {
+            get
+            {
+                return Value;
+            }
+            set
+            {
+                Value = value;
+            }
+        }
         public virtual JSONArray AsArray
         {
             get

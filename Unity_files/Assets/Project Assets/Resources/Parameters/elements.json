@@ -5,6 +5,7 @@
 		"atomicNumber" : 13,
 		"family" : "Métal Pauvre",
 		"file" : "aluminium",
+		"nb_in_pick" : 2,
 		"energy" : 3
 	},
 	{
@@ -13,6 +14,7 @@
 		"atomicNumber" : 18,
 		"family" : "Gaz Noble",
 		"file" : "argon",
+		"nb_in_pick" : 1,
 		"energy" : 0
 	},
 	{
@@ -21,6 +23,7 @@
 		"atomicNumber" : 7,
 		"family" : "Non-Métal",
 		"file" : "azote",
+		"nb_in_pick" : 2,
 		"energy" : 7
 	},
 	{
@@ -29,6 +32,7 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "carbone",
+		"nb_in_pick" : 2,
 		"energy" : 2
 	},
 ]
