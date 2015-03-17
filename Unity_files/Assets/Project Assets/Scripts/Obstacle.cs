@@ -16,9 +16,11 @@ public class Obstacle
     /// </summary>
     /// <param name="nName">Le nom de l'obstacle.</param>
     /// <param name="fileName">Le nom du fichier image (sans extension).</param>
-    public Obstacle (string nName, string fileName)
+    /// <param name="wweakness">Le type de réaction contre laquelle l'obstacle est faible.</param>
+    public Obstacle (string nName, string fileName, ReactionType wweakness)
     {
         name = nName;
         obstacleResource = Resources.Load<Sprite> ("Images/Obstacles/" + fileName);
+        weakness = wweakness;
     }
 }

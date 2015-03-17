@@ -11,6 +11,7 @@ public class Player {
     List<Penalty> penalties; // Liste des pénalités du joueur (gaz moutarde, ...)
     public GameObject playerScreen {get;set;} // Ecran de jeu contenant le plateau, les cartes, le score, la liste des réactions
     public ReactionType currentReactionSelected;
+    List<ObstacleToken> obstacles = new List<ObstacleToken> ();
 
 	public Player () {
         playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
@@ -41,9 +42,24 @@ public class Player {
 
         currentReactionSelected = Main.reactionTypes[0];
         updateReactionsList();
+
+        // Ajout manuel des (jetons d') obstacles
+        ObstacleToken o = new ObstacleToken (Main.obstacles.Find (oo => oo.name == "Métal"), playerScreen.transform.Find("BoardGame").gameObject);
+
+        Main.Write (o.obstacleImg.transform.localPosition);
+        o.obstacleImg.transform.localPosition =
+      new Vector2 (playerScreen.transform.Find ("BoardGame/First Obstacle").GetComponent<RectTransform> ().localPosition.x,
+        playerScreen.
+            transform.
+            Find ("BoardGame/First Obstacle")
+            .GetComponent<RectTransform> ()
+            .localPosition.y);
+
+        obstacles.Add (o);
 	}
 
-    public void updateReactionsList() {
+    public void updateReactionsList ()
+    {
         GameObject reactionsList = playerScreen.transform.Find("Reactions/Reactions list").gameObject;
         Main.removeAllChilds(reactionsList);
         foreach (Reaction reaction in Main.reactions) {

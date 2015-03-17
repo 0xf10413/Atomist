@@ -11,11 +11,12 @@ public class Main : MonoBehaviour {
 
 	public static Main context;
 
-    public static List<Element> elements { private set; get; } // Liste des éléments, fixée au démarrage
+    public static List<Element> elements { private set; get; }   // Liste des éléments, fixée au démarrage
     public static List<Reaction> reactions { private set; get; } // Liste des réaction, fixée au démarrage
+    public static List<Obstacle> obstacles { private set; get; } // Liste des obtacles, fixée au démarrage
 	
 	public static List<Player> players = new List<Player>(); // La liste des joueurs
-    public static List<Obstacle> obstacles = new List<Obstacle>(); // liste des obtacles
+    
     public static List<ReactionType> reactionTypes = new List<ReactionType> (); // liste des types de réaction
     public static List<KeyValuePair<Element,int>> pick = new List<KeyValuePair<Element,int>>(); // La pioche : liste de paires (élément, nombre de fois où cet élément apparait dans la pioche)
 	public static int turnID = 0; // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
@@ -55,7 +56,15 @@ public class Main : MonoBehaviour {
             reactions.Add (new Reaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
         }
 
-		players.Add (new Player ());
+        // Génération de la liste des (types d') obstacles, ainsi que des jetons
+        obstacles = new List<Obstacle> ();
+        obstacles.Add (new Obstacle ("Débris", "debris", reactionTypes.Find (n => n.name == "Explosion")));
+        obstacles.Add (new Obstacle ("Flamme", "flamme", reactionTypes.Find (n => n.name == "Eau")));
+        obstacles.Add (new Obstacle ("Feu", "glace", reactionTypes.Find (n => n.name == "Feu")));
+        obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide"))); 
+
+        
+        players.Add (new Player ());
         players[0].BeginTurn();
 	}
 
