@@ -28,14 +28,23 @@ public class Deck {
 	}
 	
 	/// <summary>
-	/// Retire une carte de la main du joueur
+	/// Retire des cartes de la main du joueur
 	/// </summary>
 	/// <param name="element">L'élément associé à la carte</param>
-	public void RemoveCard(Element element) {
+    /// <param name="nb">Le nombre de cartes à retirer</param>
+	public void RemoveCards(Element element, int nb) {
 		Card c = listCards.Find (ca => (ca.element.name==element.name));
 		if (c != null) {
-			c.nbCards--;
-			listCards.Remove(c);
+            if (c.nbSelected >= nb)
+                c.nbSelected -= nb;
+            else
+                c.nbSelected = 0;
+            if (c.nbCards > nb)
+                c.nbCards -= nb;
+            else {
+                c.remove();
+    			listCards.Remove(c);
+            }
 			updatePositions ();
 		}
 	}
@@ -43,6 +52,14 @@ public class Deck {
 	public Card getCard(int i) {
 		return listCards [i];
 	}
+	/// <summary>
+	/// Retourne la carte du joueur contenant l'élément elt
+    /// Si le joueur n'a pas la carte, retourne null
+	/// </summary>
+	/// <param name="elt"></param>
+    public Card getCard(Element elt) {
+        return listCards.Find(c => c.element == elt);
+    }
 	// Retourne le nombre de types de cartes possédées par le joueur
 	public int getNbCards() {
 		int res = 0;

@@ -5,11 +5,11 @@ using System.Collections.Generic;
 /// <summary>
 /// Contient les informations d'une réaction chimique : réactifs, produits
 /// </summary>
-public class Reaction {
+public abstract class Reaction {
 
 	public string reagents  { private set; get; } // Texte contenant les réactifs
 	public string products  { private set; get; } // Texte contenant les produits
-	public List<KeyValuePair<Element,int>> reagentsList  { private get; set; } // Liste de couples (élément, stoechiométrie)
+	public List<KeyValuePair<Element,int>> reagentsList { get; private set; } // Liste de couples (élément, stoechiométrie)
 	public ReactionType type { private set; get; } // Type de réaction (glace, feu, etc)
     public int cost { private set; get; }
     public int gain { private set; get; }
@@ -31,4 +31,6 @@ public class Reaction {
         cost = cCost;
         gain = gGain;
 	}
+
+    public abstract void effect();
 }

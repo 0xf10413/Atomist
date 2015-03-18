@@ -35,4 +35,31 @@
 		"nb_in_pick" : 2,
 		"energy" : 2
 	},
+	{
+		"name" : "Hydrogène",
+		"symbol" : "H",
+		"atomicNumber" : 6,
+		"family" : "Non-Métal",
+		"file" : "hydrogene",
+		"nb_in_pick" : 2,
+		"energy" : 2
+	},
+	{
+		"name" : "Oxygène",
+		"symbol" : "O",
+		"atomicNumber" : 6,
+		"family" : "Non-Métal",
+		"file" : "oxygene",
+		"nb_in_pick" : 2,
+		"energy" : 2
+	},
+	{
+		"name" : "Chlore",
+		"symbol" : "Cl",
+		"atomicNumber" : 6,
+		"family" : "Non-Métal",
+		"file" : "chlore",
+		"nb_in_pick" : 2,
+		"energy" : 2
+	}
 ]

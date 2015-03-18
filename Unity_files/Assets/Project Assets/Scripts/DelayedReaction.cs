@@ -18,7 +18,20 @@ public class DelayedReaction : Reaction {
         base(tReagents,tProducts,lReagents,nType, cCost, gGain) {
 	}
 
-	public void inflige(Player cible) {
+	public void inflict(Player cible) {
 
 	}
+
+    public override void effect() {
+        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SelectPlayerDialog"));
+        Player currentPlayer = Main.currentPlayer();
+        foreach (Player p in Main.players) {
+            if (p != currentPlayer) {
+                GameObject playerSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerSelector"));
+                Main.addClickEvent(playerSelector, delegate {
+                    inflict(p);
+                });
+            }
+        }
+    }
 }

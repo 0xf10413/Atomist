@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 /**
  * <summary>
@@ -46,14 +48,14 @@ public class Main : MonoBehaviour {
             List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
             foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
             {
-                rList.Add (new KeyValuePair<Element, int> (elements.Find(n => (n.symbole == elt[0].AsString)), elt[1].AsInt));
+                rList.Add (new KeyValuePair<Element, int> (getElementBySymbol(elt[0].AsString), elt[1].AsInt));
             }
             ReactionType rt = reactionTypes.Find (n => n.name == r["type"].AsString);
             if (null == rt) {
                 rt = new ReactionType (r["type"]);
                 reactionTypes.Add (rt);
             }
-            reactions.Add (new Reaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
+            reactions.Add (new ObstacleReaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
         }
 
         // Génération de la liste des (types d') obstacles, ainsi que des jetons
@@ -67,6 +69,81 @@ public class Main : MonoBehaviour {
         players.Add (new Player ());
         players[0].BeginTurn();
 	}
+    
+    public delegate void Confirm();
+    public delegate void Undo();
+
+    public delegate void Del();
+
+    public static void addClickEvent(GameObject go, Del onClick) {
+		EventTrigger.Entry clicEvent = new EventTrigger.Entry();
+		clicEvent.eventID = EventTriggerType.PointerClick;
+		clicEvent.callback = new EventTrigger.TriggerEvent();
+		UnityEngine.Events.UnityAction<BaseEventData> clicCallback =
+			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
+                onClick();
+            });
+		clicEvent.callback.AddListener(clicCallback);
+		go.AddComponent<EventTrigger>().delegates = new List<EventTrigger.Entry>();
+		go.GetComponent<EventTrigger>().delegates.Add(clicEvent);
+    }
+
+    
+
+    /// <summary>
+    /// Affiche une boîte de dialogue avec une opération à cofirmer
+    /// </summary>
+    /// <param name="message">Le message à afficher</param>
+    /// <param name="onClickedYes">Un delegate appelé lorsque l'utilisateur à cliqué sur "Oui"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject confirmDialog(string message, Del onClickedYes) {
+        return confirmDialog(message,onClickedYes,delegate{});
+    }
+
+    /// <summary>
+    /// Affiche une boîte de dialogue avec une opération à cofirmer
+    /// </summary>
+    /// <param name="message">Le message à afficher</param>
+    /// <param name="onClickedYes">Un delegate appelé lorsque l'utilisateur à cliqué sur "Oui"</param>
+    /// <param name="onClickedNo">Un delegate appelé lorsque l'utilisateur à cliqué sur "Non"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject confirmDialog(string message, Del onClickedYes, Del onClickedNo) {
+        GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ConfirmDialog"));
+        res.transform.SetParent(currentPlayer().playerScreen.transform);
+        res.transform.localPosition = new Vector3(0,0,0);
+        res.transform.Find("Message").GetComponent<Text>().text = message;
+        addClickEvent(res.transform.Find("Yes Button").gameObject, delegate {
+            GameObject.Destroy(res);
+            onClickedYes();
+        });
+        addClickEvent(res.transform.Find("No Button").gameObject, delegate {
+            GameObject.Destroy(res);
+            onClickedNo();
+        });
+        return res;
+    }
+
+    /// <summary>
+    /// Affiche une boîte de dialogue d'information
+    /// </summary>
+    /// <param name="message">Le message à afficher</param>
+    /// <param name="onClickedYes">Un delegate appelé lorsque l'utilisateur à cliqué sur "Oui"</param>
+    /// <param name="onClickedNo">Un delegate appelé lorsque l'utilisateur à cliqué sur "Non"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject infoDialog(string message) {
+        return infoDialog(message,delegate{});
+    }
+    public static GameObject infoDialog(string message, Del onValid) {
+        GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/InfoDialog"));
+        res.transform.SetParent(currentPlayer().playerScreen.transform);
+        res.transform.localPosition = new Vector3(0,0,0);
+        res.transform.Find("Message").GetComponent<Text>().text = message;
+        addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
+            GameObject.Destroy(res);
+            onValid();
+        });
+        return res;
+    }
 
     /// <summary>
     /// Retourne une carte élément choisie au hasard dans la pioche
@@ -85,10 +162,18 @@ public class Main : MonoBehaviour {
         return null; // Cette ligne ne sert à rien à part éviter une erreur de compilation
     }
 
+    /// <summary>
+    /// Supprime tous les enfants d'un gameObject
+    /// </summary>
+    /// <param name="parent">Le gameObject dont on veut supprimer les enfants</param>
     public static void removeAllChilds(GameObject parent) {
         int childCount = parent.transform.childCount;
         for (int i=childCount-1; i>=0; i--)
             GameObject.Destroy(parent.transform.GetChild(i).gameObject);
+    }
+
+    public static Element getElementBySymbol(string symbol) {
+        return elements.Find(n => (n.symbole == symbol));
     }
 
 	/**

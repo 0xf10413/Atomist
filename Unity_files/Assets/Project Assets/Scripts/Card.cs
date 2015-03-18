@@ -50,17 +50,13 @@ public class Card {
 		cardImg = new GameObject ();
 		cardImg.name = "Card(s) "+ nElement.symbole; // Nom de l'objet (celui qui apparait dans la hiérarchie)
 		cardImg.AddComponent<Image>();
-		cardImg.GetComponent<Image> ().sprite = nElement.cardRessource;
+		cardImg.GetComponent<Image>().sprite = nElement.cardRessource;
 		
 		cardImg.AddComponent<EventTrigger>();
 		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
 
 		// Ajout d'un événement de sélection de la carte au clic de la souris
-		EventTrigger.Entry clicEvent = new EventTrigger.Entry();
-		clicEvent.eventID = EventTriggerType.PointerDown;
-		clicEvent.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> clicCallback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
+        Main.addClickEvent(cardImg, delegate {
 				if (_nbSelected == N) {
 					nbSelected = 0;
 					Object.Destroy(cardSelected);
@@ -70,18 +66,16 @@ public class Card {
 						// Ajout de l'élément de sélection (cadre bleu)
 						cardSelected = new GameObject();
 						cardSelected.name = "Card Selected";
-						cardSelected.transform.parent = cardImg.transform;
+						cardSelected.transform.SetParent(cardImg.transform);
 						cardSelected.AddComponent<Image> ();
 						cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
-						cardSelected.GetComponent<Image> ().GetComponent<RectTransform>().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
-						cardSelected.GetComponent<Image> ().GetComponent<RectTransform>().localPosition = new Vector2 (0,0); // Position
+						cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
+						cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
 						infosNb.transform.SetParent(infosNb.transform.parent);
 					}
 					nbSelected++;
 				}
-			});
-		clicEvent.callback.AddListener(clicCallback);
-		cardImg.GetComponent<EventTrigger>().delegates.Add(clicEvent);
+		});
 
 		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
 		EventTrigger.Entry overEvent = new EventTrigger.Entry();
@@ -96,8 +90,8 @@ public class Card {
 					cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find ("BoardGame"));
 					cardPreview.AddComponent<Image> ();
 					cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
-					cardPreview.GetComponent<Image> ().GetComponent<RectTransform>().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
-					cardPreview.GetComponent<Image> ().GetComponent<RectTransform>().localPosition = new Vector2 (0,0); // Position
+					cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
+					cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
 				}
 			});
 		overEvent.callback.AddListener(overCallback);
@@ -120,7 +114,7 @@ public class Card {
 		
 		cardImg.transform.SetParent(Main.currentPlayer().playerScreen.gameObject.transform.Find ("Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
-		RectTransform imgParams = cardImg.GetComponent<Image> ().GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
+		RectTransform imgParams = cardImg.GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
 		imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
 		
 		infosNb = new GameObject ();
@@ -133,7 +127,7 @@ public class Card {
 		infosNb.GetComponent<Text> ().font = (Font)Resources.GetBuiltinResource (typeof(Font), "Arial.ttf");
 		infosNb.GetComponent<Text> ().fontSize = 25;
 		infosNb.GetComponent<Text> ().fontStyle = FontStyle.Bold;
-		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (30f,-96f*Screen.height/Screen.width);
+		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (20f,-96f*Screen.height/Screen.width);
 		infosNb.GetComponent<Text> ().alignment = TextAnchor.MiddleCenter;
 
 		element = nElement;
@@ -142,11 +136,14 @@ public class Card {
 	
 	public void updateX(float posX) {
 		x = posX;
-		RectTransform imgParams = cardImg.GetComponent<Image> ().GetComponent<RectTransform> ();
+		RectTransform imgParams = cardImg.GetComponent<RectTransform> ();
 		imgParams.localPosition = new Vector2 (x,y); // attention, c'est l'attribut "localPosition" et non "position" qui contient les coordonnées
 	}
 	public void updateText() {
 		infosNb.GetComponent<Text> ().color = (nbSelected>0) ? Color.cyan : Color.yellow;
 		infosNb.GetComponent<Text> ().text = (N>1) ? ((nbSelected>0) ? nbSelected+"/"+N:("×" + N)):"";
 	}
+    public void remove() {
+        GameObject.Destroy(cardImg);
+    }
 }

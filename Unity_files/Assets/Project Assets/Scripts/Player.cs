@@ -26,18 +26,12 @@ public class Player {
             icon.name = reactionType.name;
             icon.GetComponent<Image>().sprite = reactionType.icon;
 
-		    // Ajout d'un événement de sélection de la carte au clic de la souris
-		    EventTrigger.Entry clicEvent = new EventTrigger.Entry();
-		    clicEvent.eventID = EventTriggerType.PointerDown;
-		    clicEvent.callback = new EventTrigger.TriggerEvent();
+		    // Ajout d'un événement au clic de la souris
             ReactionType rType = reactionType; // On rend la variable locale pour le delegate, sinon ça fait de la merde
-		    UnityEngine.Events.UnityAction<BaseEventData> clicCallback =
-			    new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-                    currentReactionSelected = rType;
-                    updateReactionsList();
-			    });
-		    clicEvent.callback.AddListener(clicCallback);
-		    icon.GetComponent<EventTrigger>().delegates.Add(clicEvent);
+            Main.addClickEvent(icon, delegate {
+                currentReactionSelected = rType;
+                updateReactionsList();
+			});
         }
 
         currentReactionSelected = Main.reactionTypes[0];
@@ -46,7 +40,8 @@ public class Player {
         // Ajout manuel des (jetons d') obstacles
         ObstacleToken o = new ObstacleToken (Main.obstacles.Find (oo => oo.name == "Métal"), playerScreen.transform.Find("BoardGame").gameObject);
 
-        Main.Write (o.obstacleImg.transform.localPosition);
+		// TODO
+      /*  Main.Write (o.obstacleImg.transform.localPosition);
         o.obstacleImg.transform.localPosition =
       new Vector2 (playerScreen.transform.Find ("BoardGame/First Obstacle").GetComponent<RectTransform> ().localPosition.x,
         playerScreen.
@@ -55,7 +50,7 @@ public class Player {
             .GetComponent<RectTransform> ()
             .localPosition.y);
 
-        obstacles.Add (o);
+        obstacles.Add (o);*/
 	}
 
     public void updateReactionsList ()
@@ -68,20 +63,54 @@ public class Player {
                 button.transform.SetParent(playerScreen.transform.Find("Reactions/Reactions list"));
                 button.name = reaction.reagents;
                 button.transform.localScale = new Vector3(1,1,1);
-                button.transform.Find("Text").GetComponent<Text>().text = reaction.reagents + "->"+ reaction.products;
+                button.transform.Find("Text").GetComponent<Text>().text = reaction.reagents + " -> "+ reaction.products;
+                
+		        // Ajout d'un événement au clic de la souris
+                    Reaction r = reaction;
+                Main.addClickEvent(button, delegate {
+                    // On vérifie si la réaction est faisable avec les éléments sélectionnés
+                    bool possibleReaction = true;
+                    foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
+                        Card eltCard = deck.getCard(reagents.Key);
+                        if (eltCard == null) {
+                            possibleReaction = false;
+                            break;
+                        }
+                        if (eltCard.nbSelected < reagents.Value) {
+                            possibleReaction = false;
+                            break;
+                        }
+                    }
+                    if (possibleReaction) {
+                        Main.confirmDialog("Confirmer cette réaction ?", delegate {
+                            foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
+                                Card eltCard = deck.getCard(reagents.Key);
+                                deck.RemoveCards(reagents.Key,reagents.Value);
+                                r.effect();
+                            }
+                        });
+                    }
+                    else
+                        Main.infoDialog("La réaction est impossible avec les objects sélectionnés");
+			    });
             }
         }
     }
 
-    public void test() {
-		deck.AddCard (Main.elements[0]); // Ajout de la carte "aluminium"
-		deck.AddCard (Main.elements[1]); // Ajout de la carte "argon"
-		deck.AddCard (Main.elements[2]); // Ajout de la carte "azote"
-		deck.AddCard (Main.elements[1]); // Ajout de la carte "argon"
-    }
-
     public void BeginTurn() {
         playerScreen.SetActive(true);
+        /*// On pioche 2 cartes
+        for (int i=0;i<2;i++)
+            deck.AddCard(Main.pickCard());*/
+        deck.AddCard(Main.getElementBySymbol("O"));
+        deck.AddCard(Main.getElementBySymbol("O"));
+        deck.AddCard(Main.getElementBySymbol("H"));
+        deck.AddCard(Main.getElementBySymbol("H"));
+        deck.AddCard(Main.getElementBySymbol("H"));
+        deck.AddCard(Main.getElementBySymbol("H"));
+        deck.AddCard(Main.getElementBySymbol("Cl"));
+        deck.AddCard(Main.getElementBySymbol("Cl"));
+        deck.AddCard(Main.getElementBySymbol("Al"));
     }
     public void EndTurn() {
         playerScreen.SetActive(false);
