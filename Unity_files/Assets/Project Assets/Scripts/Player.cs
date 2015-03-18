@@ -9,7 +9,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
 	
 	Deck deck = new Deck(); // Liste des cartes du joueur
-    List<Penalty> penalties; // Liste des pénalités du joueur (gaz moutarde, ...)
+    public List<Penalty> penalties; // Liste des pénalités du joueur (gaz moutarde, ...)
     private int _energy;
 	public int energy { get {
         return _energy;
