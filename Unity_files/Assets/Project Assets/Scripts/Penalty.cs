@@ -2,13 +2,13 @@
 using System.Collections;
 
 /// <summary>
-/// Représente une pénalité infligée à un joueur : le nombre de tours à partir duquel la pénalité a lieu, et l'effet à déclancher
+/// Représente une pénalité infligée à un joueur : le nombre de tours à partir duquel la pénalité a lieu, et l'effet à déclencher.
 /// </summary>
 public class Penalty {
     public delegate void Effect(Penalty p);
 
-	int remainingTurns { get; set; } // Nombre de tours avant effet. Vaut -1 si la réaction n'implique pas un certain nombre de tours avant effet
-	Player target { get; set; } // Joueur à attaquer
+	public int remainingTurns { get; private set; } // Nombre de tours avant effet. Vaut -1 si la réaction n'implique pas un certain nombre de tours avant effet
+	public Player target { get; private set; } // Joueur à attaquer
 	public Effect effect; // "Pointeur sur fonction" appelé au début du tour du joueur
 
     /// <summary>
@@ -22,4 +22,23 @@ public class Penalty {
 		target = nTarget;
 		effect = nEffect;
 	}
+
+    /// <summary>
+    /// Fait passer un tour à la pénalité. Attention, un compteur négatif (ou nul)
+    /// n'est pas modifié.
+    /// </summary>
+    public void newTurn ()
+    {
+        if (remainingTurns > 0)
+         remainingTurns--;
+    }
+
+    /// <summary>
+    /// Teste si la pénalité est active (compteur négatif ou nul).
+    /// </summary>
+    /// <returns>Vrai ssi la pénalité est active.</returns>
+    public bool isActive ()
+    {
+        return remainingTurns <= 0;
+    }
 }

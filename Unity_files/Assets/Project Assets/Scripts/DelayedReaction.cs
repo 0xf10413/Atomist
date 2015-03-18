@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Contient une réaction à retardement, c'est-à-dire une réaction qui a un effet sur le joueur au bout d'un certain nombre de tours
+/// Contient une réaction à retardement, c'est-à-dire une réaction qui a un effet sur le joueur au bout d'un certain nombre de tours.
 /// </summary>
-public class DelayedReaction : Reaction {
+abstract public class DelayedReaction : Reaction {
 
     /// <summary>
     /// Constructeur de la réaction
@@ -18,9 +18,7 @@ public class DelayedReaction : Reaction {
         base(tReagents,tProducts,lReagents,nType, cCost, gGain) {
 	}
 
-	public void inflict(Player cible) {
-
-	}
+    abstract public void inflict (Player cible);
 
     public override void effect(Player maker) {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SelectPlayerDialog"));

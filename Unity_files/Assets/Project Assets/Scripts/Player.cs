@@ -9,7 +9,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
 	
 	Deck deck = new Deck(); // Liste des cartes du joueur
-    public List<Penalty> penalties; // Liste des pénalités du joueur (gaz moutarde, ...)
+
     private int _energy;
 	public int energy { get {
         return _energy;
@@ -18,6 +18,7 @@ public class Player {
         playerScreen.transform.Find("Energy container/nbPts").GetComponent<Text>().text = _energy.ToString();
     }}
     public int salle {get; set;}
+    public List<Penalty> penalties { get; set; } // Liste des pénalités du joueur (gaz moutarde, ...)
     public GameObject playerScreen {get;set;} // Ecran de jeu contenant le plateau, les cartes, le score, la liste des réactions
     public ReactionType currentReactionSelected {get;set;}
     public List<ObstacleToken> obstacles {get;set;}
@@ -27,6 +28,7 @@ public class Player {
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
         playerScreen.SetActive(false);
+        penalties = new List<Penalty> ();
 
         salle = 0;
         energy = ENERGY0;
@@ -48,6 +50,10 @@ public class Player {
 
         currentReactionSelected = Main.reactionTypes[0];
         updateReactionsList();
+
+      
+        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate { EndTurn (); });
+        penalties.Add (new Penalty (2, this, p => { Main.infoDialog ("Tour annulé !", delegate { p.target.EndTurn (); }); }));
 	}
 
     public void updateReactionsList ()
@@ -112,7 +118,15 @@ public class Player {
     }
 
     public void BeginTurn() {
+        Main.Write ("Beginning a turn !");
         playerScreen.SetActive(true);
+        for (int i=0; i<penalties.Count; i++)
+            if (penalties[i].isActive ()) {
+                Penalty p = penalties[i];
+                penalties.Remove (penalties[i]);
+                p.effect (p);
+            }
+        
         /*// On pioche 2 cartes
         for (int i=0;i<2;i++)
             deck.AddCard(Main.pickCard());*/
@@ -127,6 +141,10 @@ public class Player {
         deck.AddCard(Main.getElementBySymbol("Al"));
     }
     public void EndTurn() {
+        Main.Write ("Ending a turn !");
+        foreach (Penalty p in penalties)
+            p.newTurn ();
         playerScreen.SetActive(false);
+        Main.nextPlayer ();
     }
 }

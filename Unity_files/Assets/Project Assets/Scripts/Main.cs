@@ -65,8 +65,8 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide"))); 
 
-        
         players.Add (new Player ());
+        //players.Add (new Player ());
         players[0].BeginTurn();
 	}
     
@@ -91,7 +91,7 @@ public class Main : MonoBehaviour {
     
 
     /// <summary>
-    /// Affiche une boîte de dialogue avec une opération à cofirmer
+    /// Affiche une boîte de dialogue avec une opération à confirmer
     /// </summary>
     /// <param name="message">Le message à afficher</param>
     /// <param name="onClickedYes">Un delegate appelé lorsque l'utilisateur à cliqué sur "Oui"</param>
@@ -224,5 +224,11 @@ public class Main : MonoBehaviour {
 	/// </summary>
     public static Player currentPlayer() {
         return players[turnID];
+    }
+
+    public static void nextPlayer ()
+    {
+        turnID = (turnID + 1) % players.Count;
+        players[turnID].BeginTurn ();
     }
 }
