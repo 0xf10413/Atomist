@@ -41,16 +41,11 @@ public class Player {
         ObstacleToken o = new ObstacleToken (Main.obstacles.Find (oo => oo.name == "Métal"), playerScreen.transform.Find("BoardGame").gameObject);
 
 		// TODO
-      /*  Main.Write (o.obstacleImg.transform.localPosition);
-        o.obstacleImg.transform.localPosition =
-      new Vector2 (playerScreen.transform.Find ("BoardGame/First Obstacle").GetComponent<RectTransform> ().localPosition.x,
-        playerScreen.
-            transform.
-            Find ("BoardGame/First Obstacle")
-            .GetComponent<RectTransform> ()
-            .localPosition.y);
+        Main.Write (o.obstacleImg.transform.localPosition);
+        
+        o.obstacleImg.transform.localPosition = new Vector2 (playerScreen.transform.Find ("BoardGame/First Obstacle").GetComponent<RectTransform> ().localPosition.x,playerScreen.transform.Find ("BoardGame/First Obstacle").GetComponent<RectTransform> ().localPosition.y);
 
-        obstacles.Add (o);*/
+        obstacles.Add (o);
 	}
 
     public void updateReactionsList ()
@@ -63,7 +58,7 @@ public class Player {
                 button.transform.SetParent(playerScreen.transform.Find("Reactions/Reactions list"));
                 button.name = reaction.reagents;
                 button.transform.localScale = new Vector3(1,1,1);
-                button.transform.Find("Text").GetComponent<Text>().text = reaction.reagents + " -> "+ reaction.products;
+                button.transform.Find("Text").GetComponent<Text>().text = reaction.reagents + " → "+ reaction.products;
                 
 		        // Ajout d'un événement au clic de la souris
                     Reaction r = reaction;
