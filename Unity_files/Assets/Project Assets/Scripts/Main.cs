@@ -36,7 +36,7 @@ public class Main : MonoBehaviour {
 		elements = new List<Element> ();
 		SimpleJSON.JSONArray elementsInfos = loadJSONFile("elements").AsArray;
 		foreach (SimpleJSON.JSONNode elementInfos in elementsInfos) {
-            Element nElement = new Element(elementInfos["name"],elementInfos["symbol"], elementInfos["atomicNumber"].AsInt, elementInfos["family"], elementInfos["file"], elementInfos["energy"].AsInt);
+            Element nElement = new Element(elementInfos["name"],elementInfos["symbol"], elementInfos["atomicNumber"].AsInt, elementInfos["family"], elementInfos["file"]);
 			elements.Add(nElement);
             pick.Add(new KeyValuePair<Element,int>(nElement,elementInfos["nb_in_pick"].AsInt));
 		}
@@ -62,7 +62,7 @@ public class Main : MonoBehaviour {
         obstacles = new List<Obstacle> ();
         obstacles.Add (new Obstacle ("Débris", "debris", reactionTypes.Find (n => n.name == "Explosion")));
         obstacles.Add (new Obstacle ("Flamme", "flamme", reactionTypes.Find (n => n.name == "Eau")));
-        obstacles.Add (new Obstacle ("Feu", "glace", reactionTypes.Find (n => n.name == "Feu")));
+        obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide"))); 
 
         
@@ -170,6 +170,27 @@ public class Main : MonoBehaviour {
         int childCount = parent.transform.childCount;
         for (int i=childCount-1; i>=0; i--)
             GameObject.Destroy(parent.transform.GetChild(i).gameObject);
+    }
+
+    /// <summary>
+    /// Retourne la liste des enfants d'un gameobject possédant un certain nom
+    /// </summary>
+    /// <param name="parent">Le gameObject dont on cherche les enfants</param>
+    /// <param name="name">Le nom à chercher</param>
+    /// <returns>Une liste de GameObject</returns>
+    public static List<GameObject> findChildsByName(GameObject parent, string name) {
+        List<GameObject> res = new List<GameObject>();
+ 
+        for (int i = 0; i < parent.transform.childCount; ++i) {
+            GameObject child = parent.transform.GetChild(i).gameObject;
+            if (child.name == name)
+                res.Add(child);
+            List<GameObject> result = findChildsByName(child, name);
+            foreach (GameObject go in result)
+                res.Add(go);
+        }
+ 
+        return res;
     }
 
     public static Element getElementBySymbol(string symbol) {

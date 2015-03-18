@@ -10,6 +10,13 @@ public class ObstacleReaction : Reaction {
         base(tReagents,tProducts,lReagents,nType, cCost, gGain) {
 	}
 
-    public override void effect() {
+    public override void effect(Player maker) {
+        foreach (ObstacleToken obstacle in maker.obstacles) {
+            if ((obstacle.salle == maker.salle) && (obstacle.obstacle.weakness == type)) {
+                obstacle.destroy();
+                break;
+            }
+        }
+        maker.consumeForReaction(this);
     }
 }

@@ -5,8 +5,7 @@
 		"atomicNumber" : 13,
 		"family" : "Métal Pauvre",
 		"file" : "aluminium",
-		"nb_in_pick" : 2,
-		"energy" : 3
+		"nb_in_pick" : 2
 	},
 	{
 		"name" : "Argon",
@@ -14,8 +13,7 @@
 		"atomicNumber" : 18,
 		"family" : "Gaz Noble",
 		"file" : "argon",
-		"nb_in_pick" : 1,
-		"energy" : 0
+		"nb_in_pick" : 1
 	},
 	{
 		"name" : "Azote",
@@ -23,8 +21,7 @@
 		"atomicNumber" : 7,
 		"family" : "Non-Métal",
 		"file" : "azote",
-		"nb_in_pick" : 2,
-		"energy" : 7
+		"nb_in_pick" : 2
 	},
 	{
 		"name" : "Carbone",
@@ -32,8 +29,7 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "carbone",
-		"nb_in_pick" : 2,
-		"energy" : 2
+		"nb_in_pick" : 2
 	},
 	{
 		"name" : "Hydrogène",
@@ -41,8 +37,7 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
-		"nb_in_pick" : 2,
-		"energy" : 2
+		"nb_in_pick" : 2
 	},
 	{
 		"name" : "Oxygène",
@@ -50,8 +45,7 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "oxygene",
-		"nb_in_pick" : 2,
-		"energy" : 2
+		"nb_in_pick" : 2
 	},
 	{
 		"name" : "Chlore",
@@ -59,7 +53,6 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "chlore",
-		"nb_in_pick" : 2,
-		"energy" : 2
+		"nb_in_pick" : 2
 	}
 ]

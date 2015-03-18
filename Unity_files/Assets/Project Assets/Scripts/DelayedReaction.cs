@@ -22,7 +22,7 @@ public class DelayedReaction : Reaction {
 
 	}
 
-    public override void effect() {
+    public override void effect(Player maker) {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SelectPlayerDialog"));
         Player currentPlayer = Main.currentPlayer();
         foreach (Player p in Main.players) {

@@ -32,5 +32,5 @@ public abstract class Reaction {
         gain = gGain;
 	}
 
-    public abstract void effect();
+    public abstract void effect(Player maker);
 }
