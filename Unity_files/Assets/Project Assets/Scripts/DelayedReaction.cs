@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -21,13 +22,27 @@ abstract public class DelayedReaction : Reaction {
     abstract public void inflict (Player cible);
 
     public override void effect(Player maker) {
-        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SelectPlayerDialog"));
-        Player currentPlayer = Main.currentPlayer();
+        GameObject mask = Main.AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerSelectorDialog"));
+        dialog.transform.SetParent(mask.transform);
+        dialog.transform.localPosition = new Vector3(0,0,0);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        Main.addClickEvent(mask, delegate {
+            GameObject.Destroy(mask);
+        });
         foreach (Player p in Main.players) {
-            if (p != currentPlayer) {
-                GameObject playerSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerSelector"));
+            if (p != maker) {
+                GameObject playerSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerSelectorButton"));
+                playerSelector.transform.SetParent(dialog.transform.Find("PlayersList"));
+                playerSelector.transform.Find("Text").gameObject.GetComponent<Text>().text = p.name;
+
+                Player localVarP = p; 
                 Main.addClickEvent(playerSelector, delegate {
-                    inflict(p);
+                    Object.Destroy(dialog);
+                    Object.Destroy(mask);
+                    maker.consumeForReaction(this);
+                    inflict(localVarP);
                 });
             }
         }

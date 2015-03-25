@@ -14,6 +14,11 @@ public class PoisonReaction : DelayedReaction
 
     public override void inflict(Player target)
     {
-        target.penalties.Add (new Penalty (nbOfTurns, target, p => { Main.infoDialog ("Tour annulé !", delegate { p.target.EndTurn (); }); }));
+        target.penalties.Add (new Penalty (nbOfTurns, target, p => {
+            p.target.undoTurn ();
+            Main.infoDialog ("Au tour de "+ target.name +"\nTour annulé !", delegate {
+                p.target.EndTurn();
+            });
+        }));
     }
 }

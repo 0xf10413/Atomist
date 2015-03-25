@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class Player {
 
     public const int ENERGY0 = 4; // Energie initiale du joueur
+    public const int DELTA_ENERGY = 3; // Gain d'énergie au début de chaque tour
 	
 	Deck deck = new Deck(); // Liste des cartes du joueur
 
@@ -22,8 +23,12 @@ public class Player {
     public GameObject playerScreen {get;set;} // Ecran de jeu contenant le plateau, les cartes, le score, la liste des réactions
     public ReactionType currentReactionSelected {get;set;}
     public List<ObstacleToken> obstacles {get;set;}
+    public bool isTurn; // Vaut true Ssi c'est le tour de ce joueur
+    public string name {get;set;} // Nom du joueur
 
-	public Player () {
+	public Player (string nName) {
+        name = nName;
+
         playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
@@ -31,7 +36,7 @@ public class Player {
         penalties = new List<Penalty> ();
 
         salle = 0;
-        energy = ENERGY0;
+        energy = ENERGY0 - DELTA_ENERGY;
 
         // Ajout des icones feu, poison, etc
         foreach (ReactionType reactionType in Main.reactionTypes) {
@@ -53,7 +58,6 @@ public class Player {
 
       
         Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate { EndTurn (); });
-        penalties.Add (new Penalty (2, this, p => { Main.infoDialog ("Tour annulé !", delegate { p.target.EndTurn (); }); }));
 	}
 
     public void updateReactionsList ()
@@ -118,8 +122,9 @@ public class Player {
     }
 
     public void BeginTurn() {
-        Main.Write ("Beginning a turn !");
-        playerScreen.SetActive(true);
+        isTurn = true;
+
+        energy += DELTA_ENERGY;
         for (int i=0; i<penalties.Count; i++)
             if (penalties[i].isActive ()) {
                 Penalty p = penalties[i];
@@ -127,24 +132,35 @@ public class Player {
                 p.effect (p);
             }
         
-        /*// On pioche 2 cartes
+        // On pioche 2 cartes
         for (int i=0;i<2;i++)
-            deck.AddCard(Main.pickCard());*/
+            deck.AddCard(Main.pickCard());
+        /*deck.AddCard(Main.getElementBySymbol("O"));
         deck.AddCard(Main.getElementBySymbol("O"));
-        deck.AddCard(Main.getElementBySymbol("O"));
         deck.AddCard(Main.getElementBySymbol("H"));
         deck.AddCard(Main.getElementBySymbol("H"));
         deck.AddCard(Main.getElementBySymbol("H"));
         deck.AddCard(Main.getElementBySymbol("H"));
+        deck.AddCard(Main.getElementBySymbol("C"));
         deck.AddCard(Main.getElementBySymbol("Cl"));
         deck.AddCard(Main.getElementBySymbol("Cl"));
-        deck.AddCard(Main.getElementBySymbol("Al"));
+        deck.AddCard(Main.getElementBySymbol("Al"));*/
+
+        if (isTurn) {
+            Main.infoDialog("Au tour de "+ name, delegate {
+                playerScreen.SetActive(true);
+            });
+        }
+    }
+    public void undoTurn() {
+        isTurn = false;
     }
     public void EndTurn() {
         Main.Write ("Ending a turn !");
         foreach (Penalty p in penalties)
             p.newTurn ();
         playerScreen.SetActive(false);
+        isTurn = false;
         Main.nextPlayer ();
     }
 }

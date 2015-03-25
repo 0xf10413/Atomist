@@ -1,0 +1,20 @@
+[
+	{
+		"reagents" : [["C",1],["O",1]],
+		"reaction": "C + O",
+		"products" : "CO2",
+		"infos" : "Monoxyde de carbone",
+		"cost" : 4,
+		"gain" : 5,
+		"nbTurns" : 1
+	},
+	{
+		"reagents" : [["Cl",2]],
+		"reaction": "Cl + Cl",
+		"products" : "Cl2",
+		"infos" : "Dichlore",
+		"cost" : 4,
+		"gain" : 5,
+		"nbTurns" : 2
+	}
+]

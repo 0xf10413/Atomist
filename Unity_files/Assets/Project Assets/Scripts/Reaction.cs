@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// Contient les informations d'une réaction chimique : réactifs, produits
@@ -24,13 +25,17 @@ public abstract class Reaction {
     /// <param name="cCost">Le coût de la réaction</param>
     /// <param name="gGain">Le gain d'énergie apporté par la réaction</param>
 	public Reaction(string tReagents, string tProducts, List<KeyValuePair<Element,int>> lReagents, ReactionType nType, int cCost, int gGain) {
-		reagents = tReagents;
-		products = tProducts;
+		reagents = convertLowerCase(tReagents);
+		products = convertLowerCase(tProducts);
 		reagentsList = lReagents;
 		type = nType;
         cost = cCost;
         gain = gGain;
 	}
+
+    private static string convertLowerCase(string s) {
+        return new Regex("([a-zA-Z\\)])([0-9])").Replace(s, "$1<size=12>$2</size>").ToString();
+    }
 
     public abstract void effect(Player maker);
 }

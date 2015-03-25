@@ -13,8 +13,10 @@ public class ObstacleScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         List<Obstacle> obstacles = Main.obstacles;
-        Obstacle obstacle = obstacles.Find(n => n.name == obstacleName);
-	    gameObject.transform.GetComponent<Image>().sprite = obstacle.obstacleResource;
+        if (obstacles != null) {
+            Obstacle obstacle = obstacles.Find(n => n.name == obstacleName);
+	        gameObject.transform.GetComponent<Image>().sprite = obstacle.obstacleResource;
+        }
 	}
 	
 	// Update is called once per frame

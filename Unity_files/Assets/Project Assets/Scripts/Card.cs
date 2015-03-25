@@ -21,7 +21,13 @@ public class Card {
 	private int _nbSelected = 0;
 	public int nbSelected {
 		get {return _nbSelected;}
-		set {if ((value >= 0) && (value <= N)) {_nbSelected = value; updateText();}}
+		set {
+            if ((value >= 0) && (value <= N)) {
+                _nbSelected = value;
+                if ((_nbSelected == 0) && (cardSelected != null))
+                    Object.Destroy(cardSelected); updateText();
+            }
+        }
 	}
 	
 	private GameObject cardImg; // L'image de la carte
@@ -56,24 +62,29 @@ public class Card {
 		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
 
 		// Ajout d'un événement de sélection de la carte au clic de la souris
-        Main.addClickEvent(cardImg, delegate {
-				if (_nbSelected == N) {
-					nbSelected = 0;
-					Object.Destroy(cardSelected);
-				}
-				else {
-					if (_nbSelected == 0) {
-						// Ajout de l'élément de sélection (cadre bleu)
-						cardSelected = new GameObject();
-						cardSelected.name = "Card Selected";
-						cardSelected.transform.SetParent(cardImg.transform);
-						cardSelected.AddComponent<Image> ();
-						cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
-						cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
-						cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
-						infosNb.transform.SetParent(infosNb.transform.parent);
-					}
-					nbSelected++;
+        Main.addEvent(cardImg, EventTriggerType.PointerDown, delegate {
+                if (Input.GetMouseButton(0) && !Input.GetMouseButton(1)) {
+				    if (_nbSelected == N) {
+					    nbSelected = 0;
+				    }
+				    else {
+					    if (_nbSelected == 0) {
+						    // Ajout de l'élément de sélection (cadre bleu)
+						    cardSelected = new GameObject();
+						    cardSelected.name = "Card Selected";
+						    cardSelected.transform.SetParent(cardImg.transform);
+						    cardSelected.AddComponent<Image> ();
+						    cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
+						    cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
+						    cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+						    infosNb.transform.SetParent(infosNb.transform.parent);
+					    }
+                        nbSelected++;
+                    }
+                }
+                else if (!Input.GetMouseButton (0)) {
+                    if (nbSelected != 0)
+                        nbSelected--;
 				}
 		});
 

@@ -43,8 +43,10 @@ public class Main : MonoBehaviour {
 
         // Génération de la liste des réactions, ainsi que des types de réaction
         reactions = new List<Reaction> ();
-        SimpleJSON.JSONArray reactionsInfos = loadJSONFile("reactions").AsArray;
-        foreach (SimpleJSON.JSONNode r in reactionsInfos) {
+
+        // Réactions de type obstacle
+        SimpleJSON.JSONArray obstacleReactionsInfos = loadJSONFile("obstacle_reactions").AsArray;
+        foreach (SimpleJSON.JSONNode r in obstacleReactionsInfos) {
             List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
             foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
             {
@@ -57,16 +59,30 @@ public class Main : MonoBehaviour {
             }
             reactions.Add (new ObstacleReaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
         }
+        
+        // Réactions de type poison
+        SimpleJSON.JSONArray delayedReactionsInfos = loadJSONFile("poison_reactions").AsArray;
+        ReactionType poisonType = new ReactionType("Poison");
+        reactionTypes.Add (poisonType);
+        foreach (SimpleJSON.JSONNode r in delayedReactionsInfos) {
+            List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
+            foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
+            {
+                rList.Add (new KeyValuePair<Element, int> (getElementBySymbol(elt[0].AsString), elt[1].AsInt));
+            }
+            reactions.Add (new PoisonReaction (r["reaction"], r["products"], rList, poisonType, r["cost"].AsInt, r["gain"].AsInt, r["nbTurns"].AsInt));
+        }
 
         // Génération de la liste des (types d') obstacles, ainsi que des jetons
         obstacles = new List<Obstacle> ();
         obstacles.Add (new Obstacle ("Débris", "debris", reactionTypes.Find (n => n.name == "Explosion")));
         obstacles.Add (new Obstacle ("Flamme", "flamme", reactionTypes.Find (n => n.name == "Eau")));
         obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
-        obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide"))); 
+        obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
-        players.Add (new Player ());
-        //players.Add (new Player ());
+        players.Add (new Player ("Timothé"));
+        players.Add (new Player ("Florent"));
+        players.Add (new Player ("Guillaume"));
         players[0].BeginTurn();
 	}
     
@@ -74,21 +90,31 @@ public class Main : MonoBehaviour {
     public delegate void Undo();
 
     public delegate void Del();
-
-    public static void addClickEvent(GameObject go, Del onClick) {
+    
+    public static void addEvent(GameObject go, EventTriggerType eventType, Del onFire) {
 		EventTrigger.Entry clicEvent = new EventTrigger.Entry();
-		clicEvent.eventID = EventTriggerType.PointerClick;
+		clicEvent.eventID = eventType;
 		clicEvent.callback = new EventTrigger.TriggerEvent();
 		UnityEngine.Events.UnityAction<BaseEventData> clicCallback =
 			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-                onClick();
+                onFire();
             });
 		clicEvent.callback.AddListener(clicCallback);
 		go.AddComponent<EventTrigger>().delegates = new List<EventTrigger.Entry>();
 		go.GetComponent<EventTrigger>().delegates.Add(clicEvent);
     }
+    public static void addClickEvent(GameObject go, Del onClick) {
+        addEvent(go, EventTriggerType.PointerClick, onClick);
+        addEvent(go, EventTriggerType.Submit, onClick);
+    }
 
-    
+    public static GameObject AddMask() {
+        GameObject mask = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Mask"));
+        mask.transform.SetParent(context.gameObject.transform);
+        mask.transform.localPosition = new Vector3(0,0,0);
+        mask.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width,Screen.height);
+        return mask;
+    }
 
     /// <summary>
     /// Affiche une boîte de dialogue avec une opération à confirmer
@@ -108,16 +134,23 @@ public class Main : MonoBehaviour {
     /// <param name="onClickedNo">Un delegate appelé lorsque l'utilisateur à cliqué sur "Non"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject confirmDialog(string message, Del onClickedYes, Del onClickedNo) {
+        GameObject mask = AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ConfirmDialog"));
-        res.transform.SetParent(currentPlayer().playerScreen.transform);
+        res.transform.SetParent(mask.transform);
         res.transform.localPosition = new Vector3(0,0,0);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
         res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Yes Button").gameObject, delegate {
-            GameObject.Destroy(res);
+            GameObject.Destroy(mask);
             onClickedYes();
         });
         addClickEvent(res.transform.Find("No Button").gameObject, delegate {
-            GameObject.Destroy(res);
+            GameObject.Destroy(mask);
+            onClickedNo();
+        });
+        addClickEvent(mask, delegate {
+            GameObject.Destroy(mask);
             onClickedNo();
         });
         return res;
@@ -134,14 +167,22 @@ public class Main : MonoBehaviour {
         return infoDialog(message,delegate{});
     }
     public static GameObject infoDialog(string message, Del onValid) {
+        GameObject mask = AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/InfoDialog"));
-        res.transform.SetParent(currentPlayer().playerScreen.transform);
+        res.transform.SetParent(mask.transform);
         res.transform.localPosition = new Vector3(0,0,0);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
         res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
-            GameObject.Destroy(res);
+            GameObject.Destroy(mask);
             onValid();
         });
+        addClickEvent(mask, delegate {
+            GameObject.Destroy(mask);
+            onValid();
+        });
+        EventSystem.current.SetSelectedGameObject(res.transform.Find("Ok Button").gameObject, null);
         return res;
     }
 

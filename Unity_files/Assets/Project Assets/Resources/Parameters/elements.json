@@ -32,11 +32,67 @@
 		"nb_in_pick" : 2
 	},
 	{
+		"name" : "Chlore",
+		"symbol" : "Cl",
+		"atomicNumber" : 17,
+		"family" : "Halogène",
+		"file" : "chlore",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Chrome",
+		"symbol" : "Cr",
+		"atomicNumber" : 24,
+		"family" : "Métal de transition",
+		"file" : "chrome",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Germanium",
+		"symbol" : "Cr",
+		"atomicNumber" : 32,
+		"family" : "Métaloïde",
+		"file" : "germanium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Hélium",
+		"symbol" : "He",
+		"atomicNumber" : 2,
+		"family" : "Gaz noble",
+		"file" : "helium",
+		"nb_in_pick" : 2
+	},
+	{
 		"name" : "Hydrogène",
 		"symbol" : "H",
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Krypton",
+		"symbol" : "Kr",
+		"atomicNumber" : 18,
+		"family" : "Gaz noble",
+		"file" : "krypton",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Magnésium",
+		"symbol" : "Mg",
+		"atomicNumber" : 12,
+		"family" : "Métal Alcalin",
+		"file" : "magnesium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Néon",
+		"symbol" : "Ne",
+		"atomicNumber" : 10,
+		"family" : "Métal Alcalin",
+		"file" : "neon",
 		"nb_in_pick" : 2
 	},
 	{
@@ -48,11 +104,51 @@
 		"nb_in_pick" : 2
 	},
 	{
-		"name" : "Chlore",
-		"symbol" : "Cl",
-		"atomicNumber" : 6,
+		"name" : "Potassium",
+		"symbol" : "P",
+		"atomicNumber" : 19,
+		"family" : "Non-Alcalin",
+		"file" : "potassium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Rubidium",
+		"symbol" : "Rb",
+		"atomicNumber" : 37,
+		"family" : "Non-Alcalin",
+		"file" : "rubidium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Sodium",
+		"symbol" : "Na",
+		"atomicNumber" : 11,
+		"family" : "Non-Alcalin",
+		"file" : "sodium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Soufre",
+		"symbol" : "S",
+		"atomicNumber" : 16,
 		"family" : "Non-Métal",
-		"file" : "chlore",
+		"file" : "soufre",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Uranium",
+		"symbol" : "Cl",
+		"atomicNumber" : 92,
+		"family" : "Actinides",
+		"file" : "uranium",
+		"nb_in_pick" : 2
+	},
+	{
+		"name" : "Xénon",
+		"symbol" : "Cl",
+		"atomicNumber" : 54,
+		"family" : "Gaz Noble",
+		"file" : "xenon",
 		"nb_in_pick" : 2
 	}
 ]
