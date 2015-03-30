@@ -62,10 +62,7 @@ public class Deck {
     }
 	// Retourne le nombre de types de cartes possédées par le joueur
 	public int getNbCards() {
-		int res = 0;
-		foreach (Card c in listCards)
-			res += c.nbCards;
-		return res;
+		return listCards.Count;
 	}
 	
 	/**

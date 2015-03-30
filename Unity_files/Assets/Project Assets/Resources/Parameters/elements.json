@@ -5,7 +5,7 @@
 		"atomicNumber" : 13,
 		"family" : "Métal Pauvre",
 		"file" : "aluminium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 4
 	},
 	{
 		"name" : "Argon",
@@ -13,7 +13,7 @@
 		"atomicNumber" : 18,
 		"family" : "Gaz Noble",
 		"file" : "argon",
-		"nb_in_pick" : 1
+		"nb_in_pick" : 3
 	},
 	{
 		"name" : "Azote",
@@ -21,7 +21,7 @@
 		"atomicNumber" : 7,
 		"family" : "Non-Métal",
 		"file" : "azote",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 5
 	},
 	{
 		"name" : "Carbone",
@@ -29,7 +29,7 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "carbone",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 1
 	},
 	{
 		"name" : "Chlore",
@@ -37,7 +37,7 @@
 		"atomicNumber" : 17,
 		"family" : "Halogène",
 		"file" : "chlore",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 14
 	},
 	{
 		"name" : "Chrome",
@@ -53,15 +53,15 @@
 		"atomicNumber" : 32,
 		"family" : "Métaloïde",
 		"file" : "germanium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 0
 	},
 	{
 		"name" : "Hélium",
 		"symbol" : "He",
 		"atomicNumber" : 2,
-		"family" : "Gaz noble",
+		"family" : "Gaz Noble",
 		"file" : "helium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 3
 	},
 	{
 		"name" : "Hydrogène",
@@ -69,15 +69,15 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 32
 	},
 	{
 		"name" : "Krypton",
 		"symbol" : "Kr",
 		"atomicNumber" : 18,
-		"family" : "Gaz noble",
+		"family" : "Gaz Noble",
 		"file" : "krypton",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 3
 	},
 	{
 		"name" : "Magnésium",
@@ -91,9 +91,9 @@
 		"name" : "Néon",
 		"symbol" : "Ne",
 		"atomicNumber" : 10,
-		"family" : "Métal Alcalin",
+		"family" : "Gaz Noble",
 		"file" : "neon",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 4
 	},
 	{
 		"name" : "Oxygène",
@@ -101,11 +101,11 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "oxygene",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 29
 	},
 	{
 		"name" : "Potassium",
-		"symbol" : "P",
+		"symbol" : "K",
 		"atomicNumber" : 19,
 		"family" : "Non-Alcalin",
 		"file" : "potassium",
@@ -117,7 +117,7 @@
 		"atomicNumber" : 37,
 		"family" : "Non-Alcalin",
 		"file" : "rubidium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 4
 	},
 	{
 		"name" : "Sodium",
@@ -125,7 +125,7 @@
 		"atomicNumber" : 11,
 		"family" : "Non-Alcalin",
 		"file" : "sodium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 4
 	},
 	{
 		"name" : "Soufre",
@@ -133,22 +133,22 @@
 		"atomicNumber" : 16,
 		"family" : "Non-Métal",
 		"file" : "soufre",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 1
 	},
 	{
 		"name" : "Uranium",
-		"symbol" : "Cl",
+		"symbol" : "U",
 		"atomicNumber" : 92,
 		"family" : "Actinides",
 		"file" : "uranium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 0
 	},
 	{
 		"name" : "Xénon",
-		"symbol" : "Cl",
+		"symbol" : "Xe",
 		"atomicNumber" : 54,
 		"family" : "Gaz Noble",
 		"file" : "xenon",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 3
 	}
 ]

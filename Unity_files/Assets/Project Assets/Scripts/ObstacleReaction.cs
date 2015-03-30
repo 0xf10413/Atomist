@@ -12,8 +12,9 @@ public class ObstacleReaction : Reaction {
 
     public override void effect(Player maker) {
         foreach (ObstacleToken obstacle in maker.obstacles) {
-            if ((obstacle.salle == maker.salle) && (obstacle.obstacle.weakness == type)) {
-                obstacle.destroy();
+            if ((obstacle.room == maker.room) && (obstacle.obstacle.weakness == type)) {
+                obstacle.destroy(maker);
+                maker.moveToNextRoom();
                 break;
             }
         }

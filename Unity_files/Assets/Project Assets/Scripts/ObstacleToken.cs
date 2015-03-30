@@ -10,7 +10,7 @@ public class ObstacleToken
 {
     public Obstacle obstacle { get; private set; } // L'obstacle représenté
     public GameObject obstacleImg { get;  set; } // Le GameObject correspondant
-    public int salle; // Le numéro de la salle
+    public int room; // Le numéro de la salle
 
     /// <summary>
     /// Constructeur du jeton d'obstacle.
@@ -21,7 +21,7 @@ public class ObstacleToken
     {
         obstacle = nObstacle;
         obstacleImg = gameObject;
-        salle = gameObject.GetComponent<ObstacleScript>().salle;
+        room = gameObject.GetComponent<ObstacleScript>().room;
         /* Initialisation du GameObject */
         // Désolé Florent, ton code sert à rien en fait ^^
         /*obstacleImg = new GameObject ();
@@ -33,7 +33,8 @@ public class ObstacleToken
        // obstacleImg.AddComponent<RectTransform> ();
     }
 
-    public void destroy() {
+    public void destroy(Player maker) {
+        maker.obstacles.Remove(this);
         GameObject.Destroy(obstacleImg);
     }
 }

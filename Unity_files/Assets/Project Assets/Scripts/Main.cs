@@ -84,6 +84,15 @@ public class Main : MonoBehaviour {
         players.Add (new Player ("Florent"));
         players.Add (new Player ("Guillaume"));
         players[0].BeginTurn();
+
+        /*int[] eltsNB = new int[elements.Count];
+        foreach (Reaction r in reactions) {
+            foreach (KeyValuePair<Element,int> r2 in r.reagentsList) {
+                eltsNB[elements.IndexOf(r2.Key)] += r2.Value;
+            }
+        }
+        for (int i=0;i<eltsNB.Length;i++)
+            Write(elements[i].name +" : "+ eltsNB[i]);*/
 	}
     
     public delegate void Confirm();
@@ -153,6 +162,7 @@ public class Main : MonoBehaviour {
             GameObject.Destroy(mask);
             onClickedNo();
         });
+        autoFocus(res.transform.Find("Yes Button").gameObject);
         return res;
     }
 
@@ -182,8 +192,48 @@ public class Main : MonoBehaviour {
             GameObject.Destroy(mask);
             onValid();
         });
-        EventSystem.current.SetSelectedGameObject(res.transform.Find("Ok Button").gameObject, null);
+        autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
+    }
+
+    /// <summary>
+    /// Affiche une boîte de dialogue avec les cartes piochées
+    /// </summary>
+    /// <param name="nbCards">Les cartes piochées</param>
+    /// <param name="message">Le message à afficher</param>
+    /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject pickCardsDialog(List<Element> pickedCards, string message, Del onValid) {
+        GameObject mask = AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/NewCardsDialog"));
+        foreach (Element pickedCard in pickedCards) {
+            GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
+            cardImg.GetComponent<Image>().sprite = pickedCard.cardRessource;
+            cardImg.transform.SetParent(res.transform.Find("Cards List"));
+            cardImg.transform.localPosition = new Vector3(0,0,0);
+        }
+        res.transform.Find("Message").GetComponent<Text>().text = message;
+        addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
+            GameObject.Destroy(mask);
+            onValid();
+        });
+        addClickEvent(mask, delegate {
+            GameObject.Destroy(mask);
+            onValid();
+        });
+        res.transform.SetParent(mask.transform);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        autoFocus(res.transform.Find("Ok Button").gameObject);
+        return res;
+    }
+
+    /// <summary>
+    /// Donne le focus au gameObject, c'est-à-dire qu'un appui sur la touche enter déclenchera l'événement de clic
+    /// </summary>
+    /// <param name="go"></param>
+    public static void autoFocus(GameObject go) {
+        EventSystem.current.SetSelectedGameObject(go);
     }
 
     /// <summary>
@@ -242,6 +292,7 @@ public class Main : MonoBehaviour {
 	 * Fonction appelée à chaque frame, environ 60 fois par seconde
 	 **/
 	void Update () {
+        Transform t = gameObject.transform.Find("Mask(Clone)/NewCardsDialog(Clone)");
 	}
 
 	/// <summary>

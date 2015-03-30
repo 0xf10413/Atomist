@@ -2,7 +2,7 @@
 	{
 		"reagents" : [["C",1],["O",1]],
 		"reaction": "C + O",
-		"products" : "CO2",
+		"products" : "CO",
 		"infos" : "Monoxyde de carbone",
 		"cost" : 4,
 		"gain" : 5,

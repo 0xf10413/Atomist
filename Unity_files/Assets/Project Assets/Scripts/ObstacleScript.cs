@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class ObstacleScript : MonoBehaviour {
 
     public string obstacleName;
-    public int salle;
+    public int room;
 
     public bool initialized = false;
 

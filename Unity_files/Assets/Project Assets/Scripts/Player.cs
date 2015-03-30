@@ -7,7 +7,12 @@ using UnityEngine.EventSystems;
 public class Player {
 
     public const int ENERGY0 = 4; // Energie initiale du joueur
-    public const int DELTA_ENERGY = 3; // Gain d'énergie au début de chaque tour
+    public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
+    public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
+    public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
+    public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
+
+    public const int NB_ROOOMS = 4; // Le nombre de salles dans le jeu
 	
 	Deck deck = new Deck(); // Liste des cartes du joueur
 
@@ -18,7 +23,7 @@ public class Player {
         _energy = value;
         playerScreen.transform.Find("Energy container/nbPts").GetComponent<Text>().text = _energy.ToString();
     }}
-    public int salle {get; set;}
+    public int room {get; set;}
     public List<Penalty> penalties { get; set; } // Liste des pénalités du joueur (gaz moutarde, ...)
     public GameObject playerScreen {get;set;} // Ecran de jeu contenant le plateau, les cartes, le score, la liste des réactions
     public ReactionType currentReactionSelected {get;set;}
@@ -35,8 +40,8 @@ public class Player {
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
-        salle = 0;
-        energy = ENERGY0 - DELTA_ENERGY;
+        room = 0;
+        energy = ENERGY0 - TURN_ENERGY_GAIN;
 
         // Ajout des icones feu, poison, etc
         foreach (ReactionType reactionType in Main.reactionTypes) {
@@ -57,7 +62,31 @@ public class Player {
         updateReactionsList();
 
       
-        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate { EndTurn (); });
+        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate {
+            Main.confirmDialog("Fin du tour ?", delegate {
+                EndTurn ();
+            });
+        });
+        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Discard cards").gameObject, delegate {
+            Main.confirmDialog("Jeter les cartes sélectionnées ?", delegate {
+                int energyToGain = 0;
+                int nbCardsToPick = 0;
+                for (int i=deck.getNbCards()-1;i>=0;i--) {
+                    Card c = deck.getCard(i);
+                    if (c.nbSelected > 0) {
+                        if (c.element.family == "Gaz Noble") {
+                            energyToGain += NOBLE_GAZ_ENERGY*c.nbSelected;
+                            nbCardsToPick += NOBLE_GAZ_CARDS*c.nbSelected;
+                        }
+                        deck.RemoveCards(c.element,c.nbSelected);
+                    }
+                }
+                energy += energyToGain;
+                if (nbCardsToPick > 0)
+                    pickCards(nbCardsToPick);
+                deck.updatePositions();
+            });
+        });
 	}
 
     public void updateReactionsList ()
@@ -96,7 +125,7 @@ public class Player {
                             });
                         }
                         else
-                            Main.infoDialog("La réaction est impossible avec les objects sélectionnés");
+                            Main.infoDialog("La réaction est impossible avec les objets sélectionnés");
                     }
                     else
                         Main.infoDialog("Vous n'avez pas assez de points d'énergie.");
@@ -121,10 +150,24 @@ public class Player {
         }
     }
 
+    public void pickCards(int nbCards) {
+        pickCards(nbCards, "Vous piochez "+ nbCards +" cartes");
+    }
+    public void pickCards(int nbCards, string message) {
+        List<Element> toPick = new List<Element>();
+        for (int i=0;i<nbCards;i++)
+            toPick.Add(Main.pickCard());
+        Main.pickCardsDialog(toPick, message, delegate {
+            foreach (Element card in toPick) {
+                deck.AddCard(card);
+            }
+        });
+    }
+
     public void BeginTurn() {
         isTurn = true;
 
-        energy += DELTA_ENERGY;
+        energy += TURN_ENERGY_GAIN;
         for (int i=0; i<penalties.Count; i++)
             if (penalties[i].isActive ()) {
                 Penalty p = penalties[i];
@@ -132,9 +175,6 @@ public class Player {
                 p.effect (p);
             }
         
-        // On pioche 2 cartes
-        for (int i=0;i<2;i++)
-            deck.AddCard(Main.pickCard());
         /*deck.AddCard(Main.getElementBySymbol("O"));
         deck.AddCard(Main.getElementBySymbol("O"));
         deck.AddCard(Main.getElementBySymbol("H"));
@@ -147,8 +187,10 @@ public class Player {
         deck.AddCard(Main.getElementBySymbol("Al"));*/
 
         if (isTurn) {
+            // On pioche 2 cartes
             Main.infoDialog("Au tour de "+ name, delegate {
                 playerScreen.SetActive(true);
+                pickCards(CARDS_PICKED_TURN);
             });
         }
     }
@@ -156,11 +198,24 @@ public class Player {
         isTurn = false;
     }
     public void EndTurn() {
-        Main.Write ("Ending a turn !");
         foreach (Penalty p in penalties)
             p.newTurn ();
         playerScreen.SetActive(false);
         isTurn = false;
         Main.nextPlayer ();
+    }
+    /// <summary>
+    /// Déplace le joueur vers la salle d'après, supprime ses pénalités, et affiche un message si c'est gagné.
+    /// </summary>
+    public void moveToNextRoom() {
+        room++;
+        penalties.Clear();
+        if (room >= NB_ROOOMS) {
+            Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
+                Application.Quit();
+            });
+        }
+        else
+            Main.infoDialog("Vous pouvez accéder à la salle suivante.");
     }
 }
