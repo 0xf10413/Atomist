@@ -24,6 +24,8 @@ public class Main : MonoBehaviour {
 	public static int turnID = 0; // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
 
     public static System.Random randomGenerator = new System.Random(); // Générateur de nombre aléatoires
+
+    private static List<KeyValuePair<Del,float>> delayedTasks = new List<KeyValuePair<Del,float>>();
 	
 	/**
 	 * Fonction appelée au démarrage de l'application
@@ -80,7 +82,6 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
-        players.Add (new Player ("Timothé"));
         players.Add (new Player ("Florent"));
         players.Add (new Player ("Guillaume"));
         players[0].BeginTurn();
@@ -292,8 +293,25 @@ public class Main : MonoBehaviour {
 	 * Fonction appelée à chaque frame, environ 60 fois par seconde
 	 **/
 	void Update () {
-        Transform t = gameObject.transform.Find("Mask(Clone)/NewCardsDialog(Clone)");
+        for (int i=delayedTasks.Count-1;i>=0;i--) {
+            KeyValuePair<Del,float> task = delayedTasks[i];
+            if (task.Value <= Time.deltaTime) {
+                task.Key();
+                delayedTasks.Remove(task);
+            }
+            else
+                delayedTasks[i] = new KeyValuePair<Del,float>(task.Key,task.Value-Time.deltaTime);
+        }
 	}
+
+    /// <summary>
+    /// Exécute une action au bout d'un certain temps
+    /// </summary>
+    /// <param name="task">Un delegate contenant la tâche à exécuter</param>
+    /// <param name="delay">Le temps au bout de laquelle on exécute la tâche, en secondes</param>
+    public static void postTask(Del task, float delay) {
+        delayedTasks.Add(new KeyValuePair<Del,float>(task,delay));
+    }
 
 	/// <summary>
 	/// Retourne un object JSON contenu dans un fichier

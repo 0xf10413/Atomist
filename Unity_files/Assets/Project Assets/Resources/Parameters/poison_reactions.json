@@ -6,7 +6,7 @@
 		"infos" : "Monoxyde de carbone",
 		"cost" : 4,
 		"gain" : 5,
-		"nbTurns" : 1
+		"nbTurns" : 3
 	},
 	{
 		"reagents" : [["Cl",2]],

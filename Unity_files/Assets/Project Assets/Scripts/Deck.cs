@@ -79,8 +79,13 @@ public class Deck {
 	/// <param name="card">La carte à replacer</param>
 	/// <param name="name">La position dans la main du joueur (0 pour la 1re carte, 1 pour la 2e, etc)</param>
 	public void updatePosition(Card card, int position) {
-		float x1 = -152; // Abcisse 1re carte, déterminée "à l'arrache" avec Unity
-		float x2 = -110; // Abcisse 2e carte
-		card.updateX (x1 + (x2 - x1) * position);
+		float x1 = -162; // Abcisse 1re carte, déterminée "à l'arrache" avec Unity
+		float x2 = -120; // Abcisse 2e carte
+        float deltaX = x2-x1; // Distance entre 2 cartes par défaut
+        float maxWidth = 348; // Place maximale que peuvent prendre les cartes
+        float maxDeltaX = maxWidth/listCards.Count; // Distance maximale entre 2 cartes
+        if (deltaX > maxDeltaX)
+            deltaX = maxDeltaX;
+		card.updateX (x1 + deltaX * position);
 	}
 }

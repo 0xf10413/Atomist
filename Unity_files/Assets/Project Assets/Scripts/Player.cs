@@ -3,16 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Threading;
 
 public class Player {
 
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
+    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
 
     public const int NB_ROOOMS = 4; // Le nombre de salles dans le jeu
+
+    public static bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
 	
 	Deck deck = new Deck(); // Liste des cartes du joueur
 
@@ -41,10 +45,10 @@ public class Player {
         penalties = new List<Penalty> ();
 
         room = 0;
-        energy = ENERGY0 - TURN_ENERGY_GAIN;
 
         // Ajout des icones feu, poison, etc
         foreach (ReactionType reactionType in Main.reactionTypes) {
+
             GameObject icon = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Icon"));
             icon.transform.SetParent(playerScreen.transform.Find("Reactions/Families Icons"));
             icon.name = reactionType.name;
@@ -144,10 +148,8 @@ public class Player {
 
     public void consumeForReaction(Reaction r) {
         energy += r.gain-r.cost;
-        foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
-            Card eltCard = deck.getCard(reagents.Key);
+        foreach (KeyValuePair<Element,int> reagents in r.reagentsList)
             deck.RemoveCards(reagents.Key,reagents.Value);
-        }
     }
 
     public void pickCards(int nbCards) {
@@ -166,31 +168,31 @@ public class Player {
 
     public void BeginTurn() {
         isTurn = true;
+        
+        /*
+        deck.AddCard(Main.getElementBySymbol("C"));
+        deck.AddCard(Main.getElementBySymbol("O"));
+        //*/
 
-        energy += TURN_ENERGY_GAIN;
         for (int i=0; i<penalties.Count; i++)
             if (penalties[i].isActive ()) {
                 Penalty p = penalties[i];
                 penalties.Remove (penalties[i]);
-                p.effect (p);
+                p.setOff ();
             }
-        
-        /*deck.AddCard(Main.getElementBySymbol("O"));
-        deck.AddCard(Main.getElementBySymbol("O"));
-        deck.AddCard(Main.getElementBySymbol("H"));
-        deck.AddCard(Main.getElementBySymbol("H"));
-        deck.AddCard(Main.getElementBySymbol("H"));
-        deck.AddCard(Main.getElementBySymbol("H"));
-        deck.AddCard(Main.getElementBySymbol("C"));
-        deck.AddCard(Main.getElementBySymbol("Cl"));
-        deck.AddCard(Main.getElementBySymbol("Cl"));
-        deck.AddCard(Main.getElementBySymbol("Al"));*/
 
         if (isTurn) {
             // On pioche 2 cartes
             Main.infoDialog("Au tour de "+ name, delegate {
                 playerScreen.SetActive(true);
-                pickCards(CARDS_PICKED_TURN);
+                if (firstTurn) {
+                    energy = ENERGY0;
+                    pickCards(NBCARDS0);
+                }
+                else {
+                    energy += TURN_ENERGY_GAIN;
+                    pickCards(CARDS_PICKED_TURN);
+                }
             });
         }
     }
@@ -202,6 +204,7 @@ public class Player {
             p.newTurn ();
         playerScreen.SetActive(false);
         isTurn = false;
+        firstTurn = false;
         Main.nextPlayer ();
     }
     /// <summary>
@@ -209,13 +212,36 @@ public class Player {
     /// </summary>
     public void moveToNextRoom() {
         room++;
+        foreach (Penalty p in penalties)
+            p.Remove();
         penalties.Clear();
         if (room >= NB_ROOOMS) {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
                 Application.Quit();
             });
         }
-        else
-            Main.infoDialog("Vous pouvez accéder à la salle suivante.");
+        else {
+            Main.infoDialog("Vous pouvez accéder à la salle suivante.", delegate {
+                progressMoveToNextRoom();
+            });
+        }
+    }
+
+    private void progressMoveToNextRoom() {
+        Vector3 tokenPos1 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
+        Vector3 tokenPos2 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
+        movePlayer(tokenPos1 + (tokenPos2-tokenPos1)*room);
+    }
+    private void movePlayer(Vector3 but) {
+        GameObject playerToken = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerToken").gameObject;
+        float nextX = playerToken.transform.localPosition.x + 5;
+        if (nextX > but.x)
+            nextX = but.x;
+        playerToken.transform.localPosition = new Vector3(nextX, but.y,but.z);
+        if (nextX < but.x) {
+            Main.postTask(delegate {
+                movePlayer(but);
+            }, 0.05f);
+        }
     }
 }

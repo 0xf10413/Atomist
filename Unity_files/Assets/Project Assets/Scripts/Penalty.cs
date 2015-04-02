@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
@@ -9,7 +10,10 @@ public class Penalty {
 
 	public int remainingTurns { get; private set; } // Nombre de tours avant effet. Vaut -1 si la réaction n'implique pas un certain nombre de tours avant effet
 	public Player target { get; private set; } // Joueur à attaquer
-	public Effect effect; // "Pointeur sur fonction" appelé au début du tour du joueur
+	private Effect effect; // "Pointeur sur fonction" appelé au début du tour du joueur
+
+    
+    private GameObject penaltyToken;
 
     /// <summary>
     /// Constructeur de la pénalité
@@ -21,6 +25,12 @@ public class Penalty {
 		remainingTurns = turns;
 		target = nTarget;
 		effect = nEffect;
+
+        if (turns > 0) {
+            penaltyToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PenaltyToken"));
+            penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = remainingTurns.ToString();
+            penaltyToken.transform.SetParent(target.playerScreen.transform.Find("BoardGame/PenaltyTokensContainer"+ target.room));
+        }
 	}
 
     /// <summary>
@@ -29,8 +39,19 @@ public class Penalty {
     /// </summary>
     public void newTurn ()
     {
-        if (remainingTurns > 0)
-         remainingTurns--;
+        if (remainingTurns > 0) {
+            remainingTurns--;
+            penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = remainingTurns.ToString();
+        }
+    }
+
+    public void setOff() {
+        Remove();
+        effect(this);
+    }
+
+    public void Remove() {
+        GameObject.Destroy(penaltyToken);
     }
 
     /// <summary>
