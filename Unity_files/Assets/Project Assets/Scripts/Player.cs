@@ -16,9 +16,9 @@ public class Player {
 
     public const int NB_ROOOMS = 4; // Le nombre de salles dans le jeu
 
-    public static bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
+    public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
 	
-	Deck deck = new Deck(); // Liste des cartes du joueur
+	public Deck deck {get; private set;} // Liste des cartes du joueur
 
     private int _energy;
 	public int energy { get {
@@ -37,6 +37,8 @@ public class Player {
 
 	public Player (string nName) {
         name = nName;
+
+        deck = new Deck();
 
         playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
@@ -87,7 +89,7 @@ public class Player {
                 }
                 energy += energyToGain;
                 if (nbCardsToPick > 0)
-                    pickCards(nbCardsToPick);
+                    pickCards(nbCardsToPick, false);
                 deck.updatePositions();
             });
         });
@@ -151,19 +153,37 @@ public class Player {
         foreach (KeyValuePair<Element,int> reagents in r.reagentsList)
             deck.RemoveCards(reagents.Key,reagents.Value);
     }
-
-    public void pickCards(int nbCards) {
-        pickCards(nbCards, "Vous piochez "+ nbCards +" cartes");
+    
+    /// <summary>
+    /// Pioche des cartes et affiche la boîte de dialogue avec les cartes piochées
+    /// </summary>
+    /// <param name="nbCards">Le nombre de carte à piocher</param>
+    public void pickCards(int nbCards, bool askInPeriodicTable) {
+        pickCards(nbCards, "Vous piochez "+ nbCards +" cartes", askInPeriodicTable);
     }
-    public void pickCards(int nbCards, string message) {
+    /// <summary>
+    /// Pioche des cartes et affiche la boîte de dialogue avec les cartes piochées
+    /// </summary>
+    /// <param name="nbCards">Le nombre de carte à piocher</param>
+    /// <param name="message">Le message à afficher</param>
+    public void pickCards(int nbCards, string message, bool askInPeriodicTable) {
         List<Element> toPick = new List<Element>();
         for (int i=0;i<nbCards;i++)
             toPick.Add(Main.pickCard());
-        Main.pickCardsDialog(toPick, message, delegate {
-            foreach (Element card in toPick) {
-                deck.AddCard(card);
-            }
-        });
+        if (askInPeriodicTable) {
+            Main.postPickCardsDialog(toPick, message, pickedCards => {
+                foreach (Element card in pickedCards) {
+                    deck.AddCard(card);
+                }
+            });
+        }
+        else {
+            Main.pickCardsDialog(toPick, message, delegate {
+                foreach (Element card in toPick) {
+                    deck.AddCard(card);
+                }
+            });
+        }
     }
 
     public void BeginTurn() {
@@ -187,11 +207,11 @@ public class Player {
                 playerScreen.SetActive(true);
                 if (firstTurn) {
                     energy = ENERGY0;
-                    pickCards(NBCARDS0);
+                    pickCards(NBCARDS0, false);
                 }
                 else {
                     energy += TURN_ENERGY_GAIN;
-                    pickCards(CARDS_PICKED_TURN);
+                    pickCards(CARDS_PICKED_TURN, true);
                 }
             });
         }

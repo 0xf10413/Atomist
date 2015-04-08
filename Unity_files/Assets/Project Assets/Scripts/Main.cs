@@ -27,6 +27,8 @@ public class Main : MonoBehaviour {
 
     private static List<KeyValuePair<Del,float>> delayedTasks = new List<KeyValuePair<Del,float>>();
 	
+    private static Sprite backCardRessource; // La ressource du verso des cartes élément
+
 	/**
 	 * Fonction appelée au démarrage de l'application
 	 * Disons que c'est l'équivalent du main() en C++
@@ -86,6 +88,8 @@ public class Main : MonoBehaviour {
         players.Add (new Player ("Guillaume"));
         players[0].BeginTurn();
 
+        backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
+
         /*int[] eltsNB = new int[elements.Count];
         foreach (Reaction r in reactions) {
             foreach (KeyValuePair<Element,int> r2 in r.reagentsList) {
@@ -100,6 +104,7 @@ public class Main : MonoBehaviour {
     public delegate void Undo();
 
     public delegate void Del();
+    public delegate void PickCardsCallback(List<Element> cardsPicked);
     
     public static void addEvent(GameObject go, EventTriggerType eventType, Del onFire) {
 		EventTrigger.Entry clicEvent = new EventTrigger.Entry();
@@ -117,12 +122,17 @@ public class Main : MonoBehaviour {
         addEvent(go, EventTriggerType.PointerClick, onClick);
         addEvent(go, EventTriggerType.Submit, onClick);
     }
-
+    
     public static GameObject AddMask() {
+        return AddMask(false);
+    }
+    public static GameObject AddMask(bool scaleWithScreenSize) {
         GameObject mask = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Mask"));
         mask.transform.SetParent(context.gameObject.transform);
         mask.transform.localPosition = new Vector3(0,0,0);
         mask.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width,Screen.height);
+        if (scaleWithScreenSize)
+            mask.transform.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         return mask;
     }
 
@@ -198,9 +208,153 @@ public class Main : MonoBehaviour {
     }
 
     /// <summary>
+    /// Affiche une boîte de dialogue avec les cartes que l'on va piocher si on place bien les éléments sur le tableau périodique
+    /// </summary>
+    /// <param name="playerScreen">L'écran du joueur</param>
+    /// <param name="pickedCards">Les cartes à piocher</param>
+    /// <param name="message">Le message à afficher</param>
+    /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject postPickCardsDialog(List<Element> pickedCards, string message, PickCardsCallback onValid) {
+        GameObject mask = AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
+        foreach (Element pickedCard in pickedCards) {
+            GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
+            cardImg.GetComponent<Image>().sprite = backCardRessource;
+            cardImg.transform.SetParent(dialogBox.transform.Find("Cards List"));
+            cardImg.transform.localPosition = new Vector3(0,0,0);
+        }
+        dialogBox.transform.Find("Message").GetComponent<Text>().text = message;
+        addClickEvent(dialogBox.transform.Find("Ok Button").gameObject, delegate {
+            GameObject.Destroy(mask);
+            placeCardsInTableDialog(pickedCards, onValid);
+        });
+        dialogBox.transform.SetParent(mask.transform);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        autoFocus(dialogBox.transform.Find("Ok Button").gameObject);
+        return dialogBox;
+    }
+
+    /// <summary>
+    /// Affiche une boîte de dialogue avec le tableau périodique et la carte à placer
+    /// </summary>
+    /// <param name="pickedCards">Les cartes à placer</param>
+    /// <param name="onValid">Un delegate appelé lorsque le joueur a placé toutes les cartes</param>
+    public static void placeCardsInTableDialog(List<Element> pickedCards, PickCardsCallback onValid) {
+        Player cPlayer = currentPlayer();
+        bool ownAllElements = true;
+        foreach (Element elt in pickedCards) {
+            if (cPlayer.deck.getCard(elt) == null) {
+                ownAllElements = false;
+                break;
+            }
+        }
+        if (ownAllElements) {
+            pickCardsDialog(pickedCards, delegate {
+                onValid(pickedCards);
+            });
+            return;
+        }
+        int idCard; // L'id de la carte à placer : 0 si c'est la 1re carte piochée, 1 si c'est la 2e carte, etc
+        List<Element> toPick = new List<Element>(); // Les cartes bien placées par le joueur sur le tableau
+        for (idCard=0;(cPlayer.deck.getCard(pickedCards[idCard])!=null);idCard++)
+            toPick.Add(pickedCards[idCard]);
+
+        cPlayer.playerScreen.SetActive(false); // On efface l'écran du joueur (sinon il voit le tableau, c'est trop facile)
+        
+        GameObject mask = AddMask();
+        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PeriodicTableDialog"));
+        float scaleFactor = Screen.height/232f;
+        dialogBox.transform.localScale = new Vector3(scaleFactor,scaleFactor,scaleFactor);
+        setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
+        dialogBox.transform.SetParent(mask.transform);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+
+        Transform masksContainer = dialogBox.transform.Find("Periodic Table");
+        for (int i=0;i<masksContainer.childCount;i++) {
+            GameObject iMask = masksContainer.GetChild(i).gameObject;
+            Main.addClickEvent(iMask, delegate { // Lorsque le joueur clique sur le masque...
+                iMask.SetActive(false); // On retire le masque
+                Element eltPicked = iMask.GetComponent<TableCaseScript>().getElement();
+                if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
+                    setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
+                    toPick.Add(eltPicked);
+                }
+                else {
+                    for (int j=0;j<masksContainer.childCount;j++) {
+                        if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
+                            masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
+                            break;
+                        }
+                    }
+                    setPeriodicTableMsg(dialogBox, "Dommage, réessayez au prochain tour...");
+                }
+                dialogBox.transform.Find("NextButton").gameObject.SetActive(true); // On affiche le bouton "suivant"
+                autoFocus(dialogBox.transform.Find("NextButton").gameObject);
+            });
+        }
+        updateMaskedElements(dialogBox);
+        addClickEvent(dialogBox.transform.Find("NextButton").gameObject, delegate {
+            updateMaskedElements(dialogBox, toPick);
+            dialogBox.transform.Find("NextButton").gameObject.SetActive(false); // On cache le bouton "suivant"
+            while (true) {
+                idCard++;
+                if (idCard == pickedCards.Count)
+                    break;
+                if (!toPick.Contains(pickedCards[idCard]) && (cPlayer.deck.getCard(pickedCards[idCard])!=null))
+                    break;
+                toPick.Add(pickedCards[idCard]);
+            }
+            if (idCard < pickedCards.Count)
+                setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
+            else { // On supprime la boite de dialogue, et on affiche les cartes piochées
+                GameObject.Destroy(mask);
+                GameObject.Destroy(dialogBox);
+                currentPlayer().playerScreen.SetActive(true); // On réaffiche l'écran du joueur
+
+                pickCardsDialog(toPick, delegate {
+                    onValid(toPick);
+                });
+            }
+        });
+    }
+    private static void updateMaskedElements(GameObject dialogBox) {
+        updateMaskedElements(dialogBox, new List<Element>());
+    }
+    private static void updateMaskedElements(GameObject dialogBox, List<Element> eltsRecovered) {
+        Player cPlayer = currentPlayer();
+        
+        Transform masksContainer = dialogBox.transform.Find("Periodic Table");
+        for (int i=0;i<masksContainer.childCount;i++) {
+            GameObject iMask = masksContainer.GetChild(i).gameObject;
+            Element maskElt = iMask.GetComponent<TableCaseScript>().getElement();
+            iMask.SetActive(!eltsRecovered.Contains(maskElt) && (cPlayer.deck.getCard(maskElt) == null));
+        }
+    }
+    private static void setPeriodicTableMsg(GameObject parent, Element elt) {
+        setPeriodicTableMsg(parent, "Placez l'élément <b>"+ elt.name +"</b> ("+ elt.symbole +") sur le tableau périodique pour obtenir la carte :");
+    }
+    private static void setPeriodicTableMsg(GameObject parent, string message) {
+        parent.transform.Find("Message").GetComponent<Text>().text = message;
+    }
+    
+
+    /// <summary>
     /// Affiche une boîte de dialogue avec les cartes piochées
     /// </summary>
-    /// <param name="nbCards">Les cartes piochées</param>
+    /// <param name="pickedCards">Les cartes piochées</param>
+    /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
+    /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
+    public static GameObject pickCardsDialog(List<Element> pickedCards, Del onValid) {
+        return pickCardsDialog(pickedCards, "Vous piochez "+ pickedCards.Count +" carte"+ ((pickedCards.Count >= 2) ? "s":""), onValid);
+    }
+
+    /// <summary>
+    /// Affiche une boîte de dialogue avec les cartes piochées
+    /// </summary>
+    /// <param name="pickedCards">Les cartes piochées</param>
     /// <param name="message">Le message à afficher</param>
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>

@@ -66,7 +66,7 @@
 	{
 		"name" : "Hydrogène",
 		"symbol" : "H",
-		"atomicNumber" : 6,
+		"atomicNumber" : 1,
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
 		"nb_in_pick" : 32
@@ -98,7 +98,7 @@
 	{
 		"name" : "Oxygène",
 		"symbol" : "O",
-		"atomicNumber" : 6,
+		"atomicNumber" : 8,
 		"family" : "Non-Métal",
 		"file" : "oxygene",
 		"nb_in_pick" : 29
