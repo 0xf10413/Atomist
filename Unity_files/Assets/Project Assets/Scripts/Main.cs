@@ -303,7 +303,7 @@ public class Main : MonoBehaviour {
                 idCard++;
                 if (idCard == pickedCards.Count)
                     break;
-                if (!toPick.Contains(pickedCards[idCard]) && (cPlayer.deck.getCard(pickedCards[idCard])!=null))
+                if (!toPick.Contains(pickedCards[idCard]) && (cPlayer.deck.getCard(pickedCards[idCard])==null))
                     break;
                 toPick.Add(pickedCards[idCard]);
             }
