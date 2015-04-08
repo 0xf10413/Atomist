@@ -22,15 +22,6 @@ public class ObstacleToken
         obstacle = nObstacle;
         obstacleImg = gameObject;
         room = gameObject.GetComponent<ObstacleScript>().room;
-        /* Initialisation du GameObject */
-        // Désolé Florent, ton code sert à rien en fait ^^
-        /*obstacleImg = new GameObject ();
-        obstacleImg.name = "Token " + nObstacle.name;
-        obstacleImg.AddComponent<Image> ();
-        obstacleImg.GetComponent<Image> ().sprite = nObstacle.obstacleResource;
-        obstacleImg.transform.SetParent (parent.transform);
-        obstacleImg.transform.localPosition = new Vector2 ();*/
-       // obstacleImg.AddComponent<RectTransform> ();
     }
 
     public void destroy(Player maker) {

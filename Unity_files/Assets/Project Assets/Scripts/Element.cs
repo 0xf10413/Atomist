@@ -5,7 +5,6 @@ using System.Collections;
 /// Contient les informations de la carte d'un élément du tableau périodique :
 /// Nom, symbole, énergie, Ressource graphique
 /// </summary>
-/// <todo>Eliminer le paramètre énergie.</todo>
 public class Element {
 
 	public string name { get; set;} // Le nom entier (Ex : Sodium)

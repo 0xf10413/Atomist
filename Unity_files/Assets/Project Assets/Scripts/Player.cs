@@ -34,13 +34,13 @@ public class Player {
     public List<ObstacleToken> obstacles {get;set;}
     public bool isTurn; // Vaut true Ssi c'est le tour de ce joueur
     public string name {get;set;} // Nom du joueur
+    public int rank {private get; set; } // Rang du joueur
 
 	public Player (string nName) {
         name = nName;
-
         deck = new Deck();
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
 
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
         playerScreen.SetActive(false);
@@ -216,6 +216,9 @@ public class Player {
             });
         }
     }
+    /// <summary>
+    /// Fonction appelée lors de l'annulation d'un tour.
+    /// </summary>
     public void undoTurn() {
         isTurn = false;
     }
@@ -232,6 +235,7 @@ public class Player {
     /// </summary>
     public void moveToNextRoom() {
         room++;
+        updateRanks ();
         foreach (Penalty p in penalties)
             p.Remove();
         penalties.Clear();
@@ -262,6 +266,73 @@ public class Player {
             Main.postTask(delegate {
                 movePlayer(but);
             }, 0.05f);
+        }
+    }
+
+    /// <summary>
+    /// Met à jour le rang de tous les joueurs.
+    /// </summary>
+    public void updateRanks ()
+    {
+        var tmp = new List<Player> (Main.players);
+        tmp.Sort ((a, b) => -a.room + b.room);
+        
+
+        int i = 0;
+        int rank = i+1;
+        int prevRoom = tmp[i].room;
+        for (; i < Main.players.Count; i++ ) {
+            if (tmp[i].room != prevRoom) {
+                rank = i + 1;
+                prevRoom = tmp[i].room;
+            }
+            tmp[i].rank = rank;
+        }
+        foreach (Player p in Main.players)
+            p.updatePlayer ();
+    }
+
+    /// <summary>
+    /// Met à jour le tableau d'affichage du joueur (on suppose les rangs valides).
+    /// </summary>
+    /// <todo>Trouver une parade contre l'utilisateur "Title".</todo>
+    /// <bug>La taille de l'objet copiée est nulle. Il faut la corriger manuellement.</bug>
+    public void updatePlayer ()
+    {
+        // Vidage de l'interface
+        foreach (Transform r in playerScreen.transform.Find ("Players/Ranks"))
+            if (r.name != "Title")
+                GameObject.Destroy (r.gameObject);
+        foreach (Transform n in playerScreen.transform.Find ("Players/Names"))
+            if (n.name != "Title")
+                GameObject.Destroy (n.gameObject);
+        foreach (Transform r in playerScreen.transform.Find ("Players/Rooms"))
+            if (r.name != "Title")
+                GameObject.Destroy (r.gameObject);
+        
+        // Ajout des joueurs dans l'ordre
+        var tmp = new List<Player> (Main.players);
+        tmp.Sort ((a, b) => a.rank - b.rank);
+
+        foreach (Player p in tmp) {
+            GameObject rank = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Ranks/Title").gameObject);
+            GameObject room = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Rooms/Title").gameObject);
+            GameObject name = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Names/Title").gameObject);
+
+            rank.transform.GetComponent<Text> ().text = p.rank.ToString ();
+            rank.name = p.name;
+            room.transform.GetComponent<Text> ().text = (p.room+1).ToString ();
+            room.name = p.name;
+            name.transform.GetComponent<Text> ().text = p.name.ToString ();
+            name.name = p.name;
+
+            rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
+            room.transform.SetParent (playerScreen.transform.Find ("Players/Rooms"));
+            name.transform.SetParent (playerScreen.transform.Find ("Players/Names"));
+
+            rank.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
+            room.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
+            name.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
         }
     }
 }

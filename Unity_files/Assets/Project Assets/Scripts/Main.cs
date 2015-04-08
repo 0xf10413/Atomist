@@ -84,8 +84,14 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
+        // Test : ajout de deux joueurs
         players.Add (new Player ("Florent"));
         players.Add (new Player ("Guillaume"));
+        players.Add (new Player ("Timothé"));
+        players.Add (new Player ("Marwane"));
+        players[0].updateRanks ();
+        foreach (Player p in players)
+            p.updatePlayer ();
         players[0].BeginTurn();
 
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
@@ -392,7 +398,7 @@ public class Main : MonoBehaviour {
     }
 
     /// <summary>
-    /// Retourne une carte élément choisie au hasard dans la pioche
+    /// Retourne une carte élément choisie au hasard dans la pioche.
     /// </summary>
     public static Element pickCard() {
         int nbCards = 0;
