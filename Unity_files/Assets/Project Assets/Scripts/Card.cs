@@ -63,29 +63,36 @@ public class Card {
 
 		// Ajout d'un événement de sélection de la carte au clic de la souris
         Main.addEvent(cardImg, EventTriggerType.PointerDown, delegate {
-                if (Input.GetMouseButton(0) && !Input.GetMouseButton(1)) {
-				    if (_nbSelected == N) {
-					    nbSelected = 0;
-				    }
-				    else {
-					    if (_nbSelected == 0) {
-						    // Ajout de l'élément de sélection (cadre bleu)
-						    cardSelected = new GameObject();
-						    cardSelected.name = "Card Selected";
-						    cardSelected.transform.SetParent(cardImg.transform);
-						    cardSelected.AddComponent<Image> ();
-						    cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
-						    cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
-						    cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
-						    infosNb.transform.SetParent(infosNb.transform.parent);
-					    }
-                        nbSelected++;
-                    }
-                }
-                else if (!Input.GetMouseButton (0)) {
-                    if (nbSelected != 0)
-                        nbSelected--;
-				}
+            bool leftClick = false, rightClick = false;
+            if (Input.GetMouseButton(0) && !Input.GetMouseButton(1))
+                leftClick = true;
+            else if (!Input.GetMouseButton (0))
+                rightClick = true;
+            else
+                return;
+            if ((leftClick && (_nbSelected == 0)) || (rightClick && (_nbSelected == 0))) {
+				// Ajout de l'élément de sélection (cadre bleu)
+				cardSelected = new GameObject();
+				cardSelected.name = "Card Selected";
+				cardSelected.transform.SetParent(cardImg.transform);
+				cardSelected.AddComponent<Image> ();
+				cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
+				cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
+				cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+				infosNb.transform.SetParent(infosNb.transform.parent);
+            }
+            if (leftClick) {
+				if (_nbSelected == N)
+					nbSelected = 0;
+				else
+                    nbSelected++;
+            }
+            else if (rightClick) {
+                if (nbSelected != 0)
+                    nbSelected--;
+                else
+                    nbSelected = N;
+			}
 		});
 
 		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
@@ -150,6 +157,9 @@ public class Card {
 		RectTransform imgParams = cardImg.GetComponent<RectTransform> ();
 		imgParams.localPosition = new Vector2 (x,y); // attention, c'est l'attribut "localPosition" et non "position" qui contient les coordonnées
 	}
+    public void bringToFront() {
+        cardImg.transform.SetParent(cardImg.transform.parent);
+    }
 	public void updateText() {
 		infosNb.GetComponent<Text> ().color = (nbSelected>0) ? Color.cyan : Color.yellow;
 		infosNb.GetComponent<Text> ().text = (N>1) ? ((nbSelected>0) ? nbSelected+"/"+N:("×" + N)):"";

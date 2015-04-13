@@ -5,7 +5,8 @@
 		"atomicNumber" : 13,
 		"family" : "Métal Pauvre",
 		"file" : "aluminium",
-		"nb_in_pick" : 4
+		"nb_in_pick" : 4,
+		"did_you_know" : "L'aluminium, c'est cool"
 	},
 	{
 		"name" : "Argon",
@@ -13,7 +14,8 @@
 		"atomicNumber" : 18,
 		"family" : "Gaz Noble",
 		"file" : "argon",
-		"nb_in_pick" : 3
+		"nb_in_pick" : 3,
+		"did_you_know" : "L'argon, c'est cool"
 	},
 	{
 		"name" : "Azote",
@@ -21,7 +23,8 @@
 		"atomicNumber" : 7,
 		"family" : "Non-Métal",
 		"file" : "azote",
-		"nb_in_pick" : 5
+		"nb_in_pick" : 5,
+		"did_you_know" : "L'azote, c'est cool"
 	},
 	{
 		"name" : "Carbone",
@@ -29,7 +32,8 @@
 		"atomicNumber" : 6,
 		"family" : "Non-Métal",
 		"file" : "carbone",
-		"nb_in_pick" : 1
+		"nb_in_pick" : 1,
+		"did_you_know" : "Le carbone, c'est cool"
 	},
 	{
 		"name" : "Chlore",
@@ -37,7 +41,8 @@
 		"atomicNumber" : 17,
 		"family" : "Halogène",
 		"file" : "chlore",
-		"nb_in_pick" : 14
+		"nb_in_pick" : 14,
+		"did_you_know" : "Le chlore, c'est cool"
 	},
 	{
 		"name" : "Chrome",
@@ -45,7 +50,8 @@
 		"atomicNumber" : 24,
 		"family" : "Métal de transition",
 		"file" : "chrome",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 2,
+		"did_you_know" : "Le chrome, c'est cool"
 	},
 	{
 		"name" : "Germanium",
@@ -53,7 +59,8 @@
 		"atomicNumber" : 32,
 		"family" : "Métaloïde",
 		"file" : "germanium",
-		"nb_in_pick" : 0
+		"nb_in_pick" : 0,
+		"did_you_know" : "Le germanium, c'est cool"
 	},
 	{
 		"name" : "Hélium",
@@ -61,7 +68,8 @@
 		"atomicNumber" : 2,
 		"family" : "Gaz Noble",
 		"file" : "helium",
-		"nb_in_pick" : 3
+		"nb_in_pick" : 3,
+		"did_you_know" : "L'hélium, c'est cool"
 	},
 	{
 		"name" : "Hydrogène",
@@ -69,15 +77,17 @@
 		"atomicNumber" : 1,
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
-		"nb_in_pick" : 32
+		"nb_in_pick" : 32,
+		"did_you_know" : "L'hydrogène, c'est cool"
 	},
 	{
 		"name" : "Krypton",
 		"symbol" : "Kr",
-		"atomicNumber" : 18,
+		"atomicNumber" : 36,
 		"family" : "Gaz Noble",
 		"file" : "krypton",
-		"nb_in_pick" : 3
+		"nb_in_pick" : 3,
+		"did_you_know" : "Le krypton, c'est cool"
 	},
 	{
 		"name" : "Magnésium",
@@ -85,7 +95,8 @@
 		"atomicNumber" : 12,
 		"family" : "Métal Alcalin",
 		"file" : "magnesium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 2,
+		"did_you_know" : "Le magnésium, c'est cool"
 	},
 	{
 		"name" : "Néon",
@@ -93,7 +104,8 @@
 		"atomicNumber" : 10,
 		"family" : "Gaz Noble",
 		"file" : "neon",
-		"nb_in_pick" : 4
+		"nb_in_pick" : 4,
+		"did_you_know" : "Le néon, c'est cool"
 	},
 	{
 		"name" : "Oxygène",
@@ -101,7 +113,8 @@
 		"atomicNumber" : 8,
 		"family" : "Non-Métal",
 		"file" : "oxygene",
-		"nb_in_pick" : 29
+		"nb_in_pick" : 29,
+		"did_you_know" : "L'oxygène, c'est cool"
 	},
 	{
 		"name" : "Potassium",
@@ -109,7 +122,8 @@
 		"atomicNumber" : 19,
 		"family" : "Non-Alcalin",
 		"file" : "potassium",
-		"nb_in_pick" : 2
+		"nb_in_pick" : 2,
+		"did_you_know" : "Le potassium, c'est cool"
 	},
 	{
 		"name" : "Rubidium",
@@ -117,7 +131,8 @@
 		"atomicNumber" : 37,
 		"family" : "Non-Alcalin",
 		"file" : "rubidium",
-		"nb_in_pick" : 4
+		"nb_in_pick" : 4,
+		"did_you_know" : "Le rubidium, c'est cool"
 	},
 	{
 		"name" : "Sodium",
@@ -125,7 +140,8 @@
 		"atomicNumber" : 11,
 		"family" : "Non-Alcalin",
 		"file" : "sodium",
-		"nb_in_pick" : 4
+		"nb_in_pick" : 4,
+		"did_you_know" : "Le sodium, c'est cool"
 	},
 	{
 		"name" : "Soufre",
@@ -133,7 +149,8 @@
 		"atomicNumber" : 16,
 		"family" : "Non-Métal",
 		"file" : "soufre",
-		"nb_in_pick" : 1
+		"nb_in_pick" : 1,
+		"did_you_know" : "Le souffre, c'est cool"
 	},
 	{
 		"name" : "Uranium",
@@ -141,7 +158,8 @@
 		"atomicNumber" : 92,
 		"family" : "Actinides",
 		"file" : "uranium",
-		"nb_in_pick" : 0
+		"nb_in_pick" : 0,
+		"did_you_know" : "L'urainum, c'est cool"
 	},
 	{
 		"name" : "Xénon",
@@ -149,6 +167,7 @@
 		"atomicNumber" : 54,
 		"family" : "Gaz Noble",
 		"file" : "xenon",
-		"nb_in_pick" : 3
+		"nb_in_pick" : 3,
+		"did_you_know" : "Le Xénon, c'est cool"
 	}
 ]

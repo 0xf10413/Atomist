@@ -40,7 +40,7 @@ public class Main : MonoBehaviour {
 		elements = new List<Element> ();
 		SimpleJSON.JSONArray elementsInfos = loadJSONFile("elements").AsArray;
 		foreach (SimpleJSON.JSONNode elementInfos in elementsInfos) {
-            Element nElement = new Element(elementInfos["name"],elementInfos["symbol"], elementInfos["atomicNumber"].AsInt, elementInfos["family"], elementInfos["file"]);
+            Element nElement = new Element(elementInfos["name"],elementInfos["symbol"], elementInfos["atomicNumber"].AsInt, elementInfos["family"], elementInfos["file"], elementInfos["did_you_know"]);
 			elements.Add(nElement);
             pick.Add(new KeyValuePair<Element,int>(nElement,elementInfos["nb_in_pick"].AsInt));
 		}
@@ -86,10 +86,10 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de deux joueurs
         players.Add (new Player ("Florent"));
-        players.Add (new Player ("Guillaume"));
+        //players.Add (new Player ("Guillaume"));
         players.Add (new Player ("Timothé"));
-        players.Add (new Player ("Marwane"));
-        players[0].updateRanks ();
+        //players.Add (new Player ("Marwane"));
+        Player.updateRanks ();
         foreach (Player p in players)
             p.updatePlayer ();
         players[0].BeginTurn();
@@ -175,6 +175,8 @@ public class Main : MonoBehaviour {
             GameObject.Destroy(mask);
             onClickedNo();
         });
+        addClickEvent(res, delegate {
+        });
         addClickEvent(mask, delegate {
             GameObject.Destroy(mask);
             onClickedNo();
@@ -205,6 +207,8 @@ public class Main : MonoBehaviour {
             GameObject.Destroy(mask);
             onValid();
         });
+        addClickEvent(res, delegate {
+        });
         addClickEvent(mask, delegate {
             GameObject.Destroy(mask);
             onValid();
@@ -222,7 +226,7 @@ public class Main : MonoBehaviour {
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject postPickCardsDialog(List<Element> pickedCards, string message, PickCardsCallback onValid) {
-        GameObject mask = AddMask();
+        GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
         foreach (Element pickedCard in pickedCards) {
@@ -271,11 +275,18 @@ public class Main : MonoBehaviour {
         
         GameObject mask = AddMask();
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
-        GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PeriodicTableDialog"));
+        GameObject dialogContainer = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ElementFinder"));
+        GameObject DYKDialog = dialogContainer.transform.Find("DYKDialog").gameObject;
+        Text DYKText = DYKDialog.transform.Find("DYKMessage").gameObject.GetComponent<Text>();
+        DYKText.text = pickedCards[idCard].didYouKnow;
+
+        GameObject dialogBox = dialogContainer.transform.Find("PeriodicTableDialog").gameObject;
         float scaleFactor = Screen.height/232f;
-        dialogBox.transform.localScale = new Vector3(scaleFactor,scaleFactor,scaleFactor);
+        dialogContainer.transform.localScale = new Vector3(scaleFactor,scaleFactor,scaleFactor);
+        float scaleFactor2 = 1/scaleFactor;
+        DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
         setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
-        dialogBox.transform.SetParent(mask.transform);
+        dialogContainer.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
 
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
@@ -313,8 +324,10 @@ public class Main : MonoBehaviour {
                     break;
                 toPick.Add(pickedCards[idCard]);
             }
-            if (idCard < pickedCards.Count)
+            if (idCard < pickedCards.Count) {
                 setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
+                DYKText.text = pickedCards[idCard].didYouKnow;
+            }
             else { // On supprime la boite de dialogue, et on affiche les cartes piochées
                 GameObject.Destroy(mask);
                 GameObject.Destroy(dialogBox);
@@ -365,7 +378,7 @@ public class Main : MonoBehaviour {
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject pickCardsDialog(List<Element> pickedCards, string message, Del onValid) {
-        GameObject mask = AddMask();
+        GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/NewCardsDialog"));
         foreach (Element pickedCard in pickedCards) {
@@ -378,6 +391,8 @@ public class Main : MonoBehaviour {
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
             GameObject.Destroy(mask);
             onValid();
+        });
+        addClickEvent(res, delegate {
         });
         addClickEvent(mask, delegate {
             GameObject.Destroy(mask);

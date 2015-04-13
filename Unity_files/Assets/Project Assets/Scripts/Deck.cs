@@ -22,8 +22,14 @@ public class Deck {
 		Card c = listCards.Find (ca => (ca.element==element));
 		if (c != null)
 			c.nbCards++;
-		else
-			listCards.Insert(0,new Card(element));
+		else {
+            int insertID = 0;
+            foreach (Card card in listCards) {
+                if (card.element.symbole.CompareTo(element.symbole) <= 0)
+                    insertID++;
+            }
+			listCards.Insert(insertID,new Card(element));
+        }
 		updatePositions ();
 	}
 	
@@ -71,6 +77,8 @@ public class Deck {
 	public void updatePositions() {
 		for (int i=0; i<listCards.Count; i++)
 			updatePosition(listCards[i],i);
+		for (int i=listCards.Count-1; i>=0; i--)
+    		listCards[i].bringToFront();
 	}
 	
 	/// <summary>

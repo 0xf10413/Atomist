@@ -39,7 +39,7 @@ public class Player {
 	public Player (string nName) {
         name = nName;
         deck = new Deck();
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
 
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
@@ -272,7 +272,7 @@ public class Player {
     /// <summary>
     /// Met à jour le rang de tous les joueurs.
     /// </summary>
-    public void updateRanks ()
+    public static void updateRanks ()
     {
         var tmp = new List<Player> (Main.players);
         tmp.Sort ((a, b) => -a.room + b.room);
@@ -297,8 +297,7 @@ public class Player {
     /// </summary>
     /// <todo>Trouver une parade contre l'utilisateur "Title".</todo>
     /// <bug>La taille de l'objet copiée est nulle. Il faut la corriger manuellement.</bug>
-    public void updatePlayer ()
-    {
+    public void updatePlayer () {
         // Vidage de l'interface
         foreach (Transform r in playerScreen.transform.Find ("Players/Ranks"))
             if (r.name != "Title")
@@ -312,7 +311,20 @@ public class Player {
         
         // Ajout des joueurs dans l'ordre
         var tmp = new List<Player> (Main.players);
-        tmp.Sort ((a, b) => a.rank - b.rank);
+        tmp.Sort (delegate(Player a, Player b) {
+            if (a == b) // wtf c'est quoi cet algo de tri de merde
+                return 0;
+            if (a.rank == b.rank) {
+                if (a == this)
+                    return -1;
+                else if (b == this)
+                    return 1;
+                else
+                    return 0;
+            }
+            else
+                return a.rank - b.rank;
+        });
 
         foreach (Player p in tmp) {
             GameObject rank = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Ranks/Title").gameObject);
