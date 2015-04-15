@@ -38,6 +38,9 @@ public class Player {
 
 	public Player (string nName) {
         name = nName;
+    }
+
+    public void init() {
         deck = new Deck();
         playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
 

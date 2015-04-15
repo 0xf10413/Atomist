@@ -85,10 +85,12 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de deux joueurs
-        players.Add (new Player ("Florent"));
-        //players.Add (new Player ("Guillaume"));
+        /*players.Add (new Player ("Florent"));
+        players.Add (new Player ("Guillaume"));
         players.Add (new Player ("Timothé"));
-        //players.Add (new Player ("Marwane"));
+        players.Add (new Player ("Marwane"));*/
+        foreach (Player p in players)
+            p.init();
         Player.updateRanks ();
         foreach (Player p in players)
             p.updatePlayer ();
