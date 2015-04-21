@@ -7,7 +7,7 @@ using System.Collections.Generic;
 /// </summary>
 public class Deck {
 
-	private List<Card> listCards { get; set; }
+	public List<Card> listCards { get; private set; }
 
 	// Use this for initialization
 	public Deck() {
@@ -34,10 +34,12 @@ public class Deck {
 	}
 	
 	/// <summary>
-	/// Retire des cartes de la main du joueur
+	/// Retire des cartes de la main du joueur, en prenant en compte
+    /// la sélection ou pas.
 	/// </summary>
 	/// <param name="element">L'élément associé à la carte</param>
     /// <param name="nb">Le nombre de cartes à retirer</param>
+    
 	public void RemoveCards(Element element, int nb) {
 		Card c = listCards.Find (ca => (ca.element.name==element.name));
 		if (c != null) {
@@ -54,10 +56,12 @@ public class Deck {
 			updatePositions ();
 		}
 	}
+
 	// Retourne la i-ème carte du joueur
 	public Card getCard(int i) {
 		return listCards [i];
 	}
+
 	/// <summary>
 	/// Retourne la carte du joueur contenant l'élément elt
     /// Si le joueur n'a pas la carte, retourne null
@@ -94,6 +98,6 @@ public class Deck {
         float maxDeltaX = maxWidth/listCards.Count; // Distance maximale entre 2 cartes
         if (deltaX > maxDeltaX)
             deltaX = maxDeltaX;
-		card.updateX (x1 + deltaX * position);
+        card.updateX (x1 + deltaX * position);
 	}
 }

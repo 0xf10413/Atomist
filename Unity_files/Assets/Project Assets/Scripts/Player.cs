@@ -14,11 +14,11 @@ public class Player {
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
 
-    public const int NB_ROOOMS = 4; // Le nombre de salles dans le jeu
+    public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
 
     public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
 	
-	public Deck deck {get; private set;} // Liste des cartes du joueur
+	public Deck deck {get; protected set;} // Liste des cartes du joueur
 
     private int _energy;
 	public int energy { get {
@@ -34,15 +34,25 @@ public class Player {
     public List<ObstacleToken> obstacles {get;set;}
     public bool isTurn; // Vaut true Ssi c'est le tour de ce joueur
     public string name {get;set;} // Nom du joueur
+    public string printName { get; protected set; } // Nom affiché dans les scores
     public int rank {private get; set; } // Rang du joueur
 
+    /// <summary>
+    /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
+    /// reste plus tard.
+    /// </summary>
+    /// <param name="nName">Le nom du joueur.</param>
 	public Player (string nName) {
         name = nName;
+        printName = name;
     }
 
-    public void init() {
+    /// <summary>
+    /// Fonction d'initialisation effective.
+    /// </summary>
+    public virtual void init() {
         deck = new Deck();
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
 
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
@@ -164,12 +174,13 @@ public class Player {
     public void pickCards(int nbCards, bool askInPeriodicTable) {
         pickCards(nbCards, "Vous piochez "+ nbCards +" cartes", askInPeriodicTable);
     }
+
     /// <summary>
     /// Pioche des cartes et affiche la boîte de dialogue avec les cartes piochées
     /// </summary>
     /// <param name="nbCards">Le nombre de carte à piocher</param>
     /// <param name="message">Le message à afficher</param>
-    public void pickCards(int nbCards, string message, bool askInPeriodicTable) {
+    public virtual void pickCards(int nbCards, string message, bool askInPeriodicTable) {
         List<Element> toPick = new List<Element>();
         for (int i=0;i<nbCards;i++)
             toPick.Add(Main.pickCard());
@@ -191,11 +202,6 @@ public class Player {
 
     public void BeginTurn() {
         isTurn = true;
-        
-        /*
-        deck.AddCard(Main.getElementBySymbol("C"));
-        deck.AddCard(Main.getElementBySymbol("O"));
-        //*/
 
         for (int i=0; i<penalties.Count; i++)
             if (penalties[i].isActive ()) {
@@ -219,12 +225,18 @@ public class Player {
             });
         }
     }
+
     /// <summary>
-    /// Fonction appelée lors de l'annulation d'un tour.
+    /// Fonction appelée lors de l'annulation d'un tour,
+    /// suite à une pénalité.
     /// </summary>
     public void undoTurn() {
         isTurn = false;
     }
+
+    /// <summary>
+    /// Fonction de fin de tour. Met à jour les pénalités, et masque l'écran.
+    /// </summary>
     public void EndTurn() {
         foreach (Penalty p in penalties)
             p.newTurn ();
@@ -233,6 +245,7 @@ public class Player {
         firstTurn = false;
         Main.nextPlayer ();
     }
+
     /// <summary>
     /// Déplace le joueur vers la salle d'après, supprime ses pénalités, et affiche un message si c'est gagné.
     /// </summary>
@@ -242,7 +255,7 @@ public class Player {
         foreach (Penalty p in penalties)
             p.Remove();
         penalties.Clear();
-        if (room >= NB_ROOOMS) {
+        if (room >= NB_ROOMS) {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
                 Application.Quit();
             });
@@ -254,11 +267,19 @@ public class Player {
         }
     }
 
-    private void progressMoveToNextRoom() {
+    /// <summary>
+    /// Déplacement vers la salle suivante, avec animation.
+    /// </summary>
+    public void progressMoveToNextRoom() {
         Vector3 tokenPos1 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
         Vector3 tokenPos2 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
         movePlayer(tokenPos1 + (tokenPos2-tokenPos1)*room);
     }
+
+    /// <summary>
+    /// Déplacement avec animation de la position actuelle du jeton une position cible.
+    /// </summary>
+    /// <param name="but">Position cible d'arrivée</param>
     private void movePlayer(Vector3 but) {
         GameObject playerToken = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerToken").gameObject;
         float nextX = playerToken.transform.localPosition.x + 5;
@@ -338,8 +359,13 @@ public class Player {
             rank.name = p.name;
             room.transform.GetComponent<Text> ().text = (p.room+1).ToString ();
             room.name = p.name;
-            name.transform.GetComponent<Text> ().text = p.name.ToString ();
+            name.transform.GetComponent<Text> ().text = p.printName;
             name.name = p.name;
+            if (p == this) {
+                name.GetComponent<Text> ().color = Color.red;
+                room.GetComponent<Text> ().color = Color.red;
+                rank.GetComponent<Text> ().color = Color.red;
+            }
 
             rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
             room.transform.SetParent (playerScreen.transform.Find ("Players/Rooms"));
