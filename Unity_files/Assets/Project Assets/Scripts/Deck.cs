@@ -43,9 +43,12 @@ public class Deck {
 	public void RemoveCards(Element element, int nb) {
 		Card c = listCards.Find (ca => (ca.element.name==element.name));
 		if (c != null) {
+            // Désélection de toutes les cartes, cf issue #3
+            /*
             if (c.nbSelected >= nb)
                 c.nbSelected -= nb;
             else
+             */
                 c.nbSelected = 0;
             if (c.nbCards > nb)
                 c.nbCards -= nb;

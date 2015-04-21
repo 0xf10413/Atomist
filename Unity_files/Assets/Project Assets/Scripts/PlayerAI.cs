@@ -108,20 +108,8 @@ public class PlayerAI : Player
             else
                 Main.infoDialog (name + " passe son tour", delegate { EndTurn (); });
         else {
-            // On consomme
-            consumeForReaction (r);
-            // On avance
-            room++;
-            updateRanks ();
-            foreach (Penalty p in penalties)
-                p.Remove ();
-            
+            r.effect (this); // Le déplacement est inclus dans cette fonction.
             hasPlayed = true;
-            progressMoveToNextRoom ();
-            Main.infoDialog (name + " lance la réaction " + r.reagents +
-            " → " + r.products,
-                delegate { think (); });
-            
         }
     }
 
@@ -170,6 +158,30 @@ public class PlayerAI : Player
             if (r.cost < reaction.cost)
                 reaction = r;
         return reaction;
+    }
+
+    public override void moveToNextRoom ()
+    {
+        room++;
+        updateRanks ();
+        foreach (Penalty p in penalties)
+            p.Remove ();
+        penalties.Clear ();
+        progressMoveToNextRoom ();
+
+        if (room >= NB_ROOMS)
+            Main.infoDialog (name + " lance une réaction ... et gagne !",
+                delegate
+                {
+                    isPlaying = false;
+                    Main.winners.Add (this);
+                    think (); // Pour conclure les dernières actions
+                });
+
+        else
+            Main.infoDialog (name + " lance une réaction... et passe à la salle"
+                + " suivante !",
+                delegate {  think (); });
     }
 
 

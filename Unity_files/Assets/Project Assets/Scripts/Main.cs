@@ -18,6 +18,7 @@ public class Main : MonoBehaviour {
     public static List<Obstacle> obstacles { private set; get; } // Liste des obtacles, fixée au démarrage
 	
 	public static List<Player> players = new List<Player>(); // La liste des joueurs
+    public static List<Player> winners = new List<Player> (); // La liste des joueurs ayant gagné
     
     public static List<ReactionType> reactionTypes = new List<ReactionType> (); // liste des types de réaction
     public static List<KeyValuePair<Element,int>> pick = new List<KeyValuePair<Element,int>>(); // La pioche : liste de paires (élément, nombre de fois où cet élément apparait dans la pioche)
@@ -85,13 +86,13 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de joueurs
-        //players.Add (new Player ("Florent"));
+        players.Add (new PlayerAI ("Florent"));
         //players.Add (new Player ("Solène"));
         players.Add (new PlayerAI ("Guillaume", 2));
         players.Add (new PlayerAI ("Timothé", 0));
-        players.Add (new PlayerAI ("Marwane"));
-        players.Add (new PlayerAI ("Thomas"));
-        players.Add (new PlayerAI ("François"));
+        //players.Add (new PlayerAI ("Marwane"));
+        //players.Add (new PlayerAI ("Thomas"));
+        //players.Add (new PlayerAI ("François"));
         //players.Add (new PlayerAI ("Emanuelle"));
 
         foreach (Player p in players)
@@ -184,10 +185,14 @@ public class Main : MonoBehaviour {
         });
         addClickEvent(res, delegate {
         });
+        
+        // Désactivation, cf issue #2
+        /*
         addClickEvent(mask, delegate {
             GameObject.Destroy(mask);
             onClickedNo();
         });
+         */
         autoFocus(res.transform.Find("Yes Button").gameObject);
         return res;
     }
@@ -216,10 +221,14 @@ public class Main : MonoBehaviour {
         });
         addClickEvent(res, delegate {
         });
+
+        // Désactivation, cf issue #2
+        /*
         addClickEvent(mask, delegate {
             GameObject.Destroy(mask);
             onValid();
         });
+         */
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
     }
@@ -234,7 +243,7 @@ public class Main : MonoBehaviour {
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject postPickCardsDialog(List<Element> pickedCards, string message, PickCardsCallback onValid) {
         GameObject mask = AddMask(true);
-        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
         foreach (Element pickedCard in pickedCards) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
@@ -518,9 +527,32 @@ public class Main : MonoBehaviour {
         return players[turnID];
     }
 
+    /// <summary>
+    /// Fait passer au joueur actif suivant. Conclut s'il n'y en a plus.
+    /// </summary>
     public static void nextPlayer ()
     {
+        if (winners.Count == players.Count) // Le dernier joueur vient de gagner !
+        {
+            Main.infoDialog ("Victoire de tous les joueurs !", delegate {victoryPanel ();});
+            return;
+        }
+
         turnID = (turnID + 1) % players.Count;
-        players[turnID].BeginTurn ();
+        if (players[turnID].isPlaying)
+            players[turnID].BeginTurn ();
+        else
+            nextPlayer ();
+    }
+
+    /// <summary>
+    /// Affiche la table des victoires, puis renvoie à l'écran titre.
+    /// </summary>
+    public static void victoryPanel ()
+    {
+        Main.infoDialog ("Le panneau des victoires est en construction."
+            + " Examinez la sortie console.");
+        for (int i = 1; i <= winners.Count; i++)
+            Main.Write ("#" + i.ToString () + winners[i-1].name);
     }
 }

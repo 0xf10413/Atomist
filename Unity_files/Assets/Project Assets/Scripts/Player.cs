@@ -17,6 +17,7 @@ public class Player {
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
 
     public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
+    public bool isPlaying { get; set; } // Le joueur est-il encore en course ?
 	
 	public Deck deck {get; protected set;} // Liste des cartes du joueur
 
@@ -45,6 +46,7 @@ public class Player {
 	public Player (string nName) {
         name = nName;
         printName = name;
+        isPlaying = true;
     }
 
     /// <summary>
@@ -249,7 +251,7 @@ public class Player {
     /// <summary>
     /// Déplace le joueur vers la salle d'après, supprime ses pénalités, et affiche un message si c'est gagné.
     /// </summary>
-    public void moveToNextRoom() {
+    public virtual void moveToNextRoom() {
         room++;
         updateRanks ();
         foreach (Penalty p in penalties)
@@ -257,7 +259,8 @@ public class Player {
         penalties.Clear();
         if (room >= NB_ROOMS) {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
-                Application.Quit();
+                isPlaying = false;
+                Main.winners.Add (this);
             });
         }
         else {

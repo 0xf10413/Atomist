@@ -1,16 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 /// <summary>
 /// Classe pour les cartes "éléments"
 /// Contient le type de carte, ainsi que le nombre de cartes possédées par le joueur
 /// </summary>
-using UnityEngine.EventSystems;
-using System.Collections.Generic;
-
-
 public class Card {
 	
 	public Element element { get; set; }
