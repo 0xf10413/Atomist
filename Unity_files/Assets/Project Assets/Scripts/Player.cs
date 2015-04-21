@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 public class Player {
 
@@ -121,7 +122,13 @@ public class Player {
                 button.transform.SetParent(playerScreen.transform.Find("Reactions/Reactions list"));
                 button.name = reaction.reagents;
                 button.transform.localScale = new Vector3(1,1,1);
-                button.transform.Find("Text").GetComponent<Text>().text = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
+
+                // Toutes mes excuses... on change le "12" par défaut en une taille dynamique
+                string reactionString = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
+                int fontSize = button.transform.Find ("Text").GetComponent<Text> ().fontSize/2;
+                reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
+                button.transform.Find ("Text").GetComponent<Text> ().text = reactionString;
+                    
                 
 		        // Ajout d'un événement au clic de la souris
                 Reaction r = reaction;

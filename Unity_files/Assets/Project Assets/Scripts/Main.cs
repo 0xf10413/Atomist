@@ -11,6 +11,9 @@ using UnityEngine.EventSystems;
  **/
 public class Main : MonoBehaviour {
 
+    /// <summary>
+    /// Pointeur vers l'unique instance de Main.
+    /// </summary>
 	public static Main context;
 
     public static List<Element> elements { private set; get; }   // Liste des éléments, fixée au démarrage
@@ -90,10 +93,10 @@ public class Main : MonoBehaviour {
         //players.Add (new Player ("Solène"));
         players.Add (new PlayerAI ("Guillaume", 2));
         players.Add (new PlayerAI ("Timothé", 0));
-        //players.Add (new PlayerAI ("Marwane"));
-        //players.Add (new PlayerAI ("Thomas"));
-        //players.Add (new PlayerAI ("François"));
-        //players.Add (new PlayerAI ("Emanuelle"));
+        players.Add (new PlayerAI ("Marwane"));
+        players.Add (new PlayerAI ("Thomas"));
+        players.Add (new PlayerAI ("François"));
+        players.Add (new PlayerAI ("Emanuelle"));
 
         foreach (Player p in players)
             p.init();
@@ -138,7 +141,7 @@ public class Main : MonoBehaviour {
     }
     
     public static GameObject AddMask() {
-        return AddMask(false);
+        return AddMask(true);
     }
     public static GameObject AddMask(bool scaleWithScreenSize) {
         GameObject mask = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Mask"));
@@ -169,7 +172,7 @@ public class Main : MonoBehaviour {
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject confirmDialog(string message, Del onClickedYes, Del onClickedNo) {
         GameObject mask = AddMask();
-        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ConfirmDialog"));
         res.transform.SetParent(mask.transform);
         res.transform.localPosition = new Vector3(0,0,0);
@@ -548,11 +551,17 @@ public class Main : MonoBehaviour {
     /// <summary>
     /// Affiche la table des victoires, puis renvoie à l'écran titre.
     /// </summary>
-    public static void victoryPanel ()
+    /// <param name="position">L'indice du joueur actuel dans la liste des 
+    /// gagnants.</param>
+    public static void victoryPanel (int position = 0)
     {
-        Main.infoDialog ("Le panneau des victoires est en construction."
-            + " Examinez la sortie console.");
-        for (int i = 1; i <= winners.Count; i++)
-            Main.Write ("#" + i.ToString () + winners[i-1].name);
+        if (position == winners.Count - 1) {
+            Main.infoDialog ("Et, enfin, #" + (position + 1) + ", "
+                + winners[position].name,
+                delegate { Application.Quit (); });
+            return;
+        }
+        Main.infoDialog ("#" + (position + 1) + ", " + winners[position].name,
+            delegate { victoryPanel (position+1); });
     }
 }
