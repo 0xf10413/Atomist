@@ -7,7 +7,7 @@ public class Menu : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	    Main.addClickEvent(transform.Find("Screen/Play").gameObject, delegate {
-            playerNameDialog();
+            addPlayerDialog();
         });
 	}
 
@@ -28,6 +28,34 @@ public class Menu : MonoBehaviour {
         });
         Main.autoFocus(dialog.transform.Find("Input").gameObject);
     }
+    void playerAIDialog() {
+        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAddAIDialog"));
+        dialog.transform.SetParent(transform.Find("Screen"));
+        dialog.transform.localPosition = new Vector3(0,0,0);
+        dialog.transform.Find("Message").GetComponent<Text>().text = "Entrez le nom de l'IA :";
+        playerNameInput = dialog.transform.Find("Input").gameObject.GetComponent<InputField>();
+        string[] difficulties = {"Easy","Medium","Difficult"};
+        Main.addClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+            if (playerNameInput.text != "") {
+                for (int i=0;i<difficulties.Length;i++) {
+                    if (dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).GetComponent<Toggle>().isOn) {
+                        Main.players.Add(new PlayerAI(playerNameInput.text,i));
+                        GameObject.Destroy(dialog);
+                        addPlayerDialog();
+                        break;
+                    }
+                }
+            }
+        });
+        for (int i=0;i<difficulties.Length;i++) {
+            int diffID = i;
+            Main.addClickEvent(dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).gameObject, delegate {
+                for (int j=0;j<difficulties.Length;j++)
+                    dialog.transform.Find("Difficulty Selector").Find(difficulties[j]).GetComponent<Toggle>().isOn = (j == diffID);
+            });
+        }
+        Main.autoFocus(dialog.transform.Find("Input").gameObject);
+    }
     void addPlayerDialog() {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerNameDialog"));
         dialog.transform.SetParent(transform.Find("Screen"));
@@ -37,7 +65,8 @@ public class Menu : MonoBehaviour {
             playerNameDialog();
         });
         Main.addClickEvent(dialog.transform.Find("Add AI").gameObject, delegate {
-            // todo
+            GameObject.Destroy(dialog);
+            playerAIDialog();
         });
         if (Main.players.Count > 1) {
             Main.addClickEvent(dialog.transform.Find("Start Game").gameObject, delegate {

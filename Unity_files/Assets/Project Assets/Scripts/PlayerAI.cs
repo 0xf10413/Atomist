@@ -33,7 +33,7 @@ public class PlayerAI : Player
     difficulty = dDifficulty;
         printName += difficulty == 0 ? " 8)" :
             difficulty == 1 ? " :|" :
-            difficulty == 2 ? " >(" : "";
+            difficulty == 2 ? " >(" : ""; // Mon dieu que c'est moche
         printName = "IA-" + printName;
     }
 

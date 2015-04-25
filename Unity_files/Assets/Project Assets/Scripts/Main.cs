@@ -89,14 +89,14 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de joueurs
-        players.Add (new PlayerAI ("Florent"));
-        //players.Add (new Player ("Solène"));
+        /*players.Add (new PlayerAI ("Florent"));
+        players.Add (new PlayerAI ("Solène"));
         players.Add (new PlayerAI ("Guillaume", 2));
         players.Add (new PlayerAI ("Timothé", 0));
         players.Add (new PlayerAI ("Marwane"));
         players.Add (new PlayerAI ("Thomas"));
         players.Add (new PlayerAI ("François"));
-        players.Add (new PlayerAI ("Emanuelle"));
+        players.Add (new PlayerAI ("Emanuelle"));*/
 
         foreach (Player p in players)
             p.init();
