@@ -91,7 +91,7 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         players.Add (new Player ("Florent"));
-        /*players.Add (new Player ("Florent"));
+        //players.Add (new Player ("Florent"));
         players.Add (new PlayerAI ("Solène"));
 
         foreach (Player p in players)
@@ -306,14 +306,13 @@ public class Main : MonoBehaviour {
         DYKText.text = pickedCards[idCard].didYouKnow;
 
         GameObject dialogBox = dialogContainer.transform.Find("PeriodicTableDialog").gameObject;
-        float scaleFactor = (float) Math.Sqrt(Screen.height/232f);
-        dialogContainer.transform.localScale = new Vector3(scaleFactor,scaleFactor,scaleFactor);
-        float scaleFactor2 = 1/scaleFactor;
-        DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
         setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
         dialogContainer.transform.SetParent(mask.transform);
+        float scaleFactor = (float) Math.Sqrt(Screen.height/232f);
+        float scaleFactor2 = 1/scaleFactor;
+        DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
-        dialogContainer.transform.localScale = new Vector3(1, 1, 1);
+        dialogContainer.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
         dialogContainer.transform.localPosition = new Vector3(0, 0, 0);
 
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
