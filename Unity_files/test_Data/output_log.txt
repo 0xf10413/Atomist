@@ -1,26 +1,33 @@
-Initialize engine version: 4.6.1f1 (d1db7a1b5196)
+Initialize engine version: 4.6.3f1 (4753d8b6ef2b)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 11.0 [level 11.0]
-    Renderer: NVIDIA GeForce 840M             (ID=0x1341)
+    Renderer: NVIDIA GeForce 840M   (ID=0x1341)
     Vendor:   NVIDIA
-    VRAM:     1972 MB
+    VRAM:     1993 MB
 Begin MonoManager ReloadAssembly
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.dll into Unity Child Domain
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript-firstpass.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
-Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.076 seconds
-desktop: 3200x1800 60Hz; virtual: 3200x1800 at 0,0
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript-firstpass.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.096 seconds
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
+XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.Core.dll (this message is harmless)
-Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.dll (this message is harmless)
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.dll (this message is harmless)
+UnloadTime: 2.218239 ms
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 148 unused Assets to reduce memory usage. Loaded Objects now: 193.
+Total: 0.718885 ms (FindLiveObjects: 0.012829 ms CreateObjectMapping: 0.011118 ms MarkObjects: 0.188167 ms  DeleteObjects: 0.070135 ms)
+

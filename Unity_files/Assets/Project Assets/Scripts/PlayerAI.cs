@@ -44,8 +44,8 @@ public class PlayerAI : Player
     public override void init ()
     {
         base.init ();
-        //playerScreen.transform.Find ("Energy container").gameObject.SetActive (false);
-        //playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
+        playerScreen.transform.Find ("Energy container").gameObject.SetActive (false);
+        playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
         playerScreen.transform.Find ("Reactions").gameObject.SetActive (false);
         playerScreen.transform.Find ("Turn buttons").gameObject.SetActive (false);
     }

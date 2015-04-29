@@ -91,6 +91,7 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         players.Add (new Player ("Florent"));
+        /*players.Add (new Player ("Florent"));
         players.Add (new PlayerAI ("Solène"));
 
         foreach (Player p in players)
@@ -176,8 +177,9 @@ public class Main : MonoBehaviour {
         mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ConfirmDialog"));
         res.transform.SetParent(mask.transform);
-        res.transform.localPosition = new Vector3(0,0,0);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        res.transform.localPosition = new Vector3(0, 0, 0);
+        res.transform.localScale = new Vector3(1, 1, 1);
         res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Yes Button").gameObject, delegate {
             GameObject.Destroy(mask);
@@ -216,8 +218,9 @@ public class Main : MonoBehaviour {
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/InfoDialog"));
         res.transform.SetParent(mask.transform);
-        res.transform.localPosition = new Vector3(0,0,0);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        res.transform.localPosition = new Vector3(0, 0, 0);
+        res.transform.localScale = new Vector3(1,1,1);
         res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
             GameObject.Destroy(mask);
@@ -262,6 +265,8 @@ public class Main : MonoBehaviour {
         });
         dialogBox.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        dialogBox.transform.localPosition = new Vector3(0, 0, 0);
+        dialogBox.transform.localScale = new Vector3(1, 1, 1);
         autoFocus(dialogBox.transform.Find("Ok Button").gameObject);
         return dialogBox;
     }
@@ -308,6 +313,8 @@ public class Main : MonoBehaviour {
         setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
         dialogContainer.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        dialogContainer.transform.localScale = new Vector3(1, 1, 1);
+        dialogContainer.transform.localPosition = new Vector3(0, 0, 0);
 
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
         for (int i=0;i<masksContainer.childCount;i++) {
@@ -426,6 +433,7 @@ public class Main : MonoBehaviour {
         });
         res.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        res.transform.localScale = new Vector3(1, 1, 1);
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
     }
