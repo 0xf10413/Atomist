@@ -9,6 +9,12 @@ public class Menu : MonoBehaviour {
 	    Main.addClickEvent(transform.Find("Screen/Play").gameObject, delegate {
             addPlayerDialog();
         });
+	    Main.addClickEvent(transform.Find("Screen/How to play").gameObject, delegate {
+            addTutoDialog(5);
+        });
+	    Main.addClickEvent(transform.Find("Screen/Settings").gameObject, delegate {
+            addSettingsDialog();
+        });
 	}
 
     private InputField playerNameInput;
@@ -75,6 +81,46 @@ public class Menu : MonoBehaviour {
         }
         else
             dialog.transform.Find("Start Game").GetComponent<Button>().enabled = false;
+    }
+
+    void addSettingsDialog() {
+        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SettingsPanel"));
+        dialog.transform.SetParent(transform.Find("Screen"));
+        dialog.transform.localPosition = new Vector3(0,0,0);
+        Main.addClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+            GameObject.Destroy(dialog);
+        });
+    }
+    
+    void addTutoDialog(int nbPages) {
+        GameObject mask = Main.AddMask(true,gameObject);
+        GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Tutorial/Default"));
+        dialog.transform.SetParent(mask.transform);
+        dialog.transform.localPosition = new Vector3(0,0,0);
+
+        addTutoDialog(1, nbPages, dialog);
+    }
+    void addTutoDialog(int page, int nbPages, GameObject dialog) {
+        GameObject prevButton = dialog.transform.Find("Prev page").gameObject;
+        GameObject nextButton = dialog.transform.Find("Next page").gameObject;
+        if (page != 1) {
+            prevButton.GetComponent<Button>().interactable = true;
+            Main.addClickEvent(prevButton, delegate {
+                addTutoDialog(page-1,nbPages, dialog);
+            });
+        }
+        else
+            prevButton.GetComponent<Button>().interactable = false;
+        if (page != nbPages) {
+            nextButton.GetComponent<Button>().interactable = true;
+            Main.addClickEvent(nextButton, delegate {
+                addTutoDialog(page+1,nbPages, dialog);
+            });
+        }
+        else
+            nextButton.GetComponent<Button>().interactable = false;
+        dialog.transform.Find("Current Page").GetComponent<Text>().text = page.ToString();
+        dialog.transform.Find("Nb Pages").GetComponent<Text>().text = nbPages.ToString();
     }
 	
 	// Update is called once per frame

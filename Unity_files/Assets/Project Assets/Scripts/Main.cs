@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -89,14 +90,8 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de joueurs
-        /*players.Add (new PlayerAI ("Florent"));
+        players.Add (new Player ("Florent"));
         players.Add (new PlayerAI ("Solène"));
-        players.Add (new PlayerAI ("Guillaume", 2));
-        players.Add (new PlayerAI ("Timothé", 0));
-        players.Add (new PlayerAI ("Marwane"));
-        players.Add (new PlayerAI ("Thomas"));
-        players.Add (new PlayerAI ("François"));
-        players.Add (new PlayerAI ("Emanuelle"));*/
 
         foreach (Player p in players)
             p.init();
@@ -135,6 +130,9 @@ public class Main : MonoBehaviour {
 		go.AddComponent<EventTrigger>().delegates = new List<EventTrigger.Entry>();
 		go.GetComponent<EventTrigger>().delegates.Add(clicEvent);
     }
+    public static void removeEvents(GameObject go) {
+        GameObject.Destroy(go.GetComponent<EventTrigger>());
+    }
     public static void addClickEvent(GameObject go, Del onClick) {
         addEvent(go, EventTriggerType.PointerClick, onClick);
         addEvent(go, EventTriggerType.Submit, onClick);
@@ -144,8 +142,11 @@ public class Main : MonoBehaviour {
         return AddMask(true);
     }
     public static GameObject AddMask(bool scaleWithScreenSize) {
+        return AddMask(scaleWithScreenSize,context.gameObject);
+    }
+    public static GameObject AddMask(bool scaleWithScreenSize, GameObject parent) {
         GameObject mask = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Mask"));
-        mask.transform.SetParent(context.gameObject.transform);
+        mask.transform.SetParent(parent.transform);
         mask.transform.localPosition = new Vector3(0,0,0);
         mask.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width,Screen.height);
         if (scaleWithScreenSize)
@@ -300,7 +301,7 @@ public class Main : MonoBehaviour {
         DYKText.text = pickedCards[idCard].didYouKnow;
 
         GameObject dialogBox = dialogContainer.transform.Find("PeriodicTableDialog").gameObject;
-        float scaleFactor = Screen.height/232f;
+        float scaleFactor = (float) Math.Sqrt(Screen.height/232f);
         dialogContainer.transform.localScale = new Vector3(scaleFactor,scaleFactor,scaleFactor);
         float scaleFactor2 = 1/scaleFactor;
         DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
@@ -311,25 +312,31 @@ public class Main : MonoBehaviour {
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
         for (int i=0;i<masksContainer.childCount;i++) {
             GameObject iMask = masksContainer.GetChild(i).gameObject;
-            Main.addClickEvent(iMask, delegate { // Lorsque le joueur clique sur le masque...
-                iMask.SetActive(false); // On retire le masque
-                Element eltPicked = iMask.GetComponent<TableCaseScript>().getElement();
-                if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
-                    setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
-                    toPick.Add(eltPicked);
-                }
-                else {
-                    for (int j=0;j<masksContainer.childCount;j++) {
-                        if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
-                            masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
-                            break;
-                        }
+            Element eltPicked = iMask.GetComponent<TableCaseScript>().getElement();
+            if (eltPicked != null) {
+                Main.addClickEvent(iMask, delegate { // Lorsque le joueur clique sur le masque...
+                    iMask.SetActive(false); // On retire le masque
+                    for (int j=0;j<masksContainer.childCount;j++)
+                        Main.removeEvents(masksContainer.GetChild(j).gameObject); // On supprime l'événement au clic sur le masque
+                    if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
+                        setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
+                        toPick.Add(eltPicked);
                     }
-                    setPeriodicTableMsg(dialogBox, "Dommage, réessayez au prochain tour...");
-                }
-                dialogBox.transform.Find("NextButton").gameObject.SetActive(true); // On affiche le bouton "suivant"
-                autoFocus(dialogBox.transform.Find("NextButton").gameObject);
-            });
+                    else {
+                        for (int j=0;j<masksContainer.childCount;j++) {
+                            if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
+                                masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
+                                break;
+                            }
+                        }
+                        setPeriodicTableMsg(dialogBox, "Dommage, réessayez au prochain tour...");
+                    }
+                    dialogBox.transform.Find("NextButton").gameObject.SetActive(true); // On affiche le bouton "suivant"
+                    autoFocus(dialogBox.transform.Find("NextButton").gameObject);
+                });
+            }
+            else
+                iMask.GetComponent<Image>().color = new Color(0,0,0,0.5f);
         }
         updateMaskedElements(dialogBox);
         addClickEvent(dialogBox.transform.Find("NextButton").gameObject, delegate {
