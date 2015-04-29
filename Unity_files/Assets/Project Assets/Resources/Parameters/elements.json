@@ -158,8 +158,8 @@
 		"atomicNumber" : 92,
 		"family" : "Actinides",
 		"file" : "uranium",
-		"nb_in_pick" : 0,
-		"did_you_know" : "L'urainum, c'est cool"
+		"nb_in_pick" : 1,
+		"did_you_know" : "L'uranium, c'est cool"
 	},
 	{
 		"name" : "Xénon",

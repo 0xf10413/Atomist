@@ -73,6 +73,7 @@ public class Main : MonoBehaviour {
         SimpleJSON.JSONArray delayedReactionsInfos = loadJSONFile("poison_reactions").AsArray;
         ReactionType poisonType = new ReactionType("Poison");
         reactionTypes.Add (poisonType);
+        reactionTypes.Add (UraniumReaction.uraniumReaction);
         foreach (SimpleJSON.JSONNode r in delayedReactionsInfos) {
             List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
             foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
@@ -81,6 +82,7 @@ public class Main : MonoBehaviour {
             }
             reactions.Add (new PoisonReaction (r["reaction"], r["products"], rList, poisonType, r["cost"].AsInt, r["gain"].AsInt, r["nbTurns"].AsInt));
         }
+        reactions.Add(new UraniumReaction());
 
         // Génération de la liste des (types d') obstacles, ainsi que des jetons
         obstacles = new List<Obstacle> ();
@@ -316,29 +318,31 @@ public class Main : MonoBehaviour {
         dialogContainer.transform.localPosition = new Vector3(0, 0, 0);
 
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
+        Boolean guessing = true;
         for (int i=0;i<masksContainer.childCount;i++) {
             GameObject iMask = masksContainer.GetChild(i).gameObject;
             Element eltPicked = iMask.GetComponent<TableCaseScript>().getElement();
             if (eltPicked != null) {
                 Main.addClickEvent(iMask, delegate { // Lorsque le joueur clique sur le masque...
-                    iMask.SetActive(false); // On retire le masque
-                    for (int j=0;j<masksContainer.childCount;j++)
-                        Main.removeEvents(masksContainer.GetChild(j).gameObject); // On supprime l'événement au clic sur le masque
-                    if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
-                        setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
-                        toPick.Add(eltPicked);
-                    }
-                    else {
-                        for (int j=0;j<masksContainer.childCount;j++) {
-                            if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
-                                masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
-                                break;
-                            }
+                    if (guessing) {
+                        guessing = false;
+                        iMask.SetActive(false); // On retire le masque
+                        if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
+                            setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
+                            toPick.Add(eltPicked);
                         }
-                        setPeriodicTableMsg(dialogBox, "Dommage, réessayez au prochain tour...");
+                        else {
+                            for (int j=0;j<masksContainer.childCount;j++) {
+                                if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
+                                    masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
+                                    break;
+                                }
+                            }
+                            setPeriodicTableMsg(dialogBox, "Dommage, réessayez au prochain tour...");
+                        }
+                        dialogBox.transform.Find("NextButton").gameObject.SetActive(true); // On affiche le bouton "suivant"
+                        autoFocus(dialogBox.transform.Find("NextButton").gameObject);
                     }
-                    dialogBox.transform.Find("NextButton").gameObject.SetActive(true); // On affiche le bouton "suivant"
-                    autoFocus(dialogBox.transform.Find("NextButton").gameObject);
                 });
             }
             else
@@ -357,6 +361,7 @@ public class Main : MonoBehaviour {
                 toPick.Add(pickedCards[idCard]);
             }
             if (idCard < pickedCards.Count) {
+                guessing = true;
                 setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
                 DYKText.text = pickedCards[idCard].didYouKnow;
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PoisonReaction : DelayedReaction
 {
@@ -15,11 +16,29 @@ public class PoisonReaction : DelayedReaction
 
     public override void inflict(Player target)
     {
-        target.penalties.Add (new Penalty (nbOfTurns, target, p => {
-            p.target.undoTurn ();
-            Main.infoDialog ("Au tour de "+ target.name +"\nTour annulé !", delegate {
-                p.target.EndTurn();
-            });
+        GameObject penaltyToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PenaltyToken"));
+        penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = nbOfTurns.ToString();
+        penaltyToken.transform.SetParent(target.playerScreen.transform.Find("BoardGame/PenaltyTokensContainer"+ target.room));
+
+        int remainingTurns = nbOfTurns;
+
+        target.penalties.Add (new Penalty (delegate {
+            if (remainingTurns > 0) {
+                penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = remainingTurns.ToString();
+                remainingTurns--;
+                return false;
+            }
+            else {
+                if (target.hisTurn()) { // Si on n'a pas déjà sauté le tour du joueur (avec une autre pénalité)
+                    target.undoTurn ();
+                    Main.infoDialog ("Au tour de "+ target.name +"\nTour annulé !", delegate {
+                        target.EndTurn();
+                    });
+                }
+                return true;
+            }
+        }, delegate {
+            GameObject.Destroy(penaltyToken);
         }));
     }
 }

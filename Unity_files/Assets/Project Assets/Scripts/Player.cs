@@ -211,12 +211,12 @@ public class Player {
     public void BeginTurn() {
         isTurn = true;
 
-        for (int i=0; i<penalties.Count; i++)
-            if (penalties[i].isActive ()) {
-                Penalty p = penalties[i];
+        for (int i=0; i<penalties.Count; i++) {
+            if (penalties[i].setOff()) {
                 penalties.Remove (penalties[i]);
-                p.setOff ();
+                i--;
             }
+        }
 
         if (isTurn) {
             // On pioche 2 cartes
@@ -241,13 +241,19 @@ public class Player {
     public void undoTurn() {
         isTurn = false;
     }
+    
+    /// <summary>
+    /// Retourne false si le tour du joueur a été annulé
+    /// true sinon
+    /// </summary>
+    public bool hisTurn() {
+        return isTurn;
+    }
 
     /// <summary>
-    /// Fonction de fin de tour. Met à jour les pénalités, et masque l'écran.
+    /// Fonction de fin de tour. Masque l'écran.
     /// </summary>
     public void EndTurn() {
-        foreach (Penalty p in penalties)
-            p.newTurn ();
         playerScreen.SetActive(false);
         isTurn = false;
         firstTurn = false;
