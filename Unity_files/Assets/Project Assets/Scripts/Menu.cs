@@ -4,7 +4,9 @@ using System.Collections;
 
 public class Menu : MonoBehaviour {
 
-	// Use this for initialization
+	/// <summary>
+	/// Fonction de démarrage.
+	/// </summary>
 	void Start () {
 	    Main.addClickEvent(transform.Find("Screen/Play").gameObject, delegate {
             addPlayerDialog();
@@ -34,6 +36,8 @@ public class Menu : MonoBehaviour {
         });
         Main.autoFocus(dialog.transform.Find("Input").gameObject);
     }
+
+
     void playerAIDialog() {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAddAIDialog"));
         dialog.transform.SetParent(transform.Find("Screen"));
@@ -62,6 +66,8 @@ public class Menu : MonoBehaviour {
         }
         Main.autoFocus(dialog.transform.Find("Input").gameObject);
     }
+
+
     void addPlayerDialog() {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerNameDialog"));
         dialog.transform.SetParent(transform.Find("Screen"));
@@ -100,6 +106,7 @@ public class Menu : MonoBehaviour {
 
         addTutoDialog(1, nbPages, dialog);
     }
+
     void addTutoDialog(int page, int nbPages, GameObject dialog) {
         GameObject prevButton = dialog.transform.Find("Prev page").gameObject;
         GameObject nextButton = dialog.transform.Find("Next page").gameObject;

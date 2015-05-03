@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 40; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -53,14 +53,17 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        deck = new Deck();
         playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
-
+        
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
+        deck = new Deck ((GameObject)playerScreen.transform.Find ("Cards List/First Card").gameObject,
+            (playerScreen.transform.Find ("Cards List").GetComponent<RectTransform>().anchorMax -
+            playerScreen.transform.Find ("Cards List").GetComponent<RectTransform>().anchorMin).x* playerScreen.GetComponent<RectTransform> ().sizeDelta.x);
+       
         room = 0;
 
         // Ajout des icones feu, poison, etc
@@ -339,14 +342,11 @@ public class Player {
     public void updatePlayer () {
         // Vidage de l'interface
         foreach (Transform r in playerScreen.transform.Find ("Players/Ranks"))
-            if (r.name != "Title")
+            //if (r.name != "Title")
                 GameObject.Destroy (r.gameObject);
         foreach (Transform n in playerScreen.transform.Find ("Players/Names"))
-            if (n.name != "Title")
+            //if (n.name != "Title")
                 GameObject.Destroy (n.gameObject);
-        foreach (Transform r in playerScreen.transform.Find ("Players/Rooms"))
-            if (r.name != "Title")
-                GameObject.Destroy (r.gameObject);
         
         // Ajout des joueurs dans l'ordre
         var tmp = new List<Player> (Main.players);
@@ -366,28 +366,22 @@ public class Player {
         });
 
         foreach (Player p in tmp) {
-            GameObject rank = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Ranks/Title").gameObject);
-            GameObject room = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Rooms/Title").gameObject);
-            GameObject name = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Names/Title").gameObject);
+            GameObject rank = (GameObject)Object.Instantiate (Resources.Load<GameObject>("Prefabs/PlayerTextPrefab"));
+            GameObject name = (GameObject)Object.Instantiate (Resources.Load<GameObject>("Prefabs/PlayerTextPrefab"));
 
             rank.transform.GetComponent<Text> ().text = p.rank.ToString ();
             rank.name = p.name;
-            room.transform.GetComponent<Text> ().text = (p.room+1).ToString ();
-            room.name = p.name;
             name.transform.GetComponent<Text> ().text = p.printName;
             name.name = p.name;
             if (p == this) {
                 name.GetComponent<Text> ().color = Color.red;
-                room.GetComponent<Text> ().color = Color.red;
                 rank.GetComponent<Text> ().color = Color.red;
             }
 
             rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
-            room.transform.SetParent (playerScreen.transform.Find ("Players/Rooms"));
             name.transform.SetParent (playerScreen.transform.Find ("Players/Names"));
 
             rank.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
-            room.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
             name.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
         }
     }

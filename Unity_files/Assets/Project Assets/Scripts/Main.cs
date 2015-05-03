@@ -92,10 +92,16 @@ public class Main : MonoBehaviour {
         obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de joueurs
-        players.Add (new Player ("Florent"));
-        //players.Add (new Player ("Florent"));
-        players.Add (new PlayerAI ("Solène"));
-
+        if (players.Count == 0) {
+            players.Add (new Player ("Florent"));
+            players.Add (new PlayerAI ("Solène"));
+            players.Add (new PlayerAI ("Timothé"));
+            players.Add (new PlayerAI ("Guillaume"));
+            players.Add (new PlayerAI ("Marwane"));
+            players.Add (new PlayerAI ("Thomas"));
+            players.Add (new PlayerAI ("Emanuelle"));
+            players.Add (new PlayerAI ("François"));
+        }
         foreach (Player p in players)
             p.init();
         Player.updateRanks ();
