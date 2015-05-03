@@ -8,10 +8,25 @@ using System.Collections.Generic;
 public class Deck {
 
 	public List<Card> listCards { get; private set; }
+    /// <summary>
+    /// La carte la plus à gauche du deck.
+    /// </summary>
+    public static GameObject defaultCard { get; private set; }
 
-	// Use this for initialization
-	public Deck() {
+    /// <summary>
+    /// La longueur du jeu de cartes.
+    /// </summary>
+    private float length;
+
+	/// <summary>
+	/// Le constructeur usuel.
+	/// </summary>
+    /// <param name="leftCard">La position de la carte la plus à gauche.</param>
+    /// <param name="maxLength">La longueur maximale avant débordement.</param>
+	public Deck(GameObject leftCard, float maxLength) {
 		listCards = new List<Card> ();
+        defaultCard = leftCard;
+        length = maxLength;
 	}
 	
 	/// <summary>
@@ -43,12 +58,6 @@ public class Deck {
 	public void RemoveCards(Element element, int nb) {
 		Card c = listCards.Find (ca => (ca.element.name==element.name));
 		if (c != null) {
-            // Désélection de toutes les cartes, cf issue #3
-            /*
-            if (c.nbSelected >= nb)
-                c.nbSelected -= nb;
-            else
-             */
                 c.nbSelected = 0;
             if (c.nbCards > nb)
                 c.nbCards -= nb;
@@ -94,13 +103,18 @@ public class Deck {
 	/// <param name="card">La carte à replacer</param>
 	/// <param name="name">La position dans la main du joueur (0 pour la 1re carte, 1 pour la 2e, etc)</param>
 	public void updatePosition(Card card, int position) {
-		float x1 = -162; // Abcisse 1re carte, déterminée "à l'arrache" avec Unity
-		float x2 = -120; // Abcisse 2e carte
+        float x1 = defaultCard.transform.localPosition.x; // Abscisse 1ère carte, déterminée avec Unity
+		float x2 = x1 + card.w; // Abscisse 2ème carte
         float deltaX = x2-x1; // Distance entre 2 cartes par défaut
-        float maxWidth = 348; // Place maximale que peuvent prendre les cartes
-        float maxDeltaX = maxWidth/listCards.Count; // Distance maximale entre 2 cartes
-        if (deltaX > maxDeltaX)
-            deltaX = maxDeltaX;
-        card.updateX (x1 + deltaX * position);
+
+        float overflow = listCards.Count*defaultCard.GetComponent<RectTransform>().sizeDelta.x-length;
+        bool debordement = overflow > 0;
+        if (debordement) {
+            deltaX  -= overflow / (listCards.Count-1); // on redistribue le débordement sur les cartes
+        }
+
+            card.updateX (x1 + deltaX * position);
+        
+
 	}
 }
