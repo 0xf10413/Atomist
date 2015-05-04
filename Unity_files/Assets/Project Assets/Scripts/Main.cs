@@ -93,14 +93,14 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
-            players.Add (new Player ("Florent"));
+            players.Add (new PlayerAI ("Florent"));
             players.Add (new PlayerAI ("Solène"));
-            players.Add (new PlayerAI ("Timothé"));
+            /*players.Add (new PlayerAI ("Timothé"));
             players.Add (new PlayerAI ("Guillaume"));
             players.Add (new PlayerAI ("Marwane"));
             players.Add (new PlayerAI ("Thomas"));
             players.Add (new PlayerAI ("Emanuelle"));
-            players.Add (new PlayerAI ("François"));
+            players.Add (new PlayerAI ("François"));*/
         }
         foreach (Player p in players)
             p.init();
