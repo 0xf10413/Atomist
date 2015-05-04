@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 40; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -61,8 +61,8 @@ public class Player {
         penalties = new List<Penalty> ();
 
         deck = new Deck ((GameObject)playerScreen.transform.Find ("Cards List/First Card").gameObject,
-            (playerScreen.transform.Find ("Cards List").GetComponent<RectTransform>().anchorMax -
-            playerScreen.transform.Find ("Cards List").GetComponent<RectTransform>().anchorMin).x* playerScreen.GetComponent<RectTransform> ().sizeDelta.x);
+            playerScreen.transform.Find ("Cards List").gameObject,
+            playerScreen);
        
         room = 0;
 
