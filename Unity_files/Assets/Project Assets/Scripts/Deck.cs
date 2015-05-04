@@ -7,6 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public class Deck {
 
+    public static GameObject referenceCard;
+
 	public List<Card> listCards { get; private set; }
     /// <summary>
     /// La carte la plus à gauche du deck.
@@ -18,15 +20,28 @@ public class Deck {
     /// </summary>
     private float length;
 
+    /// <summary>
+    /// Position absolue du GameObject "Card List" sur le playerScreen
+    /// </summary>
+    private float xCardGO;
+
+    /// <summary>
+    /// Facteur d'échelle du playerScreen (le 1.7075, lol)
+    /// </summary>
+    private GameObject playerScreen;
+
 	/// <summary>
 	/// Le constructeur usuel.
 	/// </summary>
     /// <param name="leftCard">La position de la carte la plus à gauche.</param>
     /// <param name="maxLength">La longueur maximale avant débordement.</param>
-	public Deck(GameObject leftCard, float maxLength) {
+	public Deck(GameObject leftCard, GameObject cardsList, GameObject nPlayerScreen) {
 		listCards = new List<Card> ();
         defaultCard = leftCard;
-        length = maxLength;
+        playerScreen = nPlayerScreen;
+        length = (cardsList.GetComponent<RectTransform>().anchorMax - cardsList.GetComponent<RectTransform>().anchorMin).x* playerScreen.GetComponent<RectTransform> ().sizeDelta.x;
+        xCardGO = cardsList.GetComponent<RectTransform>().position.x - length/2;
+        referenceCard = playerScreen.transform.Find("Cards List/First Card").gameObject;
 	}
 	
 	/// <summary>
@@ -43,7 +58,7 @@ public class Deck {
                 if (card.element.symbole.CompareTo(element.symbole) <= 0)
                     insertID++;
             }
-			listCards.Insert(insertID,new Card(element));
+			listCards.Insert(insertID,new Card(element,referenceCard));
         }
 		updatePositions ();
 	}
@@ -103,18 +118,16 @@ public class Deck {
 	/// <param name="card">La carte à replacer</param>
 	/// <param name="name">La position dans la main du joueur (0 pour la 1re carte, 1 pour la 2e, etc)</param>
 	public void updatePosition(Card card, int position) {
+        float scalePS = playerScreen.GetComponent<RectTransform>().localScale.x;
+
         float x1 = defaultCard.transform.localPosition.x; // Abscisse 1ère carte, déterminée avec Unity
 		float x2 = x1 + card.w; // Abscisse 2ème carte
         float deltaX = x2-x1; // Distance entre 2 cartes par défaut
-
-        float overflow = listCards.Count*defaultCard.GetComponent<RectTransform>().sizeDelta.x-length;
-        bool debordement = overflow > 0;
-        if (debordement) {
-            deltaX  -= overflow / (listCards.Count-1); // on redistribue le débordement sur les cartes
-        }
-
-            card.updateX (x1 + deltaX * position);
         
+        float maxDeltaX = (length-card.w*scalePS) / listCards.Count / scalePS;
+        if (deltaX > maxDeltaX)
+            deltaX = maxDeltaX;
 
+        card.updateX (x1 + deltaX * position);
 	}
 }
