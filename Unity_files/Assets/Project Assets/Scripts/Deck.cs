@@ -15,6 +15,8 @@ public class Deck {
     /// </summary>
     public static GameObject defaultCard { get; private set; }
 
+    private System.Comparison<Element> sortFunction;
+
     /// <summary>
     /// La longueur du jeu de cartes.
     /// </summary>
@@ -42,6 +44,7 @@ public class Deck {
         length = (cardsList.GetComponent<RectTransform>().anchorMax - cardsList.GetComponent<RectTransform>().anchorMin).x* playerScreen.GetComponent<RectTransform> ().sizeDelta.x;
         xCardGO = cardsList.GetComponent<RectTransform>().position.x - length/2;
         referenceCard = playerScreen.transform.Find("Cards List/First Card").gameObject;
+        sortFunction = (a,b) => a.symbole.CompareTo(b.symbole);
 	}
 	
 	/// <summary>
@@ -55,7 +58,7 @@ public class Deck {
 		else {
             int insertID = 0;
             foreach (Card card in listCards) {
-                if (card.element.symbole.CompareTo(element.symbole) <= 0)
+                if (sortFunction(card.element,element) <= 0)
                     insertID++;
             }
 			listCards.Insert(insertID,new Card(element,referenceCard));
@@ -101,6 +104,17 @@ public class Deck {
 	public int getNbCards() {
 		return listCards.Count;
 	}
+
+    /// <summary>
+    /// Spécifie la façon dont sont triées les cartes
+    /// </summary>
+    /// <param name="?">La fonction de tri. Prend en argument 2 éléments a et b.
+    /// Revoie un nombre négatif si a inférieur à b, positif sinon</param>
+    public void setSortFunction(System.Comparison<Element> f) {
+        sortFunction = f;
+        listCards.Sort((a,b) => sortFunction(a.element,b.element));
+        updatePositions();
+    }
 	
 	/**
 	 * Replace automatiquement les cartes dans la main du joueur

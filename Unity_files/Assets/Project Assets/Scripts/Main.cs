@@ -93,8 +93,8 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
-            players.Add (new Player ("Florent"));
-            players.Add (new Player ("Solène"));
+            players.Add (new Player("Florent"));
+            players.Add (new Player("Solène"));
             /*players.Add (new PlayerAI ("Timothé"));
             players.Add (new PlayerAI ("Guillaume"));
             players.Add (new PlayerAI ("Marwane"));

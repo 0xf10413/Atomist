@@ -56,7 +56,7 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
         
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
@@ -70,22 +70,29 @@ public class Player {
         room = 0;
 
         // Ajout des icones feu, poison, etc
+        List<KeyValuePair<ReactionType,GameObject>> reactionObjects = new List<KeyValuePair<ReactionType,GameObject>>();
+        currentReactionSelected = Main.reactionTypes[0];
         foreach (ReactionType reactionType in Main.reactionTypes) {
+            ReactionType localReactionType = reactionType;
 
             GameObject icon = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Icon"));
             icon.transform.SetParent(playerScreen.transform.Find("Reactions/Families Icons"));
             icon.name = reactionType.name;
-            icon.GetComponent<Image>().sprite = reactionType.icon;
+            icon.GetComponent<Image>().sprite = (currentReactionSelected == reactionType) ? reactionType.iconH:reactionType.icon;
+
+            reactionObjects.Add(new KeyValuePair<ReactionType,GameObject>(reactionType,icon));
 
 		    // Ajout d'un événement au clic de la souris
             ReactionType rType = reactionType; // On rend la variable locale pour le delegate, sinon ça fait de la merde
             Main.addClickEvent(icon, delegate {
+                foreach (KeyValuePair<ReactionType,GameObject> reactionToUnsel in reactionObjects)
+                    reactionToUnsel.Value.GetComponent<Image>().sprite = reactionToUnsel.Key.icon;
+                icon.GetComponent<Image>().sprite = localReactionType.iconH;
                 currentReactionSelected = rType;
                 updateReactionsList();
 			});
         }
 
-        currentReactionSelected = Main.reactionTypes[0];
         updateReactionsList();
 
       
@@ -114,9 +121,54 @@ public class Player {
                 deck.updatePositions();
             });
         });
+        Main.addClickEvent(playerScreen.transform.Find ("Unselect All").gameObject, delegate {
+            for (int i=0;i<deck.getNbCards();i++)
+                deck.getCard(i).nbSelected = 0;
+        });
+        Main.addClickEvent(playerScreen.transform.Find ("Sort By").gameObject, delegate {
+            GameObject mask = Main.AddMask(true);
+            mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+            GameObject sortSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SortFunctionSelector"));
+            sortSelector.transform.SetParent(mask.transform,false);
+            mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+            KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
+                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
+                new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
+                    if (a.family == b.family)
+                        return a.atomicNumber-b.atomicNumber;
+                    return a.family.CompareTo(b.family);
+                })
+            };
+
+            Main.addClickEvent(mask, delegate {
+                GameObject.Destroy(mask);
+            });
+            Main.addClickEvent(sortSelector, delegate {
+            });
+            for (int i=0;i<buttonsWithSort.Length;i++) {
+                KeyValuePair<string,System.Comparison<Element>> sortFunctionData = buttonsWithSort[i];
+                Main.addClickEvent(sortSelector.transform.Find(sortFunctionData.Key).gameObject,delegate {
+                    deck.setSortFunction(sortFunctionData.Value);
+                    GameObject.Destroy(mask);
+                });
+            }
+        });
+
+        GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
+        boardGame.name = "BoardGame";
+        boardGame.transform.SetParent(playerScreen.transform, false);
 
         cardsBuffer = new List<Element>();
         cardsRecovered = new List<Element>();
+
+        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
+        obstacles = new List<ObstacleToken> ();
+        List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
+        foreach (GameObject obstacleToken in obstacleTokens) {
+            string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
+            obstacles.Add(new ObstacleToken(Main.obstacles.Find(o => o.name == obstacleName),obstacleToken));
+        }
 	}
 
     public void updateReactionsList ()
@@ -167,14 +219,6 @@ public class Player {
                         Main.infoDialog("Vous n'avez pas assez de points d'énergie.");
 			    });
             }
-        }
-
-        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
-        obstacles = new List<ObstacleToken> ();
-        List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
-        foreach (GameObject obstacleToken in obstacleTokens) {
-            string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
-            obstacles.Add(new ObstacleToken(Main.obstacles.Find(o => o.name == obstacleName),obstacleToken));
         }
     }
 
@@ -290,6 +334,7 @@ public class Player {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
                 isPlaying = false;
                 Main.winners.Add (this);
+                progressMoveToNextRoom();
             });
         }
         else {

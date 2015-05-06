@@ -41,8 +41,7 @@ public class PlayerAI : Player
     /// Initialisation des éléments graphiques. On masque tout sauf
     /// le plateau et l'affichage des rangs.
     /// </summary>
-    public override void init ()
-    {
+    public override void init () {
         base.init ();
         playerScreen.transform.Find ("Energy container").gameObject.SetActive (false);
         playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
@@ -54,8 +53,7 @@ public class PlayerAI : Player
     /// Récupération des cartes. À partir de ce moment, le comportement classique change.
     /// L'IA réussit toujours à récupérer les deux cartes.
     /// </summary>
-    public override void pickCards (int nbCards, string message, bool askInPeriodicTable)
-    {
+    public override void pickCards (int nbCards, string message, bool askInPeriodicTable) {
         for (int i = 0; i < nbCards; i++)
             addCardToPlayer (Main.pickCard ());
 
@@ -70,9 +68,7 @@ public class PlayerAI : Player
     /// Actuellement minimaliste : joue la première réaction possible.
     /// Elle est appelée récursivement jusqu'à la décision de fin de tour.
     /// </summary>
-    public void think ()
-    {
-
+    public void think () {
         // D'abord, on jette les gaz nobles
         if (deck.listCards.Find (ca => ca.element.family == "Gaz Noble") != null) {
             int energyToGain = 0;
@@ -117,8 +113,7 @@ public class PlayerAI : Player
     /// Détermine la prochaine réaction à jouer.
     /// </summary>
     /// <returns>Une réaction jouable si elle existe, null sinon.</returns>
-    public Reaction chooseReaction ()
-    {
+    public Reaction chooseReaction () {
         Reaction reaction = null;
         List<ObstacleToken> obs = new List<ObstacleToken> (); // Obstacles à examiner (au plus 2)
         foreach (ObstacleToken o in obstacles) {
@@ -160,8 +155,7 @@ public class PlayerAI : Player
         return reaction;
     }
 
-    public override void moveToNextRoom ()
-    {
+    public override void moveToNextRoom () {
         room++;
         updateRanks ();
         foreach (Penalty p in penalties)
@@ -183,7 +177,4 @@ public class PlayerAI : Player
                 + " suivante !",
                 delegate {  think (); });
     }
-
-
-
 }

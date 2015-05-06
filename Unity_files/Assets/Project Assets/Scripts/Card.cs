@@ -107,39 +107,25 @@ public class Card {
 		});
 
 		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
-		EventTrigger.Entry overEvent = new EventTrigger.Entry();
-		overEvent.eventID = EventTriggerType.PointerEnter;
-		overEvent.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> overCallback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
-				if (cardPreview == null) {
-					cardPreview = new GameObject();
-					cardPreview.name = "Card Preview";
-					cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find ("BoardGame"));
-					cardPreview.AddComponent<Image> ();
-					cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
-					cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
-					cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
-				}
-			});
-		overEvent.callback.AddListener(overCallback);
-		cardImg.AddComponent<EventTrigger>();
-		cardImg.GetComponent<EventTrigger>().delegates.Add(overEvent);
-		
+        Main.addEvent(cardImg, EventTriggerType.PointerEnter, delegate {
+			// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
+			if (cardPreview == null) {
+				cardPreview = new GameObject();
+				cardPreview.name = "Card Preview";
+				cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find("Card Preview Container"));
+				cardPreview.AddComponent<Image> ();
+				cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
+				cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.36f,Screen.height*0.48f); // Taille
+				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+			}
+        });
+        
 		// Ajout d'un événement de déprévisualisation de la carte à la sortie de la souris
-		EventTrigger.Entry outEvent = new EventTrigger.Entry();
-		outEvent.eventID = EventTriggerType.PointerExit;
-		outEvent.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> outCallback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				// Suppression de la prévisualisation de la carte
-				Object.Destroy(cardPreview);
-				cardPreview = null;
-			});
-		outEvent.callback.AddListener(outCallback);
-		cardImg.AddComponent<EventTrigger>();
-		cardImg.GetComponent<EventTrigger>().delegates.Add(outEvent);
+        Main.addEvent(cardImg, EventTriggerType.PointerExit, delegate {
+			// Suppression de la prévisualisation de la carte
+			Object.Destroy(cardPreview);
+			cardPreview = null;
+        });
 		
 		cardImg.transform.SetParent(Main.currentPlayer().playerScreen.gameObject.transform.Find ("Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
