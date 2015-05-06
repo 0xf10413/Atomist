@@ -57,7 +57,7 @@ public class PlayerAI : Player
     public override void pickCards (int nbCards, string message, bool askInPeriodicTable)
     {
         for (int i = 0; i < nbCards; i++)
-            deck.AddCard (Main.pickCard ());
+            addCardToPlayer (Main.pickCard ());
 
         // Ajouter un chrono ? 
         Main.infoDialog (name + " pioche " + nbCards.ToString () +

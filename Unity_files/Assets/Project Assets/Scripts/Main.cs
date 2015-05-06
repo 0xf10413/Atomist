@@ -93,8 +93,8 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
-            players.Add (new PlayerAI ("Florent"));
-            players.Add (new PlayerAI ("Solène"));
+            players.Add (new Player ("Florent"));
+            players.Add (new Player ("Solène"));
             /*players.Add (new PlayerAI ("Timothé"));
             players.Add (new PlayerAI ("Guillaume"));
             players.Add (new PlayerAI ("Marwane"));
@@ -256,7 +256,7 @@ public class Main : MonoBehaviour {
     /// <param name="message">Le message à afficher</param>
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
-    public static GameObject postPickCardsDialog(List<Element> pickedCards, string message, PickCardsCallback onValid) {
+    public static GameObject postPickCardsDialog(List<Element> pickedCards, List<Element> cardsBuffer, string message, PickCardsCallback onValid) {
         GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
@@ -269,7 +269,7 @@ public class Main : MonoBehaviour {
         dialogBox.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(dialogBox.transform.Find("Ok Button").gameObject, delegate {
             GameObject.Destroy(mask);
-            placeCardsInTableDialog(pickedCards, onValid);
+            placeCardsInTableDialog(pickedCards,cardsBuffer, onValid);
         });
         dialogBox.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
@@ -283,26 +283,35 @@ public class Main : MonoBehaviour {
     /// Affiche une boîte de dialogue avec le tableau périodique et la carte à placer
     /// </summary>
     /// <param name="pickedCards">Les cartes à placer</param>
+    /// <param name="bufferedCards">Les cartes que le joueur à "loupé" dernièrement</param>
     /// <param name="onValid">Un delegate appelé lorsque le joueur a placé toutes les cartes</param>
-    public static void placeCardsInTableDialog(List<Element> pickedCards, PickCardsCallback onValid) {
+    public static void placeCardsInTableDialog(List<Element> pickedCards, List<Element> bufferedCards, PickCardsCallback onValid) {
         Player cPlayer = currentPlayer();
         bool ownAllElements = true;
-        foreach (Element elt in pickedCards) {
-            if (cPlayer.deck.getCard(elt) == null) {
+        List<Element> cardsToGuess = new List<Element>();
+        foreach (Element elt in pickedCards)
+            cardsToGuess.Add(elt);
+        foreach (Element elt in bufferedCards) {
+            if (!pickedCards.Contains(elt))
+                cardsToGuess.Add(elt);
+        }
+        
+        foreach (Element elt in cardsToGuess) {
+            if (!cPlayer.cardsRecovered.Contains(elt)) {
                 ownAllElements = false;
                 break;
             }
         }
         if (ownAllElements) {
-            pickCardsDialog(pickedCards, delegate {
-                onValid(pickedCards);
+            pickCardsDialog(cardsToGuess, delegate {
+                onValid(cardsToGuess);
             });
             return;
         }
         int idCard; // L'id de la carte à placer : 0 si c'est la 1re carte piochée, 1 si c'est la 2e carte, etc
         List<Element> toPick = new List<Element>(); // Les cartes bien placées par le joueur sur le tableau
-        for (idCard=0;(cPlayer.deck.getCard(pickedCards[idCard])!=null);idCard++)
-            toPick.Add(pickedCards[idCard]);
+        for (idCard=0;cPlayer.cardsRecovered.Contains(cardsToGuess[idCard]);idCard++)
+            toPick.Add(cardsToGuess[idCard]);
 
         cPlayer.playerScreen.SetActive(false); // On efface l'écran du joueur (sinon il voit le tableau, c'est trop facile)
         
@@ -311,10 +320,10 @@ public class Main : MonoBehaviour {
         GameObject dialogContainer = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ElementFinder"));
         GameObject DYKDialog = dialogContainer.transform.Find("DYKDialog").gameObject;
         Text DYKText = DYKDialog.transform.Find("DYKMessage").gameObject.GetComponent<Text>();
-        DYKText.text = pickedCards[idCard].didYouKnow;
+        DYKText.text = cardsToGuess[idCard].didYouKnow;
 
         GameObject dialogBox = dialogContainer.transform.Find("PeriodicTableDialog").gameObject;
-        setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
+        setPeriodicTableMsg(dialogBox,cardsToGuess[idCard],(idCard < pickedCards.Count));
         dialogContainer.transform.SetParent(mask.transform);
         float scaleFactor = (float) Math.Sqrt(Screen.height/232f);
         float scaleFactor2 = 1/scaleFactor;
@@ -333,13 +342,15 @@ public class Main : MonoBehaviour {
                     if (guessing) {
                         guessing = false;
                         iMask.SetActive(false); // On retire le masque
-                        if (eltPicked == pickedCards[idCard]) { // Si l'élément sélectionné est le bon...
+                        if (eltPicked == cardsToGuess[idCard]) { // Si l'élément sélectionné est le bon...
                             setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
                             toPick.Add(eltPicked);
                         }
                         else {
+                            if (idCard < pickedCards.Count)
+                                cPlayer.cardsBuffer.Add(cardsToGuess[idCard]);
                             for (int j=0;j<masksContainer.childCount;j++) {
-                                if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == pickedCards[idCard].atomicNumber) {
+                                if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == cardsToGuess[idCard].atomicNumber) {
                                     masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
                                     break;
                                 }
@@ -360,16 +371,23 @@ public class Main : MonoBehaviour {
             dialogBox.transform.Find("NextButton").gameObject.SetActive(false); // On cache le bouton "suivant"
             while (true) {
                 idCard++;
-                if (idCard == pickedCards.Count)
+                if (idCard == cardsToGuess.Count)
                     break;
-                if (!toPick.Contains(pickedCards[idCard]) && (cPlayer.deck.getCard(pickedCards[idCard])==null))
+                if (!toPick.Contains(cardsToGuess[idCard]) && (!cPlayer.cardsRecovered.Contains(cardsToGuess[idCard]))) {bool alreadyAsked = false;
+                    for (int i=0;i<idCard;i++) {
+                        if (cardsToGuess[i] == cardsToGuess[idCard])
+                            alreadyAsked = true;
+                    }
+                    if (alreadyAsked)
+                        continue;
                     break;
-                toPick.Add(pickedCards[idCard]);
+                }
+                toPick.Add(cardsToGuess[idCard]);
             }
-            if (idCard < pickedCards.Count) {
+            if (idCard < cardsToGuess.Count) {
                 guessing = true;
-                setPeriodicTableMsg(dialogBox,pickedCards[idCard]);
-                DYKText.text = pickedCards[idCard].didYouKnow;
+                setPeriodicTableMsg(dialogBox,cardsToGuess[idCard], (idCard < pickedCards.Count));
+                DYKText.text = cardsToGuess[idCard].didYouKnow;
             }
             else { // On supprime la boite de dialogue, et on affiche les cartes piochées
                 GameObject.Destroy(mask);
@@ -392,11 +410,14 @@ public class Main : MonoBehaviour {
         for (int i=0;i<masksContainer.childCount;i++) {
             GameObject iMask = masksContainer.GetChild(i).gameObject;
             Element maskElt = iMask.GetComponent<TableCaseScript>().getElement();
-            iMask.SetActive(!eltsRecovered.Contains(maskElt) && (cPlayer.deck.getCard(maskElt) == null));
+            iMask.SetActive(!eltsRecovered.Contains(maskElt) && !cPlayer.cardsRecovered.Contains(maskElt));
         }
     }
-    private static void setPeriodicTableMsg(GameObject parent, Element elt) {
-        setPeriodicTableMsg(parent, "Placez l'élément <b>"+ elt.name +"</b> ("+ elt.symbole +") sur le tableau périodique pour obtenir la carte :");
+    private static void setPeriodicTableMsg(GameObject parent, Element elt, bool cardPicked) {
+        if (cardPicked)
+            setPeriodicTableMsg(parent, "Placez l'élément <b>"+ elt.name +"</b> ("+ elt.symbole +") sur le tableau périodique pour obtenir la carte :");
+        else
+            setPeriodicTableMsg(parent, "Nouvelle chance de placer l'élément <b>"+ elt.name +"</b> ("+ elt.symbole +") sur le tableau périodique :");
     }
     private static void setPeriodicTableMsg(GameObject parent, string message) {
         parent.transform.Find("Message").GetComponent<Text>().text = message;

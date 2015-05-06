@@ -38,6 +38,9 @@ public class Player {
     public string printName { get; protected set; } // Nom affiché dans les scores
     public int rank {private get; set; } // Rang du joueur
 
+    public List<Element> cardsBuffer {get;set;} // Cartes que le joueur a "loupé" dans le tableau, il peut réessayer au tour suivant
+    public List<Element> cardsRecovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
+
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
     /// reste plus tard.
@@ -111,6 +114,9 @@ public class Player {
                 deck.updatePositions();
             });
         });
+
+        cardsBuffer = new List<Element>();
+        cardsRecovered = new List<Element>();
 	}
 
     public void updateReactionsList ()
@@ -196,19 +202,27 @@ public class Player {
         for (int i=0;i<nbCards;i++)
             toPick.Add(Main.pickCard());
         if (askInPeriodicTable) {
-            Main.postPickCardsDialog(toPick, message, pickedCards => {
+            Main.postPickCardsDialog(toPick, cardsBuffer, message, pickedCards => {
                 foreach (Element card in pickedCards) {
-                    deck.AddCard(card);
+                    addCardToPlayer(card);
                 }
             });
         }
         else {
             Main.pickCardsDialog(toPick, message, delegate {
                 foreach (Element card in toPick) {
-                    deck.AddCard(card);
+                    addCardToPlayer(card);
                 }
             });
         }
+    }
+
+    public void addCardToPlayer(Element card) {
+        deck.AddCard(card);
+        if (!cardsRecovered.Contains(card))
+            cardsRecovered.Add(card);
+        if (cardsBuffer.Contains(card))
+            cardsBuffer.Remove(card);
     }
 
     public void BeginTurn() {
