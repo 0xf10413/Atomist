@@ -93,8 +93,16 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
+            Main.Write ("Warning: ajout de joueurs de test !");
             players.Add (new Player("Florent"));
             players.Add (new PlayerAI("Solène"));
+            players.Add (new Player ("Solène"));
+            players.Add (new Player ("Timothé"));
+            players.Add (new Player("Guillaume"));
+            players.Add (new Player ("Marwane"));
+            players.Add (new Player ("Thomas"));
+            players.Add (new Player ("Emanuelle"));
+            //players.Add (new Player ("François"));
         }
         foreach (Player p in players)
             p.init();
@@ -310,7 +318,7 @@ public class Main : MonoBehaviour {
         cPlayer.playerScreen.SetActive(false); // On efface l'écran du joueur (sinon il voit le tableau, c'est trop facile)
         
         GameObject mask = AddMask();
-        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogContainer = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ElementFinder"));
         GameObject DYKDialog = dialogContainer.transform.Find("DYKDialog").gameObject;
         Text DYKText = DYKDialog.transform.Find("DYKMessage").gameObject.GetComponent<Text>();

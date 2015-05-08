@@ -681,10 +681,10 @@ RectTransform:
   - {fileID: 22416702}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: .709000051}
-  m_AnchorMax: {x: .45600003, y: .958000064}
-  m_AnchoredPosition: {x: 0, y: -3.05175781e-05}
-  m_SizeDelta: {x: -6.10351562e-05, y: -1.52587891e-05}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -232.5, y: 244.499969}
+  m_SizeDelta: {x: -465.000061, y: -551}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22416698
 RectTransform:
