@@ -56,10 +56,10 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
         
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
-        playerScreen.name = "PlayerScreen";
+        playerScreen.name = "FPlayerScreen";
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
@@ -69,7 +69,7 @@ public class Player {
        
         room = 0;
 
-        // Ajout des icones feu, poison, etc
+        // Ajout des icônes feu, poison, etc
         List<KeyValuePair<ReactionType,GameObject>> reactionObjects = new List<KeyValuePair<ReactionType,GameObject>>();
         currentReactionSelected = Main.reactionTypes[0];
         foreach (ReactionType reactionType in Main.reactionTypes) {
@@ -157,7 +157,9 @@ public class Player {
 
         GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
         boardGame.name = "BoardGame";
-        boardGame.transform.SetParent(playerScreen.transform, false);
+        boardGame.transform.SetParent(playerScreen.transform.Find ("Board Container"), false);
+        boardGame.GetComponent<RectTransform> ().localPosition = new Vector2 (0, 0);
+        boardGame.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
 
         cardsBuffer = new List<Element>();
         cardsRecovered = new List<Element>();
