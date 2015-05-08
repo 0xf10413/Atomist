@@ -93,7 +93,7 @@
 		"name" : "Magnésium",
 		"symbol" : "Mg",
 		"atomicNumber" : 12,
-		"family" : "Métal Alcalin",
+		"family" : "Alcalino-terreux",
 		"file" : "magnesium",
 		"nb_in_pick" : 2,
 		"did_you_know" : "Le magnésium, c'est cool"
@@ -120,7 +120,7 @@
 		"name" : "Potassium",
 		"symbol" : "K",
 		"atomicNumber" : 19,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "potassium",
 		"nb_in_pick" : 2,
 		"did_you_know" : "Le potassium, c'est cool"
@@ -129,7 +129,7 @@
 		"name" : "Rubidium",
 		"symbol" : "Rb",
 		"atomicNumber" : 37,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "rubidium",
 		"nb_in_pick" : 4,
 		"did_you_know" : "Le rubidium, c'est cool"
@@ -138,7 +138,7 @@
 		"name" : "Sodium",
 		"symbol" : "Na",
 		"atomicNumber" : 11,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "sodium",
 		"nb_in_pick" : 4,
 		"did_you_know" : "Le sodium, c'est cool"
@@ -156,7 +156,7 @@
 		"name" : "Uranium",
 		"symbol" : "U",
 		"atomicNumber" : 92,
-		"family" : "Actinides",
+		"family" : "Actinide",
 		"file" : "uranium",
 		"nb_in_pick" : 1,
 		"did_you_know" : "L'uranium, c'est cool"
