@@ -63,9 +63,7 @@ public class Player {
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
-        deck = new Deck ((GameObject)playerScreen.transform.Find ("Cards List/First Card").gameObject,
-            playerScreen.transform.Find ("Cards List").gameObject,
-            playerScreen);
+        deck = new Deck (playerScreen.transform.Find ("Cards List").gameObject);
        
         room = 0;
 
@@ -96,12 +94,12 @@ public class Player {
         updateReactionsList();
 
       
-        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate {
+        Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Next turn").gameObject, delegate {
             Main.confirmDialog("Fin du tour ?", delegate {
                 EndTurn ();
             });
         });
-        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Discard cards").gameObject, delegate {
+        Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Discard cards").gameObject, delegate {
             Main.confirmDialog("Jeter les cartes sélectionnées ?", delegate {
                 int energyToGain = 0;
                 int nbCardsToPick = 0;
@@ -121,11 +119,11 @@ public class Player {
                 deck.updatePositions();
             });
         });
-        Main.addClickEvent(playerScreen.transform.Find ("Unselect All").gameObject, delegate {
+        Main.addClickEvent(playerScreen.transform.Find ("Card Buttons/Unselect All").gameObject, delegate {
             for (int i=0;i<deck.getNbCards();i++)
                 deck.getCard(i).nbSelected = 0;
         });
-        Main.addClickEvent(playerScreen.transform.Find ("Sort By").gameObject, delegate {
+        Main.addClickEvent(playerScreen.transform.Find ("Card Buttons/Sort By").gameObject, delegate {
             GameObject mask = Main.AddMask(true);
             mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
             GameObject sortSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SortFunctionSelector"));

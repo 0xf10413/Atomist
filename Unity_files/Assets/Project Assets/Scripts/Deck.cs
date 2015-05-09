@@ -3,47 +3,38 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Représente le deck d'un joueur, c'est-à-dire la liste des ses cartes
+/// Représente le deck d'un joueur, c'est-à-dire la liste des ses cartes.
 /// </summary>
 public class Deck {
+    /// <summary>
+    /// Le GameObject représentant le deck à l'écran.
+    /// </summary>
+    public GameObject deck;
 
-    public static GameObject referenceCard;
+    /// <summary>
+    /// Une carte de référence, servant d'exemple à la construction des cartes.
+    /// C'est la carte la plus à gauche de la main.
+    /// </summary>
+    public GameObject referenceCard;
 
+    /// <summary>
+    /// La liste des cartes en main.
+    /// </summary>
 	public List<Card> listCards { get; private set; }
-    /// <summary>
-    /// La carte la plus à gauche du deck.
-    /// </summary>
-    public static GameObject defaultCard { get; private set; }
 
+    /// <summary>
+    /// La fonction de tri à utiliser pour réorganiser les cartes.
+    /// </summary>
     private System.Comparison<Element> sortFunction;
-
-    /// <summary>
-    /// La longueur du jeu de cartes.
-    /// </summary>
-    private float length;
-
-    /// <summary>
-    /// Position absolue du GameObject "Card List" sur le playerScreen
-    /// </summary>
-    private float xCardGO;
-
-    /// <summary>
-    /// Facteur d'échelle du playerScreen (le 1.7075, lol)
-    /// </summary>
-    private GameObject playerScreen;
 
 	/// <summary>
 	/// Le constructeur usuel.
 	/// </summary>
-    /// <param name="leftCard">La position de la carte la plus à gauche.</param>
-    /// <param name="maxLength">La longueur maximale avant débordement.</param>
-	public Deck(GameObject leftCard, GameObject cardsList, GameObject nPlayerScreen) {
+    /// <param name="dDeck">Le GameObject représentant le Deck à l'écran.</param>
+	public Deck(GameObject dDeck) {
+        deck = dDeck;
 		listCards = new List<Card> ();
-        defaultCard = leftCard;
-        playerScreen = nPlayerScreen;
-        length = (cardsList.GetComponent<RectTransform>().anchorMax - cardsList.GetComponent<RectTransform>().anchorMin).x* playerScreen.GetComponent<RectTransform> ().sizeDelta.x;
-        xCardGO = cardsList.GetComponent<RectTransform>().position.x - length/2;
-        referenceCard = playerScreen.transform.Find("Cards List/First Card").gameObject;
+        referenceCard = deck.transform.Find("First Card").gameObject;
         sortFunction = (a,b) => a.symbole.CompareTo(b.symbole);
 	}
 	
@@ -116,9 +107,9 @@ public class Deck {
         updatePositions();
     }
 	
-	/**
-	 * Replace automatiquement les cartes dans la main du joueur
-	 **/
+	///<summary>
+	/// Replace automatiquement les cartes dans la main du joueur
+	///</summary>
 	public void updatePositions() {
 		for (int i=0; i<listCards.Count; i++)
 			updatePosition(listCards[i],i);
@@ -131,17 +122,14 @@ public class Deck {
 	/// </summary>
 	/// <param name="card">La carte à replacer</param>
 	/// <param name="name">La position dans la main du joueur (0 pour la 1re carte, 1 pour la 2e, etc)</param>
-	public void updatePosition(Card card, int position) {
-        float scalePS = playerScreen.GetComponent<RectTransform>().localScale.x;
-
-        float x1 = defaultCard.transform.localPosition.x; // Abscisse 1ère carte, déterminée avec Unity
-		float x2 = x1 + card.w; // Abscisse 2ème carte
-        float deltaX = x2-x1; // Distance entre 2 cartes par défaut
+	public void updatePosition(Card card, int position) 
+    {
+        float x1 = referenceCard.GetComponent<RectTransform> ().localPosition.x;
+        float deltaX = referenceCard.GetComponent<RectTransform>().rect.width;
         
-        float maxDeltaX = (length-card.w*scalePS) / listCards.Count / scalePS;
-        if (deltaX > maxDeltaX)
-            deltaX = maxDeltaX;
-
+        //if (deltaX > maxDeltaX)
+        if (false)
+        deltaX = 0;
         card.updateX (x1 + deltaX * position);
 	}
 }
