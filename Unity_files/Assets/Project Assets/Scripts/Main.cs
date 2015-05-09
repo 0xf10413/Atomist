@@ -96,6 +96,7 @@ public class Main : MonoBehaviour {
             Main.Write ("Warning: ajout de joueurs de test !");
             players.Add (new Player("Florent"));
             players.Add (new PlayerAI("Solène"));
+
             players.Add (new Player ("Solène"));
             players.Add (new Player ("Timothé"));
             players.Add (new Player("Guillaume"));

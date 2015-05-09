@@ -49,6 +49,7 @@ public class PlayerAI : Player
         playerScreen.transform.Find ("Turn buttons").gameObject.SetActive (false);
         playerScreen.transform.Find ("Unselect All").gameObject.SetActive (false);
         playerScreen.transform.Find ("Sort By").gameObject.SetActive (false);
+        playerScreen.transform.Find ("Card Buttons").gameObject.SetActive (false);
     }
 
     /// <summary>
