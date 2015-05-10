@@ -6,7 +6,7 @@
 		"family" : "Métal Pauvre",
 		"file" : "aluminium",
 		"nb_in_pick" : 4,
-		"did_you_know" : "L'aluminium, c'est cool"
+		"did_you_know" : "Z=13 L’aluminium se trouve à l’état naturel sous forme de minéraux, principalement la bauxite qui a une forte teneur en alumine Al2O3."
 	},
 	{
 		"name" : "Argon",
@@ -15,7 +15,7 @@
 		"family" : "Gaz Noble",
 		"file" : "argon",
 		"nb_in_pick" : 3,
-		"did_you_know" : "L'argon, c'est cool"
+		"did_you_know" : "Z=18 La majeure partie de l’argon terrestre est l’argon 40, produit par désintégration radioactive du potassium 40. Cependant l’isotope le plus répandu dans l’univers est l’argon 36 produit dans les supernovas (phénomène d’explosion d’une étoile)."
 	},
 	{
 		"name" : "Azote",
@@ -24,7 +24,7 @@
 		"family" : "Non-Métal",
 		"file" : "azote",
 		"nb_in_pick" : 5,
-		"did_you_know" : "L'azote, c'est cool"
+		"did_you_know" : "Z=7 Etymologiquement, le mot azote est constitué du préfixe a- (privatif) et du mot grec « vivre ». Il signifie donc « privé de vie » car contrairement à l’oxygène, il ne permet pas la vie."
 	},
 	{
 		"name" : "Carbone",
@@ -33,7 +33,7 @@
 		"family" : "Non-Métal",
 		"file" : "carbone",
 		"nb_in_pick" : 1,
-		"did_you_know" : "Le carbone, c'est cool"
+		"did_you_know" : "Z=6 Le carbone 14 est un isotope radioactif du carbone (atome ayant plus de neutrons que le carbone 12 stable) et qui permet la datation de matière organique ayant entre quelques centaines d’années et 50000 ans."
 	},
 	{
 		"name" : "Chlore",
@@ -42,7 +42,7 @@
 		"family" : "Halogène",
 		"file" : "chlore",
 		"nb_in_pick" : 14,
-		"did_you_know" : "Le chlore, c'est cool"
+		"did_you_know" : "Z=17 Le dichlore Cl2 a été un des premiers gaz utilisé pendant la première guerre mondiale en tant que gaz de combat."
 	},
 	{
 		"name" : "Chrome",
@@ -51,7 +51,7 @@
 		"family" : "Métal de transition",
 		"file" : "chrome",
 		"nb_in_pick" : 2,
-		"did_you_know" : "Le chrome, c'est cool"
+		"did_you_know" : "Z=24 Le dichromate de potassium Cr2O7 est utilisé dans les éthylotests. En effet en présence d’éthanol (présent dans l’air de nos poumons après consommation d’alcool), les ions dichromates orange sont oxydés en ions chrome de couleur verte."
 	},
 	{
 		"name" : "Germanium",
@@ -60,7 +60,7 @@
 		"family" : "Métaloïde",
 		"file" : "germanium",
 		"nb_in_pick" : 0,
-		"did_you_know" : "Le germanium, c'est cool"
+		"did_you_know" : "Z=32 Le germanium a été utilisé dans les premiers transistors avant d’être remplacé par le silicium dans les années 1970."
 	},
 	{
 		"name" : "Hélium",
@@ -69,7 +69,7 @@
 		"family" : "Gaz Noble",
 		"file" : "helium",
 		"nb_in_pick" : 3,
-		"did_you_know" : "L'hélium, c'est cool"
+		"did_you_know" : "Z=2 A des pressions inférieures à 25 atm, l’hélium reste liquide jusqu’au zéro absolu (-273.15 °C), ce qui n’est pas le cas des autres éléments."
 	},
 	{
 		"name" : "Hydrogène",
@@ -78,7 +78,7 @@
 		"family" : "Non-Métal",
 		"file" : "hydrogene",
 		"nb_in_pick" : 32,
-		"did_you_know" : "L'hydrogène, c'est cool"
+		"did_you_know" : "Z=1 L’hydrogène est l’élément le plus abondant de l’univers, il est présent en grandes quantités dans les étoiles et les planètes gazeuses."
 	},
 	{
 		"name" : "Krypton",
@@ -87,7 +87,7 @@
 		"family" : "Gaz Noble",
 		"file" : "krypton",
 		"nb_in_pick" : 3,
-		"did_you_know" : "Le krypton, c'est cool"
+		"did_you_know" : "Z=36 Jusqu’en 1983 le krypton 86 servait à la définition du mètre, il correspondait à : « la longueur égale à 1 650 763,73 longueurs d'onde dans le vide de la radiation correspondant à la transition entre les niveaux 2p10 et 5d5 de l'atome de krypton-86 »"
 	},
 	{
 		"name" : "Magnésium",
@@ -96,7 +96,7 @@
 		"family" : "Métal Alcalin",
 		"file" : "magnesium",
 		"nb_in_pick" : 2,
-		"did_you_know" : "Le magnésium, c'est cool"
+		"did_you_know" : "Z=12 Le magnésium est un élément essentiel pour le corps humain. Il permet notamment la fixation du calcium sur les os et la prévention de maladies cardio-vasculaires."
 	},
 	{
 		"name" : "Néon",
@@ -105,7 +105,7 @@
 		"family" : "Gaz Noble",
 		"file" : "neon",
 		"nb_in_pick" : 4,
-		"did_you_know" : "Le néon, c'est cool"
+		"did_you_know" : "Z=10 Les tubes fluorescents (abusivement appelés néons) ne sont pas nécessairement composés de néon. En effet le néon ne pourra donner qu’une couleur rouge, les autres couleurs sont obtenues par d’autres gaz."
 	},
 	{
 		"name" : "Oxygène",
@@ -114,7 +114,7 @@
 		"family" : "Non-Métal",
 		"file" : "oxygene",
 		"nb_in_pick" : 29,
-		"did_you_know" : "L'oxygène, c'est cool"
+		"did_you_know" : "Z=8 L’oxygène est l’élément le plus abondant de l’écorce terrestre, il représente 46% de sa masse essentiellement sous forme d’oxydes et de silicates."
 	},
 	{
 		"name" : "Potassium",
@@ -123,7 +123,7 @@
 		"family" : "Non-Alcalin",
 		"file" : "potassium",
 		"nb_in_pick" : 2,
-		"did_you_know" : "Le potassium, c'est cool"
+		"did_you_know" : "Z=19 Le potassium métallique est utilisé dans de nombreuses réactions en pharmacie pour ses propriétés de bon réducteur."
 	},
 	{
 		"name" : "Rubidium",
@@ -132,7 +132,7 @@
 		"family" : "Non-Alcalin",
 		"file" : "rubidium",
 		"nb_in_pick" : 4,
-		"did_you_know" : "Le rubidium, c'est cool"
+		"did_you_know" : "Z=37 Le rubidium 87 permet de fabriquer des horloges atomiques à bas coût avec une erreur possible de l’ordre d’une seconde tous les 600 ans. Les horloges les plus précises utilisent du césium 133."
 	},
 	{
 		"name" : "Sodium",
@@ -141,7 +141,7 @@
 		"family" : "Non-Alcalin",
 		"file" : "sodium",
 		"nb_in_pick" : 4,
-		"did_you_know" : "Le sodium, c'est cool"
+		"did_you_know" : " Z=11 Le sodium est présent dans de très nombreux composés chimiques parmi lesquels le sel de table (NaCl), la soude (NaOH) ou encore l’eau de Javel."
 	},
 	{
 		"name" : "Soufre",
@@ -150,7 +150,7 @@
 		"family" : "Non-Métal",
 		"file" : "soufre",
 		"nb_in_pick" : 1,
-		"did_you_know" : "Le souffre, c'est cool"
+		"did_you_know" : "Z=16 Le dioxyde de soufre SO2 est utilisé pour la conservation du vin."
 	},
 	{
 		"name" : "Uranium",
@@ -159,7 +159,7 @@
 		"family" : "Actinides",
 		"file" : "uranium",
 		"nb_in_pick" : 0,
-		"did_you_know" : "L'urainum, c'est cool"
+		"did_you_know" : "Z=92 En France 80% de l’électricité produite est d’origine nucléaire, l’énergie est obtenue à partir de la fission de l’uranium."
 	},
 	{
 		"name" : "Xénon",
@@ -168,6 +168,6 @@
 		"family" : "Gaz Noble",
 		"file" : "xenon",
 		"nb_in_pick" : 3,
-		"did_you_know" : "Le Xénon, c'est cool"
+		"did_you_know" : "Z=54 Plusieurs isotopes du xénon sont des produits de désintégrations radioactives et peuvent donc servir d’indicateurs d‘explosions ou d’accidents nucléaires."
 	}
 ]

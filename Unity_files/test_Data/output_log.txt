@@ -18,16 +18,16 @@ Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Dat
 Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
 Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.096 seconds
+- Completed reload, in  0.045 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 XInput1_3.dll not found. Trying XInput9_1_0.dll instead...
 <RI> Input initialized.
 Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Thomas\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.dll (this message is harmless)
-UnloadTime: 2.218239 ms
+UnloadTime: 4.400970 ms
 Unloading 5 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
 Unloading 148 unused Assets to reduce memory usage. Loaded Objects now: 193.
-Total: 0.718885 ms (FindLiveObjects: 0.012829 ms CreateObjectMapping: 0.011118 ms MarkObjects: 0.188167 ms  DeleteObjects: 0.070135 ms)
+Total: 1.520731 ms (FindLiveObjects: 0.030363 ms CreateObjectMapping: 0.057305 ms MarkObjects: 0.340838 ms  DeleteObjects: 0.136848 ms)
 
