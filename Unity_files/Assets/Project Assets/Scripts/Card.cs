@@ -15,7 +15,6 @@ public class Card {
     public float w { get; private set; }
     public float h { get; private set; }
     public float y { get; private set; }
-    public const float baseW = 732, baseH = 1181; // Largeur et hauteur de base de l'image
 	private float x;
 	private int N; // Nombre de cartes
 

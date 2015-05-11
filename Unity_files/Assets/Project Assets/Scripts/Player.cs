@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 40; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -39,7 +39,7 @@ public class Player {
     public int rank {private get; set; } // Rang du joueur
 
     public List<Element> cardsBuffer {get;set;} // Cartes que le joueur a "loupé" dans le tableau, il peut réessayer au tour suivant
-    public List<Element> cardsRecovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
+    public List<Element> cardsDiscovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
 
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
@@ -160,7 +160,7 @@ public class Player {
         boardGame.transform.SetParent(playerScreen.transform, false);
 
         cardsBuffer = new List<Element>();
-        cardsRecovered = new List<Element>();
+        cardsDiscovered = new List<Element>();
 
         // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
         obstacles = new List<ObstacleToken> ();
@@ -208,12 +208,24 @@ public class Player {
                             }
                         }
                         if (possibleReaction) {
-                            Main.confirmDialog("Confirmer cette réaction ?", delegate {
-                                r.effect(this);
-                            });
+                            bool toMuchElement = false;
+                            foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
+                                Card eltCard = deck.getCard(reagents.Key);
+                                if (eltCard.nbSelected > reagents.Value) {
+                                    toMuchElement = true;
+                                    break;
+                                }
+                            }
+                            if (toMuchElement)
+                                Main.infoDialog("Vous avez sélectionné trop d'éléments pour cette réaction.");
+                            else {
+                                Main.confirmDialog("Confirmer cette réaction ?", delegate {
+                                    r.effect(this);
+                                });
+                            }
                         }
                         else
-                            Main.infoDialog("La réaction est impossible avec les objets sélectionnés");
+                            Main.infoDialog("Vous n'avez pas sélectionné tous les éléments nécessaires à la réaction.");
                     }
                     else
                         Main.infoDialog("Vous n'avez pas assez de points d'énergie.");
@@ -263,8 +275,8 @@ public class Player {
 
     public void addCardToPlayer(Element card) {
         deck.AddCard(card);
-        if (!cardsRecovered.Contains(card))
-            cardsRecovered.Add(card);
+        if (!cardsDiscovered.Contains(card))
+            cardsDiscovered.Add(card);
         if (cardsBuffer.Contains(card))
             cardsBuffer.Remove(card);
     }

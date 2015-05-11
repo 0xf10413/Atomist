@@ -138,7 +138,7 @@ public class Deck {
 		float x2 = x1 + card.w; // Abscisse 2ème carte
         float deltaX = x2-x1; // Distance entre 2 cartes par défaut
         
-        float maxDeltaX = (length-card.w*scalePS) / listCards.Count / scalePS;
+        float maxDeltaX = ((length-card.w*scalePS - 50*scalePS) / (listCards.Count-1)) / scalePS;
         if (deltaX > maxDeltaX)
             deltaX = maxDeltaX;
 
