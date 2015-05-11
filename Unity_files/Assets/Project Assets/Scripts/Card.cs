@@ -91,6 +91,7 @@ public class Card {
 				cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
                 cardSelected.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 				infosNb.transform.SetParent(infosNb.transform.parent);
+                infosNb.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
             }
             if (leftClick) {
 				if (_nbSelected == N)
@@ -114,6 +115,7 @@ public class Card {
 				cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find("Card Preview Container"));
 				cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
 				cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0,0);
+                cardPreview.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); 
 			}
         });
@@ -131,7 +133,7 @@ public class Card {
 		infosNb.transform.SetParent(cardImg.gameObject.transform);
 		infosNb.GetComponent<Text> ().horizontalOverflow = HorizontalWrapMode.Overflow;
 		infosNb.GetComponent<Text> ().verticalOverflow = VerticalWrapMode.Overflow;
-		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (1,1); // Taille
+		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (10,10); // Taille
 		infosNb.GetComponent<Text> ().font = (Font)Resources.GetBuiltinResource (typeof(Font), "Arial.ttf");
 		infosNb.GetComponent<Text> ().fontSize = 25;
 		infosNb.GetComponent<Text> ().fontStyle = FontStyle.Bold;
@@ -147,7 +149,8 @@ public class Card {
         /* On déplace les ancres, puis on réinitialise */
         RectTransform rect = cardImg.GetComponent<RectTransform>();
         rect.localPosition = new Vector2 (posX, rect.localPosition.y);
-        //rect.localScale = new Vector2 (1, 1);
+        //Main.Write ("Carte centrée en (" + rect.position.x + "," +
+         //   rect.position.y + ")");
 	}
 
     /// <summary>
