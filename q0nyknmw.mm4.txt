@@ -1,0 +1,33 @@
+﻿Début de la seconde refonte graphique
+
+- Ajout d'un environnement 3D et d'une pièce métal d'exemple
+- Ajout d'un placeholder pour les plateaux de jeu
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Author:    flodeu <nintendocatz@msn.com>
+#
+# rebase in progress; onto b8a7297
+# You are currently rebasing branch 'master' on 'b8a7297'.
+#
+# Changes to be committed:
+#	new file:   Unity_files/Assets/Project Assets/Resources/Meshes/Materials/unnamed.mat.meta
+#	new file:   Unity_files/Assets/Project Assets/Resources/Meshes/pe.blend
+#	new file:   Unity_files/Assets/Project Assets/Resources/Meshes/pe.blend.meta
+#	new file:   Unity_files/Assets/Project Assets/Resources/Meshes/pe.blend1
+#	new file:   Unity_files/Assets/Project Assets/Resources/Meshes/pe.blend1.meta
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame0.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame1.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame2.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame3.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame4.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame5.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/BoardGame/BoardGame6.prefab
+#	modified:   Unity_files/Assets/Project Assets/Resources/Prefabs/FPlayerScreen.prefab
+#	modified:   Unity_files/Assets/Project Assets/Scripts/Main.cs
+#	modified:   Unity_files/Assets/Project Assets/Scripts/Player.cs
+#	modified:   Unity_files/Assets/florent-prefab.unity
+#
+
