@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 40; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 100; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -130,13 +130,13 @@ public class Player {
             sortSelector.transform.SetParent(mask.transform,false);
             mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
             KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
+                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
                 new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
                     if (a.family == b.family)
                         return a.atomicNumber-b.atomicNumber;
                     return a.family.CompareTo(b.family);
-                }),
-                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
-                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber)
+                })
             };
 
             Main.addClickEvent(mask, delegate {

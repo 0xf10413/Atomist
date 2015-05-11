@@ -11,13 +11,6 @@ public class Deck {
     /// </summary>
     public GameObject deck;
 
-        /// <summary>
-    /// La longueur du jeu de cartes.
-    /// Une carte de référence, servant d'exemple à la construction des cartes.
-    /// C'est la carte la plus à gauche de la main.
-    /// </summary>
-    private float length;
-
     /// <summary>
     /// Une carte de référence, servant d'exemple à la construction des cartes.
     /// C'est la carte la plus à gauche de la main.
@@ -43,7 +36,6 @@ public class Deck {
 		listCards = new List<Card> ();
         referenceCard = deck.transform.Find("First Card").gameObject;
         sortFunction = (a,b) => a.symbole.CompareTo(b.symbole);
-        length = (dDeck.GetComponent<RectTransform>().anchorMax - dDeck.GetComponent<RectTransform>().anchorMin).x* Main.currentPlayer().playerScreen.GetComponent<RectTransform> ().sizeDelta.x;
 	}
 	
 	/// <summary>
@@ -124,8 +116,8 @@ public class Deck {
 		for (int i=listCards.Count-1; i>=0; i--)
     		listCards[i].bringToFront();
         RectTransform rect = deck.GetComponent<RectTransform>();
-        Main.Write ("Deck centré en " + rect.position.x + ","
-            + rect.position.y + ")");
+        /*Main.Write ("Deck centré en " + rect.position.x + ","
+            + rect.position.y + ")");*/
 	}
 	
 	/// <summary>
@@ -135,15 +127,21 @@ public class Deck {
 	/// <param name="name">La position dans la main du joueur (0 pour la 1re carte, 1 pour la 2e, etc)</param>
 	public void updatePosition(Card card, int position) 
     {
+        // Facteur de redimensionnement du playerScreen, généré automatiquement par rapport à la résolution de référence
         float scalePS = Main.currentPlayer().playerScreen.GetComponent<RectTransform>().localScale.x;
+        // Longueur disponible de la liste de cartes
+        float length = (deck.GetComponent<RectTransform>().anchorMax - deck.GetComponent<RectTransform>().anchorMin).x*Main.currentPlayer().playerScreen.GetComponent<RectTransform> ().sizeDelta.x * scalePS;
 
         float x1 = referenceCard.GetComponent<RectTransform> ().localPosition.x;
         float deltaX = referenceCard.GetComponent<RectTransform>().rect.width;
+
+        float wCard = deltaX*scalePS; // Longueur d'une carte mise à l'échelle
         
-        float maxDeltaX = ((length-card.w*scalePS - 50*scalePS) / (listCards.Count-1)) / scalePS;
+        float maxDeltaX = ((length-wCard) / (listCards.Count-1)) / scalePS;
+        //Main.Write(length*scalePS+","+wCard+","+scalePS);
         if (deltaX > maxDeltaX)
             deltaX = maxDeltaX;
-
+        
         card.updateX (x1 + deltaX * position);
 	}
 }

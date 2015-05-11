@@ -14,10 +14,6 @@ public class Card {
 	/// </summary>
 	public Element element { get; set; }
 	
-    public float w { get; private set; }
-    public float h { get; private set; }
-    public float y { get; private set; }
-	private float x;
 	private int N; // Nombre de cartes
 
 	private int _nbSelected = 0;

@@ -46,9 +46,6 @@ public class PlayerAI : Player
         playerScreen.transform.Find ("Energy container").gameObject.SetActive (false);
         //playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
         playerScreen.transform.Find ("Reactions").gameObject.SetActive (false);
-        playerScreen.transform.Find ("Turn buttons").gameObject.SetActive (false);
-        playerScreen.transform.Find ("Unselect All").gameObject.SetActive (false);
-        playerScreen.transform.Find ("Sort By").gameObject.SetActive (false);
         playerScreen.transform.Find ("Card Buttons").gameObject.SetActive (false);
     }
 
