@@ -130,13 +130,13 @@ public class Player {
             sortSelector.transform.SetParent(mask.transform,false);
             mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
             KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
-                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
-                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
                 new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
                     if (a.family == b.family)
                         return a.atomicNumber-b.atomicNumber;
                     return a.family.CompareTo(b.family);
-                })
+                }),
+                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber)
             };
 
             Main.addClickEvent(mask, delegate {
