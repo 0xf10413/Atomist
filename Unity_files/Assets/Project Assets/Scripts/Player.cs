@@ -14,7 +14,6 @@ public class Player {
     public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
-
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
 
     public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
@@ -39,6 +38,9 @@ public class Player {
     public string printName { get; protected set; } // Nom affiché dans les scores
     public int rank {private get; set; } // Rang du joueur
 
+    public List<Element> cardsBuffer {get;set;} // Cartes que le joueur a "loupé" dans le tableau, il peut réessayer au tour suivant
+    public List<Element> cardsRecovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
+
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
     /// reste plus tard.
@@ -54,33 +56,43 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        deck = new Deck();
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
-
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
+        
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
         playerScreen.name = "PlayerScreen";
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
+        deck = new Deck ((GameObject)playerScreen.transform.Find ("Cards List/First Card").gameObject,
+            playerScreen.transform.Find ("Cards List").gameObject,
+            playerScreen);
+       
         room = 0;
 
         // Ajout des icones feu, poison, etc
+        List<KeyValuePair<ReactionType,GameObject>> reactionObjects = new List<KeyValuePair<ReactionType,GameObject>>();
+        currentReactionSelected = Main.reactionTypes[0];
         foreach (ReactionType reactionType in Main.reactionTypes) {
+            ReactionType localReactionType = reactionType;
 
             GameObject icon = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Icon"));
             icon.transform.SetParent(playerScreen.transform.Find("Reactions/Families Icons"));
             icon.name = reactionType.name;
-            icon.GetComponent<Image>().sprite = reactionType.icon;
+            icon.GetComponent<Image>().sprite = (currentReactionSelected == reactionType) ? reactionType.iconH:reactionType.icon;
+
+            reactionObjects.Add(new KeyValuePair<ReactionType,GameObject>(reactionType,icon));
 
 		    // Ajout d'un événement au clic de la souris
             ReactionType rType = reactionType; // On rend la variable locale pour le delegate, sinon ça fait de la merde
             Main.addClickEvent(icon, delegate {
+                foreach (KeyValuePair<ReactionType,GameObject> reactionToUnsel in reactionObjects)
+                    reactionToUnsel.Value.GetComponent<Image>().sprite = reactionToUnsel.Key.icon;
+                icon.GetComponent<Image>().sprite = localReactionType.iconH;
                 currentReactionSelected = rType;
                 updateReactionsList();
 			});
         }
 
-        currentReactionSelected = Main.reactionTypes[0];
         updateReactionsList();
 
       
@@ -109,6 +121,54 @@ public class Player {
                 deck.updatePositions();
             });
         });
+        Main.addClickEvent(playerScreen.transform.Find ("Unselect All").gameObject, delegate {
+            for (int i=0;i<deck.getNbCards();i++)
+                deck.getCard(i).nbSelected = 0;
+        });
+        Main.addClickEvent(playerScreen.transform.Find ("Sort By").gameObject, delegate {
+            GameObject mask = Main.AddMask(true);
+            mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+            GameObject sortSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SortFunctionSelector"));
+            sortSelector.transform.SetParent(mask.transform,false);
+            mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+            KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
+                new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
+                new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
+                    if (a.family == b.family)
+                        return a.atomicNumber-b.atomicNumber;
+                    return a.family.CompareTo(b.family);
+                })
+            };
+
+            Main.addClickEvent(mask, delegate {
+                GameObject.Destroy(mask);
+            });
+            Main.addClickEvent(sortSelector, delegate {
+            });
+            for (int i=0;i<buttonsWithSort.Length;i++) {
+                KeyValuePair<string,System.Comparison<Element>> sortFunctionData = buttonsWithSort[i];
+                Main.addClickEvent(sortSelector.transform.Find(sortFunctionData.Key).gameObject,delegate {
+                    deck.setSortFunction(sortFunctionData.Value);
+                    GameObject.Destroy(mask);
+                });
+            }
+        });
+
+        GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
+        boardGame.name = "BoardGame";
+        boardGame.transform.SetParent(playerScreen.transform, false);
+
+        cardsBuffer = new List<Element>();
+        cardsRecovered = new List<Element>();
+
+        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
+        obstacles = new List<ObstacleToken> ();
+        List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
+        foreach (GameObject obstacleToken in obstacleTokens) {
+            string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
+            obstacles.Add(new ObstacleToken(Main.obstacles.Find(o => o.name == obstacleName),obstacleToken));
+        }
 	}
 
     public void updateReactionsList ()
@@ -125,7 +185,7 @@ public class Player {
 
                 // Toutes mes excuses... on change le "12" par défaut en une taille dynamique
                 string reactionString = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
-                int fontSize = button.transform.Find ("Text").GetComponent<Text> ().fontSize/2;
+                float fontSize = 8f*Mathf.Sqrt(Screen.height/232f);
                 reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
                 button.transform.Find ("Text").GetComponent<Text> ().text = reactionString;
                     
@@ -160,14 +220,6 @@ public class Player {
 			    });
             }
         }
-
-        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
-        obstacles = new List<ObstacleToken> ();
-        List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
-        foreach (GameObject obstacleToken in obstacleTokens) {
-            string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
-            obstacles.Add(new ObstacleToken(Main.obstacles.Find(o => o.name == obstacleName),obstacleToken));
-        }
     }
 
     public void consumeForReaction(Reaction r) {
@@ -194,30 +246,38 @@ public class Player {
         for (int i=0;i<nbCards;i++)
             toPick.Add(Main.pickCard());
         if (askInPeriodicTable) {
-            Main.postPickCardsDialog(toPick, message, pickedCards => {
+            Main.postPickCardsDialog(toPick, cardsBuffer, message, pickedCards => {
                 foreach (Element card in pickedCards) {
-                    deck.AddCard(card);
+                    addCardToPlayer(card);
                 }
             });
         }
         else {
             Main.pickCardsDialog(toPick, message, delegate {
                 foreach (Element card in toPick) {
-                    deck.AddCard(card);
+                    addCardToPlayer(card);
                 }
             });
         }
     }
 
+    public void addCardToPlayer(Element card) {
+        deck.AddCard(card);
+        if (!cardsRecovered.Contains(card))
+            cardsRecovered.Add(card);
+        if (cardsBuffer.Contains(card))
+            cardsBuffer.Remove(card);
+    }
+
     public void BeginTurn() {
         isTurn = true;
 
-        for (int i=0; i<penalties.Count; i++)
-            if (penalties[i].isActive ()) {
-                Penalty p = penalties[i];
+        for (int i=0; i<penalties.Count; i++) {
+            if (penalties[i].setOff()) {
                 penalties.Remove (penalties[i]);
-                p.setOff ();
+                i--;
             }
+        }
 
         if (isTurn) {
             // On pioche 2 cartes
@@ -242,13 +302,19 @@ public class Player {
     public void undoTurn() {
         isTurn = false;
     }
+    
+    /// <summary>
+    /// Retourne false si le tour du joueur a été annulé
+    /// true sinon
+    /// </summary>
+    public bool hisTurn() {
+        return isTurn;
+    }
 
     /// <summary>
-    /// Fonction de fin de tour. Met à jour les pénalités, et masque l'écran.
+    /// Fonction de fin de tour. Masque l'écran.
     /// </summary>
     public void EndTurn() {
-        foreach (Penalty p in penalties)
-            p.newTurn ();
         playerScreen.SetActive(false);
         isTurn = false;
         firstTurn = false;
@@ -268,6 +334,7 @@ public class Player {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
                 isPlaying = false;
                 Main.winners.Add (this);
+                progressMoveToNextRoom();
             });
         }
         else {
@@ -334,14 +401,11 @@ public class Player {
     public void updatePlayer () {
         // Vidage de l'interface
         foreach (Transform r in playerScreen.transform.Find ("Players/Ranks"))
-            if (r.name != "Title")
+            //if (r.name != "Title")
                 GameObject.Destroy (r.gameObject);
         foreach (Transform n in playerScreen.transform.Find ("Players/Names"))
-            if (n.name != "Title")
+            //if (n.name != "Title")
                 GameObject.Destroy (n.gameObject);
-        foreach (Transform r in playerScreen.transform.Find ("Players/Rooms"))
-            if (r.name != "Title")
-                GameObject.Destroy (r.gameObject);
         
         // Ajout des joueurs dans l'ordre
         var tmp = new List<Player> (Main.players);
@@ -361,28 +425,22 @@ public class Player {
         });
 
         foreach (Player p in tmp) {
-            GameObject rank = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Ranks/Title").gameObject);
-            GameObject room = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Rooms/Title").gameObject);
-            GameObject name = (GameObject)Object.Instantiate (playerScreen.transform.Find ("Players/Names/Title").gameObject);
+            GameObject rank = (GameObject)Object.Instantiate (Resources.Load<GameObject>("Prefabs/PlayerTextPrefab"));
+            GameObject name = (GameObject)Object.Instantiate (Resources.Load<GameObject>("Prefabs/PlayerTextPrefab"));
 
             rank.transform.GetComponent<Text> ().text = p.rank.ToString ();
             rank.name = p.name;
-            room.transform.GetComponent<Text> ().text = (p.room+1).ToString ();
-            room.name = p.name;
             name.transform.GetComponent<Text> ().text = p.printName;
             name.name = p.name;
             if (p == this) {
                 name.GetComponent<Text> ().color = Color.red;
-                room.GetComponent<Text> ().color = Color.red;
                 rank.GetComponent<Text> ().color = Color.red;
             }
 
             rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
-            room.transform.SetParent (playerScreen.transform.Find ("Players/Rooms"));
             name.transform.SetParent (playerScreen.transform.Find ("Players/Names"));
 
             rank.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
-            room.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
             name.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
         }
     }

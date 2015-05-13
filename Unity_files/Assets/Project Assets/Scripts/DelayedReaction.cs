@@ -26,8 +26,9 @@ abstract public class DelayedReaction : Reaction {
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerSelectorDialog"));
         dialog.transform.SetParent(mask.transform);
-        dialog.transform.localPosition = new Vector3(0,0,0);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        dialog.transform.localPosition = new Vector3(0,0,0);
+        dialog.transform.localScale = new Vector3(1,1,1);
         Main.addClickEvent(mask, delegate {
             GameObject.Destroy(mask);
         });

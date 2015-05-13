@@ -93,7 +93,7 @@
 		"name" : "Magnésium",
 		"symbol" : "Mg",
 		"atomicNumber" : 12,
-		"family" : "Métal Alcalin",
+		"family" : "Alcalino-terreux",
 		"file" : "magnesium",
 		"nb_in_pick" : 2,
 		"did_you_know" : "Z=12 Le magnésium est un élément essentiel pour le corps humain. Il permet notamment la fixation du calcium sur les os et la prévention de maladies cardio-vasculaires."
@@ -120,7 +120,7 @@
 		"name" : "Potassium",
 		"symbol" : "K",
 		"atomicNumber" : 19,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "potassium",
 		"nb_in_pick" : 2,
 		"did_you_know" : "Z=19 Le potassium métallique est utilisé dans de nombreuses réactions en pharmacie pour ses propriétés de bon réducteur."
@@ -129,7 +129,7 @@
 		"name" : "Rubidium",
 		"symbol" : "Rb",
 		"atomicNumber" : 37,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "rubidium",
 		"nb_in_pick" : 4,
 		"did_you_know" : "Z=37 Le rubidium 87 permet de fabriquer des horloges atomiques à bas coût avec une erreur possible de l’ordre d’une seconde tous les 600 ans. Les horloges les plus précises utilisent du césium 133."
@@ -138,7 +138,7 @@
 		"name" : "Sodium",
 		"symbol" : "Na",
 		"atomicNumber" : 11,
-		"family" : "Non-Alcalin",
+		"family" : "Métal Alcalin",
 		"file" : "sodium",
 		"nb_in_pick" : 4,
 		"did_you_know" : " Z=11 Le sodium est présent dans de très nombreux composés chimiques parmi lesquels le sel de table (NaCl), la soude (NaOH) ou encore l’eau de Javel."
@@ -156,10 +156,10 @@
 		"name" : "Uranium",
 		"symbol" : "U",
 		"atomicNumber" : 92,
-		"family" : "Actinides",
+		"family" : "Actinide",
 		"file" : "uranium",
-		"nb_in_pick" : 0,
 		"did_you_know" : "Z=92 En France 80% de l’électricité produite est d’origine nucléaire, l’énergie est obtenue à partir de la fission de l’uranium."
+		"nb_in_pick" : 1,
 	},
 	{
 		"name" : "Xénon",

@@ -832,7 +832,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enter text...
+  m_Text: Entrez votre nom...
 --- !u!114 &11424650
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -11,7 +11,11 @@ using System.Collections.Generic;
 public class Card {
 	
 	public Element element { get; set; }
-	static float w = 132, h = 209, y = 0; // Longueur, largeur et hauteur de la carte
+	
+    public float w { get; private set; }
+    public float h { get; private set; }
+    public float y { get; private set; }
+    public const float baseW = 732, baseH = 1181; // Largeur et hauteur de base de l'image
 	private float x;
 	private int N; // Nombre de cartes
 
@@ -36,12 +40,12 @@ public class Card {
 		get {return N;}
 		set {N = value; updateText();}
 	}
-	
+
 	/// <summary>
 	/// Constructeur de la carte
 	/// </summary>
 	/// <param name="element">Le nom de la carte</param>
-	public Card (Element element) : this(element,1) {
+	public Card (Element element, GameObject referenceCard) : this(element,1,referenceCard) {
 	}
 	
 	/// <summary>
@@ -49,12 +53,19 @@ public class Card {
 	/// </summary>
 	/// <param name="element">Le nom de la carte</param>
 	/// <param name="nb">Le nombre de cartes de ce types possédées initialement par le joueur</param>
-	public Card (Element nElement, int nb) {
+    /// <todo>Faire en sorte d'utiliser la carte par défaut.</todo>
+	public Card (Element nElement, int nb, GameObject referenceCard) {
 		cardImg = new GameObject ();
 		cardImg.name = "Card(s) "+ nElement.symbole; // Nom de l'objet (celui qui apparait dans la hiérarchie)
 		cardImg.AddComponent<Image>();
 		cardImg.GetComponent<Image>().sprite = nElement.cardRessource;
-		
+
+        setDefaultCard(referenceCard);
+        
+        w = referenceCard.GetComponent<RectTransform> ().sizeDelta.x;
+        h = referenceCard.GetComponent<RectTransform> ().sizeDelta.y;
+        y = referenceCard.GetComponent<RectTransform> ().localPosition.y;
+
 		cardImg.AddComponent<EventTrigger>();
 		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
 
@@ -74,8 +85,11 @@ public class Card {
 				cardSelected.transform.SetParent(cardImg.transform);
 				cardSelected.AddComponent<Image> ();
 				cardSelected.GetComponent<Image> ().sprite = Resources.Load<Sprite>("Images/Cards/card_selected");
-				cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0.166f*Screen.height,0.2612f*Screen.height); // Taille
+				cardSelected.GetComponent<RectTransform> ().sizeDelta = new Vector2 
+                    (cardImg.GetComponent<RectTransform>().sizeDelta.x
+                    , cardImg.GetComponent<RectTransform> ().sizeDelta.y); // Taille
 				cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+                cardSelected.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 				infosNb.transform.SetParent(infosNb.transform.parent);
             }
             if (leftClick) {
@@ -93,45 +107,32 @@ public class Card {
 		});
 
 		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
-		EventTrigger.Entry overEvent = new EventTrigger.Entry();
-		overEvent.eventID = EventTriggerType.PointerEnter;
-		overEvent.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> overCallback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
-				if (cardPreview == null) {
-					cardPreview = new GameObject();
-					cardPreview.name = "Card Preview";
-					cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find ("BoardGame"));
-					cardPreview.AddComponent<Image> ();
-					cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
-					cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.45f,Screen.height*0.6f); // Taille
-					cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
-				}
-			});
-		overEvent.callback.AddListener(overCallback);
-		cardImg.AddComponent<EventTrigger>();
-		cardImg.GetComponent<EventTrigger>().delegates.Add(overEvent);
-		
+        Main.addEvent(cardImg, EventTriggerType.PointerEnter, delegate {
+			// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
+			if (cardPreview == null) {
+				cardPreview = new GameObject();
+				cardPreview.name = "Card Preview";
+				cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find("Card Preview Container"));
+				cardPreview.AddComponent<Image> ();
+				cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
+				cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.36f,Screen.height*0.48f); // Taille
+				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+			}
+        });
+        
 		// Ajout d'un événement de déprévisualisation de la carte à la sortie de la souris
-		EventTrigger.Entry outEvent = new EventTrigger.Entry();
-		outEvent.eventID = EventTriggerType.PointerExit;
-		outEvent.callback = new EventTrigger.TriggerEvent();
-		UnityEngine.Events.UnityAction<BaseEventData> outCallback =
-			new UnityEngine.Events.UnityAction<BaseEventData>(delegate {
-				// Suppression de la prévisualisation de la carte
-				Object.Destroy(cardPreview);
-				cardPreview = null;
-			});
-		outEvent.callback.AddListener(outCallback);
-		cardImg.AddComponent<EventTrigger>();
-		cardImg.GetComponent<EventTrigger>().delegates.Add(outEvent);
+        Main.addEvent(cardImg, EventTriggerType.PointerExit, delegate {
+			// Suppression de la prévisualisation de la carte
+			Object.Destroy(cardPreview);
+			cardPreview = null;
+        });
 		
 		cardImg.transform.SetParent(Main.currentPlayer().playerScreen.gameObject.transform.Find ("Cards List"));
 		cardImg.transform.localScale = new Vector3(1,1,1);
 		RectTransform imgParams = cardImg.GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
-		imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
-		
+		//imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
+        imgParams.sizeDelta = new Vector2 (w,h); // Taille
+
 		infosNb = new GameObject ();
 		infosNb.name = "Nb cards";
 		infosNb.AddComponent<Text> ();
@@ -163,5 +164,19 @@ public class Card {
 	}
     public void remove() {
         GameObject.Destroy(cardImg);
+    }
+
+    /// <summary>
+    /// Fixe la taille de la carte à partir de la carte de référence
+    /// </summary>
+    /// <param name="g">Un gameObject représentant la carte de référence.</param>
+    public void setDefaultCard (GameObject g)
+    {
+        cardImg.GetComponent<RectTransform> ().sizeDelta = new Vector2 (g.GetComponent<RectTransform> ().sizeDelta.x,
+            g.GetComponent<RectTransform> ().sizeDelta.y);
+        cardImg.GetComponent<RectTransform> ().localPosition = new Vector2 (g.GetComponent<RectTransform> ().localPosition.x,
+            g.GetComponent<RectTransform> ().localPosition.y);
+        g.name = "Reference card";
+        g.SetActive (false);
     }
 }

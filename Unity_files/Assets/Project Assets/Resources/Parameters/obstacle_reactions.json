@@ -36,7 +36,7 @@
 		"gain" : 5
 	},
 	{
-		"reagents" : [["Al",1],["H",6],["Cl",6]],
+		"reagents" : [["H",6],["Al",2],["Cl",6]],
 		"reaction" : "2Al + 6HCl",
 		"products" : "2AlCl3 + 3H2",
 		"infos" : "",
@@ -45,7 +45,11 @@
 		"gain" : 5
 	},
 	{
+<<<<<<< HEAD
 		"reagents" : [["Al",2],["H",12],["O",6]],
+=======
+		"reagents" : [["H",12],["O",6],["Al",2]],
+>>>>>>> origin/master
 		"reaction" : "2Al + 6H2O",
 		"products" : "2Al(OH)3 + 3H2",
 		"infos" : "",
@@ -99,7 +103,7 @@
 		"gain" : 5
 	},
 	{
-		"reagents" : [["H",2],["O",7],["N",3]],
+		"reagents" : [["H",2],["N",3],["O",7]],
 		"reaction" : "3NO2 + H2O",
 		"products" : "2HNO3 + NO",
 		"infos" : "",
