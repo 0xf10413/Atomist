@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 100; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -39,7 +39,7 @@ public class Player {
     public int rank {private get; set; } // Rang du joueur
 
     public List<Element> cardsBuffer {get;set;} // Cartes que le joueur a "loupé" dans le tableau, il peut réessayer au tour suivant
-    public List<Element> cardsRecovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
+    public List<Element> cardsDiscovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
 
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
@@ -56,20 +56,18 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
         
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
-        playerScreen.name = "PlayerScreen";
+        playerScreen.name = "FPlayerScreen";
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
-        deck = new Deck ((GameObject)playerScreen.transform.Find ("Cards List/First Card").gameObject,
-            playerScreen.transform.Find ("Cards List").gameObject,
-            playerScreen);
+        deck = new Deck (playerScreen.transform.Find ("Cards List").gameObject);
        
         room = 0;
 
-        // Ajout des icones feu, poison, etc
+        // Ajout des icônes feu, poison, etc
         List<KeyValuePair<ReactionType,GameObject>> reactionObjects = new List<KeyValuePair<ReactionType,GameObject>>();
         currentReactionSelected = Main.reactionTypes[0];
         foreach (ReactionType reactionType in Main.reactionTypes) {
@@ -96,12 +94,12 @@ public class Player {
         updateReactionsList();
 
       
-        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Next turn").gameObject, delegate {
+        Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Next turn").gameObject, delegate {
             Main.confirmDialog("Fin du tour ?", delegate {
                 EndTurn ();
             });
         });
-        Main.addClickEvent (playerScreen.transform.Find ("Turn buttons/Discard cards").gameObject, delegate {
+        Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Discard cards").gameObject, delegate {
             Main.confirmDialog("Jeter les cartes sélectionnées ?", delegate {
                 int energyToGain = 0;
                 int nbCardsToPick = 0;
@@ -121,11 +119,11 @@ public class Player {
                 deck.updatePositions();
             });
         });
-        Main.addClickEvent(playerScreen.transform.Find ("Unselect All").gameObject, delegate {
+        Main.addClickEvent(playerScreen.transform.Find ("Card Buttons/Unselect All").gameObject, delegate {
             for (int i=0;i<deck.getNbCards();i++)
                 deck.getCard(i).nbSelected = 0;
         });
-        Main.addClickEvent(playerScreen.transform.Find ("Sort By").gameObject, delegate {
+        Main.addClickEvent(playerScreen.transform.Find ("Card Buttons/Sort By").gameObject, delegate {
             GameObject mask = Main.AddMask(true);
             mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
             GameObject sortSelector = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SortFunctionSelector"));
@@ -157,10 +155,12 @@ public class Player {
 
         GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
         boardGame.name = "BoardGame";
-        boardGame.transform.SetParent(playerScreen.transform, false);
+        boardGame.transform.SetParent(playerScreen.transform.Find ("Board Container"), false);
+        boardGame.GetComponent<RectTransform> ().localPosition = new Vector2 (0, 0);
+        boardGame.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
 
         cardsBuffer = new List<Element>();
-        cardsRecovered = new List<Element>();
+        cardsDiscovered = new List<Element>();
 
         // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
         obstacles = new List<ObstacleToken> ();
@@ -208,12 +208,24 @@ public class Player {
                             }
                         }
                         if (possibleReaction) {
-                            Main.confirmDialog("Confirmer cette réaction ?", delegate {
-                                r.effect(this);
-                            });
+                            bool toMuchElement = false;
+                            foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
+                                Card eltCard = deck.getCard(reagents.Key);
+                                if (eltCard.nbSelected > reagents.Value) {
+                                    toMuchElement = true;
+                                    break;
+                                }
+                            }
+                            if (toMuchElement)
+                                Main.infoDialog("Vous avez sélectionné trop d'éléments pour cette réaction.");
+                            else {
+                                Main.confirmDialog("Confirmer cette réaction ?", delegate {
+                                    r.effect(this);
+                                });
+                            }
                         }
                         else
-                            Main.infoDialog("La réaction est impossible avec les objets sélectionnés");
+                            Main.infoDialog("Vous n'avez pas sélectionné tous les éléments nécessaires à la réaction.");
                     }
                     else
                         Main.infoDialog("Vous n'avez pas assez de points d'énergie.");
@@ -263,8 +275,8 @@ public class Player {
 
     public void addCardToPlayer(Element card) {
         deck.AddCard(card);
-        if (!cardsRecovered.Contains(card))
-            cardsRecovered.Add(card);
+        if (!cardsDiscovered.Contains(card))
+            cardsDiscovered.Add(card);
         if (cardsBuffer.Contains(card))
             cardsBuffer.Remove(card);
     }

@@ -93,14 +93,17 @@ public class Main : MonoBehaviour {
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
+            Main.Write ("Warning: ajout de joueurs de test !");
             players.Add (new Player("Florent"));
-            players.Add (new Player("Solène"));
-            /*players.Add (new PlayerAI ("Timothé"));
-            players.Add (new PlayerAI ("Guillaume"));
-            players.Add (new PlayerAI ("Marwane"));
-            players.Add (new PlayerAI ("Thomas"));
-            players.Add (new PlayerAI ("Emanuelle"));
-            players.Add (new PlayerAI ("François"));*/
+            players.Add (new PlayerAI("Solène"));
+
+            players.Add (new Player ("Solène"));
+            players.Add (new Player ("Timothé"));
+            players.Add (new Player("Guillaume"));
+            players.Add (new Player ("Marwane"));
+            players.Add (new Player ("Thomas"));
+            players.Add (new Player ("Emanuelle"));
+            //players.Add (new Player ("François"));
         }
         foreach (Player p in players)
             p.init();
@@ -297,7 +300,7 @@ public class Main : MonoBehaviour {
         }
         
         foreach (Element elt in cardsToGuess) {
-            if (!cPlayer.cardsRecovered.Contains(elt)) {
+            if (!cPlayer.cardsDiscovered.Contains(elt)) {
                 ownAllElements = false;
                 break;
             }
@@ -310,13 +313,13 @@ public class Main : MonoBehaviour {
         }
         int idCard; // L'id de la carte à placer : 0 si c'est la 1re carte piochée, 1 si c'est la 2e carte, etc
         List<Element> toPick = new List<Element>(); // Les cartes bien placées par le joueur sur le tableau
-        for (idCard=0;cPlayer.cardsRecovered.Contains(cardsToGuess[idCard]);idCard++)
+        for (idCard=0;cPlayer.cardsDiscovered.Contains(cardsToGuess[idCard]);idCard++)
             toPick.Add(cardsToGuess[idCard]);
 
         cPlayer.playerScreen.SetActive(false); // On efface l'écran du joueur (sinon il voit le tableau, c'est trop facile)
         
         GameObject mask = AddMask();
-        mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
+        mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogContainer = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ElementFinder"));
         GameObject DYKDialog = dialogContainer.transform.Find("DYKDialog").gameObject;
         Text DYKText = DYKDialog.transform.Find("DYKMessage").gameObject.GetComponent<Text>();
@@ -373,7 +376,7 @@ public class Main : MonoBehaviour {
                 idCard++;
                 if (idCard == cardsToGuess.Count)
                     break;
-                if (!toPick.Contains(cardsToGuess[idCard]) && (!cPlayer.cardsRecovered.Contains(cardsToGuess[idCard]))) {bool alreadyAsked = false;
+                if (!toPick.Contains(cardsToGuess[idCard]) && (!cPlayer.cardsDiscovered.Contains(cardsToGuess[idCard]))) {bool alreadyAsked = false;
                     for (int i=0;i<idCard;i++) {
                         if (cardsToGuess[i] == cardsToGuess[idCard])
                             alreadyAsked = true;
@@ -410,7 +413,7 @@ public class Main : MonoBehaviour {
         for (int i=0;i<masksContainer.childCount;i++) {
             GameObject iMask = masksContainer.GetChild(i).gameObject;
             Element maskElt = iMask.GetComponent<TableCaseScript>().getElement();
-            iMask.SetActive(!eltsRecovered.Contains(maskElt) && !cPlayer.cardsRecovered.Contains(maskElt));
+            iMask.SetActive(!eltsRecovered.Contains(maskElt) && !cPlayer.cardsDiscovered.Contains(maskElt));
         }
     }
     private static void setPeriodicTableMsg(GameObject parent, Element elt, bool cardPicked) {

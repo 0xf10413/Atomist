@@ -27,7 +27,7 @@ public class PlayerAI : Player
     /// </summary>
     /// <param name="nName">Le nom de l'IA.</param>
     /// <param name="dDifficulty">La difficulté, entre 0 et 2.</param>
-    public PlayerAI (string nName, int dDifficulty=0)
+    public PlayerAI (string nName, int dDifficulty=2)
         : base (nName)
     { hasPlayed = false;
     difficulty = dDifficulty;
@@ -44,9 +44,9 @@ public class PlayerAI : Player
     public override void init () {
         base.init ();
         playerScreen.transform.Find ("Energy container").gameObject.SetActive (false);
-        playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
+        //playerScreen.transform.Find ("Cards List").gameObject.SetActive (false);
         playerScreen.transform.Find ("Reactions").gameObject.SetActive (false);
-        playerScreen.transform.Find ("Turn buttons").gameObject.SetActive (false);
+        playerScreen.transform.Find ("Card Buttons").gameObject.SetActive (false);
     }
 
     /// <summary>
@@ -54,13 +54,47 @@ public class PlayerAI : Player
     /// L'IA réussit toujours à récupérer les deux cartes.
     /// </summary>
     public override void pickCards (int nbCards, string message, bool askInPeriodicTable) {
-        for (int i = 0; i < nbCards; i++)
-            addCardToPlayer (Main.pickCard ());
+        bool[] getTheCard = new bool[nbCards];
+        Element[] cardsPicked = new Element[nbCards];
+        double probToFind = 0;
+        switch (difficulty) {
+            case 0 :
+                probToFind = 0.5;
+                break;
+            case 1 :
+                probToFind = 0.8;
+                break;
+            case 2 :
+                probToFind = 1;
+                break;
+        }
+        for (int i=0;i<nbCards;i++) {
+            if (!askInPeriodicTable || cardsDiscovered.Contains(cardsPicked[i]))
+                getTheCard[i] = true;
+            else
+                getTheCard[i] = (Main.randomGenerator.NextDouble() < probToFind);
+        }
+        int nbCardsActuallyPicked = 0;
+        for (int i = 0; i < nbCards; i++) {
+            if (getTheCard[i]) {
+                addCardToPlayer (Main.pickCard ());
+                nbCardsActuallyPicked++;
+            }
+        }
 
-        // Ajouter un chrono ? 
-        Main.infoDialog (name + " pioche " + nbCards.ToString () +
-            " carte" + (nbCards > 1 ? "s" : ""), delegate { think (); });
-
+        // Ajouter un chrono ?
+        if (askInPeriodicTable) {
+            Main.infoDialog (name + " pioche " + nbCards.ToString () + " carte" + (nbCards > 1 ? "s" : ""), delegate {
+                Main.infoDialog (name + " récupère " + nbCardsActuallyPicked + " carte" + (nbCardsActuallyPicked > 1 ? "s" : ""), delegate {
+                    think ();
+                });
+            });
+        }
+        else {
+            Main.infoDialog (name + " récupère " + nbCards.ToString () + " carte" + (nbCards > 1 ? "s" : ""), delegate {
+                think ();
+            });
+        }
     }
 
     /// <summary>
@@ -92,20 +126,45 @@ public class PlayerAI : Player
             { pickCards (nbCardsToPick, false); });
             hasPlayed = true;
             return;
-
         }
         // On essaie d'avancer
         Reaction r = chooseReaction ();
-        if (r == null)
+        if (r != null) {
+            if (r is DelayedReaction) {
+                consumeForReaction(r);
+                Player cible = null;
+                foreach (Player p in Main.players) {
+                    if (p != this) {
+                        if (p.isPlaying) {
+                            if (cible == null)
+                                cible = p;
+                            else if (cible.room > p.room) // Todo : shuffle
+                                cible = p;
+                        }
+                    }
+                }
+                if (cible != null) {
+                    Main.infoDialog(name + " effectue la réaction \""+ r.reagents+"->"+r.products +"\" sur "+ cible.name, delegate {
+                        think();
+                    });
+                    ((DelayedReaction) r).inflict(cible);
+                    hasPlayed = true;
+                }
+                else
+                    r = null;
+            }
+            else {
+                r.effect (this); // Le déplacement est inclus dans cette fonction.
+                hasPlayed = true;
+            }
+        }
+        if (r == null) {
             if (hasPlayed) {
                 Main.infoDialog (name + " vient de finir son tour", delegate { EndTurn (); });
                 hasPlayed = false;
             }
             else
                 Main.infoDialog (name + " passe son tour", delegate { EndTurn (); });
-        else {
-            r.effect (this); // Le déplacement est inclus dans cette fonction.
-            hasPlayed = true;
         }
     }
 
@@ -122,6 +181,7 @@ public class PlayerAI : Player
         }
 
         List<Reaction> potential = new List<Reaction> (); // Réactions permettant de sortir
+        List<Reaction> penalties = new List<Reaction> (); // Réactions d'attaque
         foreach (Reaction r in Main.reactions) {
             // Réactifs présents
             bool possibleReaction = true;
@@ -136,22 +196,49 @@ public class PlayerAI : Player
                     break;
                 }
             }
-
-            if (possibleReaction)
+            if (possibleReaction) {
+                if (r is DelayedReaction) // Si c'est une réaction à pénalité
+                    penalties.Add(r);
                 // Compatibilité avec l'un des obstacles au moins
-                if (null != obs.Find (o => o.obstacle.weakness == r.type))
+                else if (null != obs.Find (o => o.obstacle.weakness == r.type))
                     // Niveau d'énergie requis
                     if (r.cost <= energy)
                         potential.Add (r);
+            }
         }
-        if (potential.Count == 0)
-            return null;
+        if (potential.Count == 0) {
+            if (penalties.Count == 0)
+                return null;
+            // S'il y a des réactions à pénalité possibles, mais aucune réaction à obstacle
+            if (difficulty == 0)
+                return null; // Le joueur facile n'attaque pas
+            else {
+                double[] choiceValues = new double[penalties.Count];
+                for (int i=0;i<choiceValues.Length;i++) {
+                    Reaction r = penalties[i];
+                    if (r.type.name == "Poison")
+                        choiceValues[i] = ((PoisonReaction) r).nbOfTurns;
+                    else if (r.type.name == "Radioactif")
+                        choiceValues[i] = 1/UraniumReaction.PROBA_DESINTEGRATION;
+                }
+                int idChoix = 0;
+                for (int i=1;i<choiceValues.Length;i++) {
+                    if (choiceValues[i] < choiceValues[idChoix])
+                        i = idChoix;
+                }
+                return penalties[idChoix];
+            }
+        }
 
         // Recherche d'un minimum
         reaction = potential[0];
         foreach (Reaction r in potential)
             if (r.cost < reaction.cost)
                 reaction = r;
+
+        foreach (Reaction r in Main.reactions) {
+
+        }
         return reaction;
     }
 

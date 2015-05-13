@@ -1,0 +1,15 @@
+Tour 0 : Message de bienvenue.
+Tour 1 : Le joueur pioche 2 cartes "H" et 2 "Cl". Un message lui donne les
+infos de base : où sont ses cartes, le plateau, les réactions.
+On peut alors faire la réaction H2 + Cl2 -> 2Hcl. Un message lui indique
+de la faire.
+Tour 2 : Le joueur pioche 2 cartes "He".  Un message lui dit qu'il devra
+trouver la carte dans le tableau périodique pour continuer, et lui dit
+où est la carte pour qu'il la trouve directement.
+Un message lui suggère ensuite de jeter ses cartes pour en obtenir
+d'autres. On obtient alors les cartes C, O, Na, et Cl.
+Un message indique au joueur de faire la réaction "C+O -> CO" pour bloquer
+l'adversaire.
+Tour 3 : Le joueur pioche les cartes "Na", "Cl". On peut faire la réaction
+Na2 + Cl2 -> 2NaCl. On dit au joueur de le faire.
+Fin du didacticiel.

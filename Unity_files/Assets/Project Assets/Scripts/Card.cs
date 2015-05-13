@@ -9,14 +9,11 @@ using System.Collections.Generic;
 /// Contient le type de carte, ainsi que le nombre de cartes possédées par le joueur
 /// </summary>
 public class Card {
-	
+	/// <summary>
+	/// L'élément dessiné sur la carte.
+	/// </summary>
 	public Element element { get; set; }
 	
-    public float w { get; private set; }
-    public float h { get; private set; }
-    public float y { get; private set; }
-    public const float baseW = 732, baseH = 1181; // Largeur et hauteur de base de l'image
-	private float x;
 	private int N; // Nombre de cartes
 
 	private int _nbSelected = 0;
@@ -53,18 +50,20 @@ public class Card {
 	/// </summary>
 	/// <param name="element">Le nom de la carte</param>
 	/// <param name="nb">Le nombre de cartes de ce types possédées initialement par le joueur</param>
-    /// <todo>Faire en sorte d'utiliser la carte par défaut.</todo>
 	public Card (Element nElement, int nb, GameObject referenceCard) {
-		cardImg = new GameObject ();
-		cardImg.name = "Card(s) "+ nElement.symbole; // Nom de l'objet (celui qui apparait dans la hiérarchie)
-		cardImg.AddComponent<Image>();
+        cardImg = (GameObject) GameObject.Instantiate (referenceCard);
+        cardImg.SetActive (true); // La referenceCard est inactive
+        cardImg.transform.SetParent (referenceCard.transform.parent);
+		cardImg.name = "Card(s) "+ nElement.symbole;
 		cardImg.GetComponent<Image>().sprite = nElement.cardRessource;
 
-        setDefaultCard(referenceCard);
-        
-        w = referenceCard.GetComponent<RectTransform> ().sizeDelta.x;
-        h = referenceCard.GetComponent<RectTransform> ().sizeDelta.y;
-        y = referenceCard.GetComponent<RectTransform> ().localPosition.y;
+        RectTransform refTransform = referenceCard.GetComponent<RectTransform>();
+
+        // On place les ancres, puis on réinitialise
+        RectTransform rect = cardImg.GetComponent<RectTransform>();
+        rect.anchoredPosition = new Vector2 (0, 0);
+        rect.localPosition = new Vector3 (refTransform.localPosition.x, refTransform.localPosition.y);
+        rect.localScale = new Vector2 (1, 1);
 
 		cardImg.AddComponent<EventTrigger>();
 		cardImg.GetComponent<EventTrigger>().delegates = new List<EventTrigger.Entry> ();
@@ -91,6 +90,7 @@ public class Card {
 				cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
                 cardSelected.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 				infosNb.transform.SetParent(infosNb.transform.parent);
+                infosNb.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
             }
             if (leftClick) {
 				if (_nbSelected == N)
@@ -108,15 +108,14 @@ public class Card {
 
 		// Ajout d'un événement de prévisualisation de la carte au passage de la souris
         Main.addEvent(cardImg, EventTriggerType.PointerEnter, delegate {
-			// Ajout de la prévisualisation de la carte au niveau du plateau de jeu
+			// Ajout de la prévisualisation de la carte au niveau du plateau de jeu, en utilisant un prefab
 			if (cardPreview == null) {
-				cardPreview = new GameObject();
-				cardPreview.name = "Card Preview";
+                cardPreview = (GameObject) GameObject.Instantiate (Resources.Load<GameObject>("Prefabs/CardPreview"));
 				cardPreview.transform.SetParent(Main.currentPlayer().playerScreen.transform.Find("Card Preview Container"));
-				cardPreview.AddComponent<Image> ();
 				cardPreview.GetComponent<Image> ().sprite = nElement.cardRessource;
-				cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (Screen.height*0.36f,Screen.height*0.48f); // Taille
-				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
+				cardPreview.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0,0);
+                cardPreview.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
+				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); 
 			}
         });
         
@@ -126,12 +125,6 @@ public class Card {
 			Object.Destroy(cardPreview);
 			cardPreview = null;
         });
-		
-		cardImg.transform.SetParent(Main.currentPlayer().playerScreen.gameObject.transform.Find ("Cards List"));
-		cardImg.transform.localScale = new Vector3(1,1,1);
-		RectTransform imgParams = cardImg.GetComponent<RectTransform> (); // Propriétés de l'image (position, taille, etc)
-		//imgParams.sizeDelta = new Vector2 (w*Screen.height/Screen.width,h*Screen.height/Screen.width); // Taille
-        imgParams.sizeDelta = new Vector2 (w,h); // Taille
 
 		infosNb = new GameObject ();
 		infosNb.name = "Nb cards";
@@ -139,44 +132,45 @@ public class Card {
 		infosNb.transform.SetParent(cardImg.gameObject.transform);
 		infosNb.GetComponent<Text> ().horizontalOverflow = HorizontalWrapMode.Overflow;
 		infosNb.GetComponent<Text> ().verticalOverflow = VerticalWrapMode.Overflow;
-		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (1,1); // Taille
+		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (10,10); // Taille
 		infosNb.GetComponent<Text> ().font = (Font)Resources.GetBuiltinResource (typeof(Font), "Arial.ttf");
 		infosNb.GetComponent<Text> ().fontSize = 25;
 		infosNb.GetComponent<Text> ().fontStyle = FontStyle.Bold;
 		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (20f,-96f*Screen.height/Screen.width);
 		infosNb.GetComponent<Text> ().alignment = TextAnchor.MiddleCenter;
+        infosNb.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 
 		element = nElement;
-		nbCards = nb;
+        nbCards = nb;
 	}
 	
 	public void updateX(float posX) {
-		x = posX;
-		RectTransform imgParams = cardImg.GetComponent<RectTransform> ();
-		imgParams.localPosition = new Vector2 (x,y); // attention, c'est l'attribut "localPosition" et non "position" qui contient les coordonnées
+        /* On déplace les ancres, puis on réinitialise */
+        RectTransform rect = cardImg.GetComponent<RectTransform>();
+        rect.localPosition = new Vector2 (posX, rect.localPosition.y);
+        //Main.Write ("Carte centrée en (" + rect.position.x + "," +
+         //   rect.position.y + ")");
 	}
+
+    /// <summary>
+    /// Fait remonter la carte dans l'arbre d'affichage.
+    /// </summary>
     public void bringToFront() {
         cardImg.transform.SetParent(cardImg.transform.parent);
     }
+
+    /// <summary>
+    /// Met à jour le multiplicateur de la carte.
+    /// </summary>
 	public void updateText() {
 		infosNb.GetComponent<Text> ().color = (nbSelected>0) ? Color.cyan : Color.yellow;
 		infosNb.GetComponent<Text> ().text = (N>1) ? ((nbSelected>0) ? nbSelected+"/"+N:("×" + N)):"";
 	}
-    public void remove() {
-        GameObject.Destroy(cardImg);
-    }
 
     /// <summary>
-    /// Fixe la taille de la carte à partir de la carte de référence
+    /// Détruit la carte.
     /// </summary>
-    /// <param name="g">Un gameObject représentant la carte de référence.</param>
-    public void setDefaultCard (GameObject g)
-    {
-        cardImg.GetComponent<RectTransform> ().sizeDelta = new Vector2 (g.GetComponent<RectTransform> ().sizeDelta.x,
-            g.GetComponent<RectTransform> ().sizeDelta.y);
-        cardImg.GetComponent<RectTransform> ().localPosition = new Vector2 (g.GetComponent<RectTransform> ().localPosition.x,
-            g.GetComponent<RectTransform> ().localPosition.y);
-        g.name = "Reference card";
-        g.SetActive (false);
+    public void remove() {
+        GameObject.Destroy(cardImg);
     }
 }
