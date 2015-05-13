@@ -133,11 +133,9 @@ public class Player {
             mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
             KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
                 new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
-                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.symbole.CompareTo(b.symbole)),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
                 new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
-                    if (a.family == b.family)
-                        return a.atomicNumber-b.atomicNumber;
-                    return a.family.CompareTo(b.family);
+                    return compareFamilies(a,b);
                 })
             };
 
@@ -217,6 +215,20 @@ public class Player {
             });
         }
 	}
+
+    public int compareFamilies(Element a, Element b) {
+        if (a.family == b.family)
+            return a.symbole.CompareTo(b.symbole);
+        int familyID1 = 0;
+        int familyID2 = 0;
+        for (int i=0;i<Main.families.Length;i++) {
+            if (Main.families[i] == a.family)
+                familyID1 = i;
+            else if (Main.families[i] == b.family)
+                familyID2 = i;
+        }
+        return (familyID1-familyID2);
+    }
 
     public void updateReactionsList ()
     {

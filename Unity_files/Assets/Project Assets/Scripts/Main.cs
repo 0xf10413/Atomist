@@ -19,6 +19,8 @@ public class Main : MonoBehaviour {
     /// </summary>
 	public static Main context;
 
+    public static String[] families = {"Non-Métal","Métal Alcalin","Alcalino-terreux","Métaloïde","Non-métai","Métal de transition","Métal Pauvre","Halogène","Gaz Noble","Actinide"};
+
     public static List<Element> elements { private set; get; }   // Liste des éléments, fixée au démarrage
     public static List<Reaction> reactions { private set; get; } // Liste des réaction, fixée au démarrage
     public static List<Obstacle> obstacles { private set; get; } // Liste des obtacles, fixée au démarrage
