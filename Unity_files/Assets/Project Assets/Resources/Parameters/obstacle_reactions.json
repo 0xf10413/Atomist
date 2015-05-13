@@ -45,11 +45,7 @@
 		"gain" : 5
 	},
 	{
-<<<<<<< HEAD
 		"reagents" : [["Al",2],["H",12],["O",6]],
-=======
-		"reagents" : [["H",12],["O",6],["Al",2]],
->>>>>>> origin/master
 		"reaction" : "2Al + 6H2O",
 		"products" : "2Al(OH)3 + 3H2",
 		"infos" : "",
