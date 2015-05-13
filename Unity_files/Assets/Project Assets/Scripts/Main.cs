@@ -12,6 +12,8 @@ using UnityEngine.EventSystems;
  **/
 public class Main : MonoBehaviour {
 
+    public const int MAX_NB_PLAYERS = 8;
+
     /// <summary>
     /// Pointeur vers l'unique instance de Main.
     /// </summary>
@@ -94,15 +96,15 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            players.Add (new Player("Florent"));
-            players.Add (new PlayerAI("Solène"));
+            players.Add (new Player("Florent",Menu.TOKENS_COLOR[0]));
+            players.Add (new Player("Solène", Menu.TOKENS_COLOR[1]));
 
-            players.Add (new Player ("Solène"));
+            /*players.Add (new Player ("Solène"));
             players.Add (new Player ("Timothé"));
             players.Add (new Player("Guillaume"));
             players.Add (new Player ("Marwane"));
             players.Add (new Player ("Thomas"));
-            players.Add (new Player ("Emanuelle"));
+            players.Add (new Player ("Emanuelle"));*/
             //players.Add (new Player ("François"));
         }
         foreach (Player p in players)
@@ -139,11 +141,13 @@ public class Main : MonoBehaviour {
                 onFire();
             });
 		clicEvent.callback.AddListener(clicCallback);
-		go.AddComponent<EventTrigger>().delegates = new List<EventTrigger.Entry>();
-		go.GetComponent<EventTrigger>().delegates.Add(clicEvent);
+        EventTrigger eventComponent = go.AddComponent<EventTrigger>();
+		eventComponent.delegates = new List<EventTrigger.Entry>();
+		eventComponent.delegates.Add(clicEvent);
     }
     public static void removeEvents(GameObject go) {
-        GameObject.Destroy(go.GetComponent<EventTrigger>());
+        for (int i=go.GetComponents<EventTrigger>().Length-1;i>=0;i--)
+            GameObject.Destroy((EventTrigger)go.GetComponents<EventTrigger>().GetValue(i));
     }
     public static void addClickEvent(GameObject go, Del onClick) {
         addEvent(go, EventTriggerType.PointerClick, onClick);
@@ -263,7 +267,7 @@ public class Main : MonoBehaviour {
         GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
-        foreach (Element pickedCard in pickedCards) {
+        for (int i=0;i<pickedCards.Count;i++) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
             cardImg.GetComponent<Image>().sprite = backCardRessource;
             cardImg.transform.SetParent(dialogBox.transform.Find("Cards List"));

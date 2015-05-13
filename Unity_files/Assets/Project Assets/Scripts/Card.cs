@@ -117,6 +117,15 @@ public class Card {
                 cardPreview.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
 				cardPreview.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); 
 			}
+
+            Deck deck = Main.currentPlayer().deck;
+            deck.updatePositions();
+            for (int i=0;i<deck.getNbCards();i++) {
+                Card iCard = deck.getCard(i);
+                    iCard.bringToFront();
+                if (iCard == this)
+                    break;
+            }
         });
         
 		// Ajout d'un événement de déprévisualisation de la carte à la sortie de la souris

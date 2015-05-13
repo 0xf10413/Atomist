@@ -27,8 +27,8 @@ public class PlayerAI : Player
     /// </summary>
     /// <param name="nName">Le nom de l'IA.</param>
     /// <param name="dDifficulty">La difficulté, entre 0 et 2.</param>
-    public PlayerAI (string nName, int dDifficulty=2)
-        : base (nName)
+    public PlayerAI (string nName, Color color, int dDifficulty=2)
+        : base (nName,color)
     { hasPlayed = false;
     difficulty = dDifficulty;
     printName += difficulty == 0 ? " ★" :
@@ -236,9 +236,6 @@ public class PlayerAI : Player
             if (r.cost < reaction.cost)
                 reaction = r;
 
-        foreach (Reaction r in Main.reactions) {
-
-        }
         return reaction;
     }
 

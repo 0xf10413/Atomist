@@ -35,6 +35,7 @@ public class Player {
     public List<ObstacleToken> obstacles {get;set;}
     public bool isTurn; // Vaut true Ssi c'est le tour de ce joueur
     public string name {get;set;} // Nom du joueur
+    public Color tokenColor {get;set;}
     public string printName { get; protected set; } // Nom affiché dans les scores
     public int rank {private get; set; } // Rang du joueur
 
@@ -46,8 +47,10 @@ public class Player {
     /// reste plus tard.
     /// </summary>
     /// <param name="nName">Le nom du joueur.</param>
-	public Player (string nName) {
+    /// <param name="nColor">Le nom du joueur.</param>
+	public Player (string nName, Color nColor) {
         name = nName;
+        tokenColor = nColor;
         printName = name;
         isPlaying = true;
     }
@@ -56,10 +59,10 @@ public class Player {
     /// Fonction d'initialisation effective.
     /// </summary>
     public virtual void init() {
-        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/FPlayerScreen"));
+        playerScreen = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerScreen"));
         
         playerScreen.transform.SetParent(Main.context.gameObject.transform);
-        playerScreen.name = "FPlayerScreen";
+        playerScreen.name = "PlayerScreen";
         playerScreen.SetActive(false);
         penalties = new List<Penalty> ();
 
@@ -92,7 +95,6 @@ public class Player {
         }
 
         updateReactionsList();
-
       
         Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Next turn").gameObject, delegate {
             Main.confirmDialog("Fin du tour ?", delegate {
@@ -131,7 +133,7 @@ public class Player {
             mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
             KeyValuePair<string,System.Comparison<Element>>[] buttonsWithSort = {
                 new KeyValuePair<string,System.Comparison<Element>>("Alphabetically", (a,b) => a.symbole.CompareTo(b.symbole)),
-                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.atomicNumber-b.atomicNumber),
+                new KeyValuePair<string,System.Comparison<Element>>("AtomicNumber", (a,b) => a.symbole.CompareTo(b.symbole)),
                 new KeyValuePair<string,System.Comparison<Element>>("Family", (a,b) => {
                     if (a.family == b.family)
                         return a.atomicNumber-b.atomicNumber;
@@ -152,12 +154,40 @@ public class Player {
                 });
             }
         });
+        Main.addEvent(playerScreen.transform.Find ("Board Container").gameObject, EventTriggerType.PointerEnter, delegate {
+            playerScreen.transform.Find("Board Preview").gameObject.SetActive(true);
+        });
+        Main.addEvent(playerScreen.transform.Find ("Board Container").gameObject, EventTriggerType.PointerExit, delegate {
+            playerScreen.transform.Find("Board Preview").gameObject.SetActive(false);
+        });
+        Main.addClickEvent(playerScreen.transform.Find("System Buttons/Table").gameObject, delegate {
+            GameObject mask = Main.AddMask();
+            GameObject tableDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PeriodicTable"));
+            mask.SetActive(false);
+            tableDialog.transform.SetParent(mask.transform,false);
+            mask.SetActive(true);
+            Main.addClickEvent(mask, delegate {
+                GameObject.Destroy(mask);
+            });
+            Main.addClickEvent(tableDialog, delegate {
+            });
+            Main.addClickEvent(tableDialog.transform.Find("Button").gameObject, delegate {
+                GameObject.Destroy(mask);
+            });
+        });
+        Main.addClickEvent(playerScreen.transform.Find("System Buttons/Quit").gameObject, delegate {
+            Main.confirmDialog("Quitter le jeu et revenir à l'écran titre ?", delegate {
+                Application.LoadLevel ("title-screen");
+            });
+        });
 
         GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
         boardGame.name = "BoardGame";
         boardGame.transform.SetParent(playerScreen.transform.Find ("Board Container"), false);
         boardGame.GetComponent<RectTransform> ().localPosition = new Vector2 (0, 0);
         boardGame.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
+        GameObject playerToken = boardGame.transform.Find("PlayerTokenContainer/PlayerToken").gameObject;
+        playerToken.GetComponent<Image>().color = tokenColor;
 
         cardsBuffer = new List<Element>();
         cardsDiscovered = new List<Element>();
@@ -167,7 +197,24 @@ public class Player {
         List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
         foreach (GameObject obstacleToken in obstacleTokens) {
             string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
-            obstacles.Add(new ObstacleToken(Main.obstacles.Find(o => o.name == obstacleName),obstacleToken));
+            Obstacle obstacleAssociated = Main.obstacles.Find(o => o.name == obstacleName);
+            obstacles.Add(new ObstacleToken(obstacleAssociated,obstacleToken));
+            GameObject localVarObstacle = obstacleToken;
+            GameObject obstacleInfoDialog = null;
+            Main.addEvent(localVarObstacle, EventTriggerType.PointerEnter, delegate {
+                float zoom = 2f;
+                localVarObstacle.transform.localScale = new Vector3(zoom,zoom,zoom);
+                obstacleInfoDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ObstacleInfoDialog"));
+                obstacleInfoDialog.transform.SetParent(playerScreen.transform, false);
+                obstacleInfoDialog.transform.Find("Title").gameObject.GetComponent<Text>().text = "Obstacle \""+ obstacleAssociated.name +"\"";
+                obstacleInfoDialog.transform.Find("Icon").gameObject.GetComponent<Image>().sprite = localVarObstacle.GetComponent<Image>().sprite;
+                obstacleInfoDialog.transform.Find("Description").gameObject.GetComponent<Text>().text = "Se détruit avec une réaction de type \""+ obstacleAssociated.weakness.name +"\"";
+            });
+            Main.addEvent(localVarObstacle, EventTriggerType.PointerExit, delegate {
+                localVarObstacle.transform.localScale = new Vector3(1,1,1);
+                if (obstacleInfoDialog != null)
+                    GameObject.Destroy(obstacleInfoDialog);
+            });
         }
 	}
 
@@ -360,8 +407,8 @@ public class Player {
     /// Déplacement vers la salle suivante, avec animation.
     /// </summary>
     public void progressMoveToNextRoom() {
-        Vector3 tokenPos1 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
-        Vector3 tokenPos2 = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
+        Vector3 tokenPos1 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
+        Vector3 tokenPos2 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
         movePlayer(tokenPos1 + (tokenPos2-tokenPos1)*room);
     }
 
@@ -370,7 +417,7 @@ public class Player {
     /// </summary>
     /// <param name="but">Position cible d'arrivée</param>
     private void movePlayer(Vector3 but) {
-        GameObject playerToken = playerScreen.transform.Find("BoardGame/PlayerTokenContainer/PlayerToken").gameObject;
+        GameObject playerToken = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerToken").gameObject;
         float nextX = playerToken.transform.localPosition.x + 5;
         if (nextX > but.x)
             nextX = but.x;

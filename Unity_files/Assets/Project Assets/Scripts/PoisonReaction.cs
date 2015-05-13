@@ -18,7 +18,7 @@ public class PoisonReaction : DelayedReaction
     {
         GameObject penaltyToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PenaltyToken"));
         penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = nbOfTurns.ToString();
-        penaltyToken.transform.SetParent(target.playerScreen.transform.Find("BoardGame/PenaltyTokensContainer"+ target.room));
+        penaltyToken.transform.SetParent(target.playerScreen.transform.Find("Board Container/BoardGame/PenaltyTokensContainer"+ target.room));
 
         int remainingTurns = nbOfTurns;
 

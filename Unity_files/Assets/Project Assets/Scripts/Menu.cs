@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class Menu : MonoBehaviour {
@@ -8,12 +9,16 @@ public class Menu : MonoBehaviour {
 	/// Fonction de démarrage.
 	/// </summary>
 	void Start () {
-	    Main.addClickEvent(transform.Find("Screen/Play").gameObject, delegate {
+	    setClickEvent(transform.Find("Screen/Play").gameObject, delegate {
             addPlayerDialog();
         });
-	    Main.addClickEvent(transform.Find("Screen/How to play").gameObject, delegate {
+	    setClickEvent(transform.Find("Screen/How to play").gameObject, delegate {
             addTutoDialog(5);
         });
+	    setClickEvent(transform.Find("Screen/Quit").gameObject, delegate {
+            Application.Quit(); // Ne fonctionne que sur l'exécutable
+        });
+        mask = transform.Find("Screen/Mask").gameObject;
 	}
 
     /// <summary>
@@ -22,22 +27,86 @@ public class Menu : MonoBehaviour {
     private InputField playerNameInput;
 
     /// <summary>
+    /// La couleur du joueur sélectionnée par l'utilisateur
+    /// </summary>
+    private Color playerColorSelected;
+
+    /// <summary>
+    /// Le GamzObject contenant le masque
+    /// </summary>
+    private GameObject mask;
+
+    public static Color[] TOKENS_COLOR = new Color[] {
+        new Color(1,0,0),
+        new Color(0,1,0),
+        new Color(0,0,1),
+        new Color(1,0,1),
+        new Color(1,1,0),
+        new Color(0,1,1),
+        new Color(1,0.5f,0),
+        new Color(0.6f,0.2f,0),
+    };
+
+    /// <summary>
     /// Affiche la boîte de dialogue d'ajout d'un joueur humain.
     /// </summary>
     void playerNameDialog() {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAddDialog"));
         dialog.transform.SetParent(transform.Find("Screen"), false);
+
+        mask.SetActive(true);
+        
+        setClickEvent(mask, delegate {
+            mask.SetActive(false);
+            GameObject.Destroy(dialog);
+        });
     
         dialog.transform.Find("Message").GetComponent<Text>().text = "Joueur "+ (Main.players.Count+1) +", entrez votre nom :";
         playerNameInput = dialog.transform.Find("Input").gameObject.GetComponent<InputField>();
-        Main.addClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+        setClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
             if (playerNameInput.text != "") {
-                Main.players.Add(new Player(playerNameInput.text));
+                Main.players.Add(new Player(playerNameInput.text,playerColorSelected));
                 GameObject.Destroy(dialog);
+                mask.SetActive(false);
                 showPlayerDialog();
             }
         });
+
+        addColorChoices(dialog.transform.Find("Tokens Color"));
+
         Main.autoFocus(dialog.transform.Find("Input").gameObject);
+    }
+
+    /// <summary>
+    /// Ajoute la liste des couleurs de jetons disponibles dans un GameObject.
+    /// Le joueur peut alors sélectionner une couleur.
+    /// </summary>
+    /// <param name="tokensContainer"></param>
+    void addColorChoices(Transform tokensContainer) {
+        GameObject colorSelected = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SelectedColor"));
+        bool firstToken = true;
+        for (int i=0;i<TOKENS_COLOR.Length;i++) {
+            Color tokenColor = TOKENS_COLOR[i];
+            if (Main.players.Find(p => p.tokenColor==tokenColor) == null) { // Si la couleur n'a pas déjà été prise
+                GameObject colorToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ColorToken"));
+                colorToken.GetComponent<Image>().color = tokenColor;
+                colorToken.transform.SetParent(tokensContainer,false);
+
+                Main.addClickEvent(colorToken, delegate {
+                    selectToken(tokenColor,colorToken,colorSelected);
+                });
+
+                if (firstToken) {
+                    selectToken(tokenColor,colorToken,colorSelected);
+                    firstToken = false;
+                }
+            }
+        }
+    }
+
+    void selectToken(Color color, GameObject token, GameObject selection) {
+        playerColorSelected = color;
+        selection.transform.SetParent(token.transform,false);
     }
 
     /// <summary>
@@ -45,18 +114,24 @@ public class Menu : MonoBehaviour {
     /// </summary>
     void playerAIDialog() {
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAddAIDialog"));
+        mask.SetActive(true);
         dialog.transform.SetParent(transform.Find("Screen"));
         dialog.transform.localPosition = new Vector3(0,0,0);
         dialog.transform.Find("Message").GetComponent<Text>().text = "Entrez le nom de l'IA :";
         playerNameInput = dialog.transform.Find("Input").gameObject.GetComponent<InputField>();
         string[] difficulties = {"Easy","Medium","Difficult"};
-        Main.addClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+        setClickEvent(mask, delegate {
+            mask.SetActive(false);
+            GameObject.Destroy(dialog);
+        });
+        setClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
             if (playerNameInput.text != "") {
                 for (int i=0;i<difficulties.Length;i++) {
                     if (dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).GetComponent<Toggle>().isOn) {
-                        Main.players.Add(new PlayerAI(playerNameInput.text,i));
+                        Main.players.Add(new PlayerAI(playerNameInput.text,playerColorSelected,i));
                         GameObject.Destroy(dialog);
                         showPlayerDialog();
+                        GameObject.Destroy(dialog);
                         break;
                     }
                 }
@@ -64,11 +139,14 @@ public class Menu : MonoBehaviour {
         });
         for (int i=0;i<difficulties.Length;i++) {
             int diffID = i;
-            Main.addClickEvent(dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).gameObject, delegate {
+            setClickEvent(dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).gameObject, delegate {
                 for (int j=0;j<difficulties.Length;j++)
                     dialog.transform.Find("Difficulty Selector").Find(difficulties[j]).GetComponent<Toggle>().isOn = (j == diffID);
             });
         }
+
+        addColorChoices(dialog.transform.Find("Tokens Color"));
+
         Main.autoFocus(dialog.transform.Find("Input").gameObject);
     }
 
@@ -78,22 +156,32 @@ public class Menu : MonoBehaviour {
     void addPlayerDialog() {
         GameObject dialog = transform.Find ("Screen/PlayerNameDialog").gameObject;
         dialog.SetActive (true);
+        
+        mask.SetActive(true);
+        setClickEvent(mask, delegate {
+            dialog.SetActive(false);
+            mask.SetActive(false);
+        });
 
-        Main.addClickEvent(dialog.transform.Find("Add Player").gameObject, delegate {
+        bool cannAddPlayer = (Main.players.Count < Main.MAX_NB_PLAYERS);
+
+        setClickEvent(dialog.transform.Find("Add Player").gameObject, delegate {
             dialog.SetActive (false);
             playerNameDialog();
         });
-        Main.addClickEvent(dialog.transform.Find("Add AI").gameObject, delegate {
+        dialog.transform.Find("Add Player").GetComponent<Button>().enabled = cannAddPlayer;
+        setClickEvent(dialog.transform.Find("Add AI").gameObject, delegate {
             dialog.SetActive (false);
             playerAIDialog();
         });
+        dialog.transform.Find("Add AI").GetComponent<Button>().enabled = cannAddPlayer;
 
-            Main.addClickEvent (dialog.transform.Find ("Start Game").gameObject, delegate
-            {
-                int players = Main.players.Count;
-                if (players > 1)
-                    Application.LoadLevel ("florent-prefab");
-            });
+        setClickEvent (dialog.transform.Find ("Start Game").gameObject, delegate
+        {
+            int players = Main.players.Count;
+            if (players > 1)
+                Application.LoadLevel ("default");
+        });
         
         dialog.transform.Find("Start Game").GetComponent<Button>().enabled = false;
     }
@@ -105,16 +193,32 @@ public class Menu : MonoBehaviour {
     {
         GameObject dialog = transform.Find ("Screen/PlayerNameDialog").gameObject;
         transform.Find ("Screen/PlayerNameDialog").gameObject.SetActive (true);
-        if (Main.players.Count > 1) {
-            dialog.transform.Find ("Start Game").GetComponent<Button> ().enabled = true;
+        dialog.transform.Find ("Start Game").GetComponent<Button> ().enabled = (Main.players.Count > 1);
+        GameObject playersList = dialog.transform.Find("PlayersList").gameObject;
+        Main.removeAllChilds(playersList);
+        setClickEvent(mask, delegate {
+            mask.SetActive(false);
+            dialog.SetActive(false);
+        });
+        foreach (Player p in Main.players) {
+            Player player = p;
+            GameObject playerAdded = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAdded"));
+            playerAdded.transform.Find("Name").GetComponent<Text>().text = player.printName;
+            setClickEvent(playerAdded, delegate {
+                Main.players.Remove(player);
+                showPlayerDialog();
+            });
+            playerAdded.transform.SetParent(playersList.transform,false);
         }
     }
 
     void addSettingsDialog() {
+        mask.SetActive(true);
         GameObject dialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SettingsPanel"));
         dialog.transform.SetParent(transform.Find("Screen"));
         dialog.transform.localPosition = new Vector3(0,0,0);
-        Main.addClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+        setClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+            mask.SetActive(false);
             GameObject.Destroy(dialog);
         });
     }
@@ -133,7 +237,7 @@ public class Menu : MonoBehaviour {
         GameObject nextButton = dialog.transform.Find("Next page").gameObject;
         if (page != 1) {
             prevButton.GetComponent<Button>().interactable = true;
-            Main.addClickEvent(prevButton, delegate {
+            setClickEvent(prevButton, delegate {
                 addTutoDialog(page-1,nbPages, dialog);
             });
         }
@@ -141,7 +245,7 @@ public class Menu : MonoBehaviour {
             prevButton.GetComponent<Button>().interactable = false;
         if (page != nbPages) {
             nextButton.GetComponent<Button>().interactable = true;
-            Main.addClickEvent(nextButton, delegate {
+            setClickEvent(nextButton, delegate {
                 addTutoDialog(page+1,nbPages, dialog);
             });
         }
@@ -161,9 +265,21 @@ public class Menu : MonoBehaviour {
     /// </summary>
     void OnGUI() {
         if ((playerNameInput != null) && playerNameInput.isFocused && (playerNameInput.text != "") && Input.GetKey(KeyCode.Return)) {
-            Main.players.Add(new Player(playerNameInput.text));
+            Main.players.Add(new Player(playerNameInput.text,playerColorSelected));
             GameObject.Destroy(playerNameInput.transform.parent.gameObject);
             showPlayerDialog();
         }
+    }
+
+    /// <summary>
+    /// Supprime l'ancien événement de clic attaché à un gameobject
+    /// (s'il existe) et le remplace par un nouvel événement.
+    /// </summary>
+    /// <param name="go">Le gameobject</param>
+    /// <param name="onClick">L'événement</param>
+    void setClickEvent(GameObject go, Main.Del onClick) {
+        if (go.GetComponents<EventTrigger>() != null)
+            Main.removeEvents(go);
+        Main.addClickEvent(go, onClick);
     }
 }

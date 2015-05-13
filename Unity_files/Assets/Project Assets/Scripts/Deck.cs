@@ -115,9 +115,6 @@ public class Deck {
 			updatePosition(listCards[i],i);
 		for (int i=listCards.Count-1; i>=0; i--)
     		listCards[i].bringToFront();
-        RectTransform rect = deck.GetComponent<RectTransform>();
-        /*Main.Write ("Deck centré en " + rect.position.x + ","
-            + rect.position.y + ")");*/
 	}
 	
 	/// <summary>
