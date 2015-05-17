@@ -7,16 +7,64 @@ ModelImporter:
     100002: Empty
     100004: //RootNode
     100006: Salle
+    100008: Camera_Position
+    100010: Camera_Target
+    100012: Metal
+    100014: Obstacle_Position
+    100016: Room
+    100018: Glace
+    100020: M_tal
+    100022: D_bris
+    100024: D_bris_MeshPart0
+    100026: D_bris_MeshPart1
+    100028: Flamme
+    100030: Next_Room
     400000: Cylinder
     400002: Empty
     400004: //RootNode
     400006: Salle
+    400008: Camera_Position
+    400010: Camera_Target
+    400012: Metal
+    400014: Obstacle_Position
+    400016: Room
+    400018: Glace
+    400020: M_tal
+    400022: D_bris
+    400024: D_bris_MeshPart0
+    400026: D_bris_MeshPart1
+    400028: Flamme
+    400030: Next_Room
     2300000: Cylinder
     2300002: Salle
+    2300004: Metal
+    2300006: Room
+    2300008: Glace
+    2300010: M_tal
+    2300012: D_bris_MeshPart0
+    2300014: D_bris_MeshPart1
+    2300016: D_bris
+    2300018: Flamme
     3300000: Cylinder
     3300002: Salle
+    3300004: Metal
+    3300006: Room
+    3300008: Glace
+    3300010: M_tal
+    3300012: D_bris_MeshPart0
+    3300014: D_bris_MeshPart1
+    3300016: D_bris
+    3300018: Flamme
     4300000: Cylinder
     4300002: Salle
+    4300004: Metal
+    4300006: Room
+    4300008: Glace
+    4300010: M_tal
+    4300012: D_bris_MeshPart0
+    4300014: D_bris_MeshPart1
+    4300016: D_bris
+    4300018: Flamme
     7400000: Default Take
     9500000: //RootNode
   materials:

@@ -18,7 +18,7 @@ public class PlayerAI : Player
 
     /// <summary>
     /// La difficulté. De 0 à 2, difficulté et agressivité croissantes. 
-    /// Symbolisée par 8), :| et >(.
+    /// Symbolisée par des étoiles.
     /// </summary>
     public int difficulty { get; private set; }
 
@@ -51,7 +51,6 @@ public class PlayerAI : Player
 
     /// <summary>
     /// Récupération des cartes. À partir de ce moment, le comportement classique change.
-    /// L'IA réussit toujours à récupérer les deux cartes.
     /// </summary>
     public override void pickCards (int nbCards, string message, bool askInPeriodicTable) {
         bool[] getTheCard = new bool[nbCards];
@@ -82,7 +81,6 @@ public class PlayerAI : Player
             }
         }
 
-        // Ajouter un chrono ?
         if (askInPeriodicTable) {
             Main.infoDialog (name + " pioche " + nbCards.ToString () + " carte" + (nbCards > 1 ? "s" : ""), delegate {
                 Main.infoDialog (name + " récupère " + nbCardsActuallyPicked + " carte" + (nbCardsActuallyPicked > 1 ? "s" : ""), delegate {
@@ -127,6 +125,7 @@ public class PlayerAI : Player
             hasPlayed = true;
             return;
         }
+
         // On essaie d'avancer
         Reaction r = chooseReaction ();
         if (r != null) {
@@ -240,8 +239,11 @@ public class PlayerAI : Player
     }
 
     public override void moveToNextRoom () {
+        rooms.transform.Find ("Salle " + room + "/Obstacle").gameObject.SetActive (false);
+        
         room++;
         updateRanks ();
+        
         foreach (Penalty p in penalties)
             p.Remove ();
         penalties.Clear ();

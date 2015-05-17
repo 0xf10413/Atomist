@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 100; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -33,18 +33,19 @@ public class Player {
     public GameObject playerScreen {get;set;} // Ecran de jeu contenant le plateau, les cartes, le score, la liste des réactions
     public ReactionType currentReactionSelected {get;set;}
     public List<ObstacleToken> obstacles {get;set;}
-    public bool isTurn; // Vaut true Ssi c'est le tour de ce joueur
+    public bool isTurn; // Vaut true ssi c'est le tour de ce joueur
     public string name {get;set;} // Nom du joueur
-    public Color tokenColor {get;set;}
+    public Color tokenColor {get;set;} // Jeton de couleur choisi
     public string printName { get; protected set; } // Nom affiché dans les scores
     public int rank {private get; set; } // Rang du joueur
 
     public List<Element> cardsBuffer {get;set;} // Cartes que le joueur a "loupé" dans le tableau, il peut réessayer au tour suivant
     public List<Element> cardsDiscovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
+    public GameObject rooms { get; private set; } // Salles en 3D affichées à l'écran
 
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
-    /// reste plus tard.
+    /// reste plus tard via init ().
     /// </summary>
     /// <param name="nName">Le nom du joueur.</param>
     /// <param name="nColor">Le nom du joueur.</param>
@@ -190,14 +191,37 @@ public class Player {
         cardsBuffer = new List<Element>();
         cardsDiscovered = new List<Element>();
 
-        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène
+        // Génération de la liste des obstacles à partir de ceux ajoutés sur la scène, et des salles 3D
         obstacles = new List<ObstacleToken> ();
+        rooms = new GameObject ("Rooms");
+        rooms.transform.SetParent (playerScreen.transform.root);
+        rooms.SetActive (false);
+        GameObject previousRoom = null;
+        int build_room = 0; // Variable utile à la construction des salles 3D
+
         List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
         foreach (GameObject obstacleToken in obstacleTokens) {
             string obstacleName = obstacleToken.GetComponent<ObstacleScript>().obstacleName;
             Obstacle obstacleAssociated = Main.obstacles.Find(o => o.name == obstacleName);
             obstacles.Add(new ObstacleToken(obstacleAssociated,obstacleToken));
             GameObject localVarObstacle = obstacleToken;
+            
+            // Création de la salle et de l'obstacle
+            GameObject localVarRoom = (GameObject) GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/PlayerRoom1")) ;
+            localVarRoom.transform.SetParent (rooms.transform);
+            localVarRoom.name = "Salle " + build_room;
+            GameObject localVarRoomObstacle = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/Obstacle" + obstacleName));
+            localVarRoomObstacle.name = "Obstacle";
+            localVarRoomObstacle.transform.SetParent (localVarRoom.transform);
+            localVarRoomObstacle.transform.position = localVarRoom.transform.Find ("Obstacle_Position").position;
+
+            if (previousRoom != null) {
+                localVarRoom.transform.position = previousRoom.transform.Find ("Next_Room").position;
+            }
+            previousRoom = localVarRoom;
+            build_room++;
+
+            // Affichage d'informations au survol
             GameObject obstacleInfoDialog = null;
             Main.addEvent(localVarObstacle, EventTriggerType.PointerEnter, delegate {
                 float zoom = 2f;
@@ -242,7 +266,7 @@ public class Player {
                 button.name = reaction.reagents;
                 button.transform.localScale = new Vector3(1,1,1);
 
-                // Toutes mes excuses... on change le "12" par défaut en une taille dynamique
+                // On change le "12" par défaut en une taille dynamique
                 string reactionString = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
                 float fontSize = 8f*Mathf.Sqrt(Screen.height/232f);
                 reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
@@ -343,6 +367,14 @@ public class Player {
     public void BeginTurn() {
         isTurn = true;
 
+        // Replacement de la caméra, réaffichage des salles
+        Transform root = playerScreen.transform.root.transform;
+        GameObject camera = root.Find ("Camera").gameObject;
+        camera.transform.position = rooms.transform.Find ("Salle " + room + "/Camera_Position").transform.position;
+        camera.transform.LookAt (rooms.transform.Find ("Salle " + room + "/Camera_Target").transform);
+        rooms.SetActive (true);
+
+
         for (int i=0; i<penalties.Count; i++) {
             if (penalties[i].setOff()) {
                 penalties.Remove (penalties[i]);
@@ -383,10 +415,11 @@ public class Player {
     }
 
     /// <summary>
-    /// Fonction de fin de tour. Masque l'écran.
+    /// Fonction de fin de tour. Masque l'écran et les salles 3D.
     /// </summary>
     public void EndTurn() {
         playerScreen.SetActive(false);
+        rooms.SetActive (false);
         isTurn = false;
         firstTurn = false;
         Main.nextPlayer ();
@@ -396,6 +429,7 @@ public class Player {
     /// Déplace le joueur vers la salle d'après, supprime ses pénalités, et affiche un message si c'est gagné.
     /// </summary>
     public virtual void moveToNextRoom() {
+        rooms.transform.Find ("Salle " + room + "/Obstacle").gameObject.SetActive (false);
         room++;
         updateRanks ();
         foreach (Penalty p in penalties)
@@ -421,7 +455,10 @@ public class Player {
     public void progressMoveToNextRoom() {
         Vector3 tokenPos1 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
         Vector3 tokenPos2 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
+
+        Vector3 playerTargetPos = rooms.transform.Find ("Salle " + room + "/Camera_Position").position;
         movePlayer(tokenPos1 + (tokenPos2-tokenPos1)*room);
+        movePlayer3D (playerTargetPos);
     }
 
     /// <summary>
@@ -437,6 +474,25 @@ public class Player {
         if (nextX < but.x) {
             Main.postTask(delegate {
                 movePlayer(but);
+            }, 0.05f);
+        }
+    }
+
+    /// <summary>
+    /// Déplacement avec animation de la position actuelle de la caméra vers une position cible.
+    /// </summary>
+    /// <param name="target">Position cible d'arrivée</param>
+    private void movePlayer3D (Vector3 target)
+    {
+        GameObject camera = rooms.transform.root.Find ("Camera").gameObject;
+        float nextX = camera.transform.localPosition.x - 0.6f;
+        if (nextX < target.x)
+            nextX = target.x;
+        camera.transform.localPosition = new Vector3 (nextX, target.y, target.z);
+        if (nextX > target.x) {
+            Main.postTask (delegate
+            {
+                movePlayer3D (target);
             }, 0.05f);
         }
     }

@@ -98,16 +98,14 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            players.Add (new Player("Florent",Menu.TOKENS_COLOR[0]));
-            players.Add (new Player("Solène", Menu.TOKENS_COLOR[1]));
-
-            /*players.Add (new Player ("Solène"));
-            players.Add (new Player ("Timothé"));
-            players.Add (new Player("Guillaume"));
-            players.Add (new Player ("Marwane"));
-            players.Add (new Player ("Thomas"));
-            players.Add (new Player ("Emanuelle"));*/
-            //players.Add (new Player ("François"));
+            players.Add (new PlayerAI ("Florent",Menu.TOKENS_COLOR[0]));
+            players.Add (new PlayerAI("Solène", Menu.TOKENS_COLOR[1]));
+            players.Add (new PlayerAI ("Timothé", Menu.TOKENS_COLOR[2]));
+            players.Add (new PlayerAI("Guillaume", Menu.TOKENS_COLOR[3]));
+            players.Add (new PlayerAI ("Marwane", Menu.TOKENS_COLOR[4]));
+            players.Add (new PlayerAI ("Thomas", Menu.TOKENS_COLOR[5]));
+            players.Add (new PlayerAI ("Emanuelle", Menu.TOKENS_COLOR [6]));
+            players.Add (new PlayerAI ("François", Menu.TOKENS_COLOR[7]));
         }
         foreach (Player p in players)
             p.init();
