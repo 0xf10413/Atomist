@@ -13,6 +13,7 @@ using UnityEngine.EventSystems;
 public class Main : MonoBehaviour {
 
     public const int MAX_NB_PLAYERS = 8;
+    private static bool waitingForNextTurn = false; // A-t-on verrouillé le passage au tour suivant, en cas d'actions restantes ?
 
     /// <summary>
     /// Pointeur vers l'unique instance de Main.
@@ -44,6 +45,7 @@ public class Main : MonoBehaviour {
 	 **/
 	void Start () {
 		context = this;
+        waitingForNextTurn = false;
 
         // Génération de la liste des éléments et de la pioche
 		elements = new List<Element> ();
@@ -98,14 +100,8 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            players.Add (new PlayerAI ("Florent",Menu.TOKENS_COLOR[0]));
-            players.Add (new PlayerAI("Solène", Menu.TOKENS_COLOR[1]));
-            players.Add (new PlayerAI ("Timothé", Menu.TOKENS_COLOR[2]));
-            players.Add (new PlayerAI("Guillaume", Menu.TOKENS_COLOR[3]));
-            players.Add (new PlayerAI ("Marwane", Menu.TOKENS_COLOR[4]));
-            players.Add (new PlayerAI ("Thomas", Menu.TOKENS_COLOR[5]));
-            players.Add (new PlayerAI ("Emanuelle", Menu.TOKENS_COLOR [6]));
-            players.Add (new PlayerAI ("François", Menu.TOKENS_COLOR[7]));
+            players.Add (new PlayerAI("Florent",Menu.TOKENS_COLOR[0]));
+            players.Add (new Player("Solène", Menu.TOKENS_COLOR[1]));
         }
         foreach (Player p in players)
             p.init();
@@ -568,10 +564,11 @@ public class Main : MonoBehaviour {
 		return SimpleJSON.JSON.Parse (System.IO.File.ReadAllText("Assets/Project Assets/Resources/Parameters/"+ fileName +".json"));
 	}
 
-	/**
-	 * Affiche un texte dans la console
-	 * Plus rapide à écrire que Debug.Log
-	 **/
+	/// <summary>
+	/// Affiche un texte dans la console
+	/// Plus rapide à écrire que Debug.Log
+	/// </summary>
+    /// <param name="message">L'objet à écrire</param>
 	public static void Write(object message) {
 		Debug.Log (message);
 	}
@@ -585,9 +582,47 @@ public class Main : MonoBehaviour {
 
     /// <summary>
     /// Fait passer au joueur actif suivant. Conclut s'il n'y en a plus.
+    /// Vérifie qu'il ne reste plus de tâche à reporter.
     /// </summary>
     public static void nextPlayer ()
     {
+        /*if (delayedTasks.Count > 1) {
+            if (delayedTasks.FindAll (t => Mathf.Abs(t.Value - 0.132f) < float.Epsilon).Count != 0) // Il reste un appel à nextPlayer, en trop
+            {
+                Main.Write ("Un appel en trop !");
+                delayedTasks.RemoveAll (t => Mathf.Abs(t.Value - 0.132f) < float.Epsilon);
+                nextPlayer ();
+            }
+            else {// Il reste des tâches non traitées, on revient plus tard
+                Main.Write ("Tâches non traitées : " + delayedTasks.Count);
+                foreach (KeyValuePair<Del, float> task in delayedTasks) {
+                    Main.Write ("En particulier, une qui dure " + task.Value);
+                }
+                postTask (delegate { nextPlayer (); }, 0.132f);
+            }
+            return;
+        }
+        Main.Write ("Ok ! On change de tour.");*/
+        /*if (waitingForNextTurn) {
+            if (delayedTasks.Count > 1) {
+                return;
+            }
+            else
+                waitingForNextTurn = false;
+            Main.Write ("Bonne sortie !");
+            nextPlayer (); // Sortie
+            return;
+        }
+        if (delayedTasks.Count > 1) {
+            Main.Write ("Passage au joueur suivant annulé !");
+            Main.postTask (delegate
+            {
+                Main.infoDialog ("Attendez ! Il reste des déplacements.\n"
+                    + "Appuyez sur \"Ok\" pour retenter", delegate { nextPlayer (); });
+            }, 0.5f);
+            waitingForNextTurn = true;
+            return;
+        }*/
         if (winners.Count == players.Count) // Le dernier joueur vient de gagner !
         {
             Main.infoDialog ("Victoire de tous les joueurs !", delegate {victoryPanel ();});

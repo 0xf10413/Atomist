@@ -1078,7 +1078,7 @@ Light:
   m_Type: 2
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
-  m_Range: 20
+  m_Range: 30
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -2009,7 +2009,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: .300000012
-  far clip plane: 30
+  far clip plane: 40
   field of view: 60
   orthographic: 0
   orthographic size: 5

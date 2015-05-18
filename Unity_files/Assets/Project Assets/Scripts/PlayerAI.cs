@@ -97,7 +97,6 @@ public class PlayerAI : Player
 
     /// <summary>
     /// Fonction principale de l'IA. Prend les décisions.
-    /// Actuellement minimaliste : joue la première réaction possible.
     /// Elle est appelée récursivement jusqu'à la décision de fin de tour.
     /// </summary>
     public void think () {
@@ -223,7 +222,7 @@ public class PlayerAI : Player
                 int idChoix = 0;
                 for (int i=1;i<choiceValues.Length;i++) {
                     if (choiceValues[i] < choiceValues[idChoix])
-                        i = idChoix;
+                        idChoix = i;
                 }
                 return penalties[idChoix];
             }

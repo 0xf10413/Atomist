@@ -180,7 +180,7 @@ public class Menu : MonoBehaviour {
         {
             int players = Main.players.Count;
             if (players > 1)
-                Application.LoadLevel ("default");
+                Application.LoadLevel ("florent-prefab");
         });
         
         dialog.transform.Find("Start Game").GetComponent<Button>().enabled = false;

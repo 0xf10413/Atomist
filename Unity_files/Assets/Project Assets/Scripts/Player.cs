@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 100; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -419,6 +419,10 @@ public class Player {
     /// </summary>
     public void EndTurn() {
         playerScreen.SetActive(false);
+
+        // Attention, on doit mettre sur pause le génrateur de particule (flammes)
+        //rooms
+
         rooms.SetActive (false);
         isTurn = false;
         firstTurn = false;
@@ -436,7 +440,7 @@ public class Player {
             p.Remove();
         penalties.Clear();
         if (room >= NB_ROOMS) {
-            Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !!", delegate {
+            Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !", delegate {
                 isPlaying = false;
                 Main.winners.Add (this);
                 progressMoveToNextRoom();
@@ -486,9 +490,17 @@ public class Player {
     {
         GameObject camera = rooms.transform.root.Find ("Camera").gameObject;
         float nextX = camera.transform.localPosition.x - 0.6f;
+        float startX = rooms.transform.Find ("Salle "+(room-1)+"/Camera_Position").position.x;
+        float nextY = camera.transform.localPosition.y +
+            0.1f*Mathf.Sin (3* (2*Mathf.PI) *(camera.transform.position.x-startX)
+            / (startX - target.x));
+        if (float.IsNaN (nextY)) // Grosse rustine, en cas de changement trop rapide de joueur (fragile, race condition ?)
+            nextY = target.y; 
+
         if (nextX < target.x)
             nextX = target.x;
-        camera.transform.localPosition = new Vector3 (nextX, target.y, target.z);
+        
+        camera.transform.localPosition = new Vector3 (nextX, nextY, target.z);
         if (nextX > target.x) {
             Main.postTask (delegate
             {
@@ -559,9 +571,15 @@ public class Player {
             rank.name = p.name;
             name.transform.GetComponent<Text> ().text = p.printName;
             name.name = p.name;
-            if (p == this) {
-                name.GetComponent<Text> ().color = Color.red;
-                rank.GetComponent<Text> ().color = Color.red;
+            name.GetComponent<Text> ().color = p.tokenColor;
+            rank.GetComponent<Text> ().color = p.tokenColor;
+            if (p == this) { // Ce code marche pas
+                Color whateverColor = new Color (1, 0, 0, 1);
+
+                Material newMaterial = new Material (Shader.Find ("Sprites/Default"));
+
+                newMaterial.color = whateverColor;
+                rank.GetComponent<Text>().material = newMaterial;
             }
 
             rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
