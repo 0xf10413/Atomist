@@ -100,7 +100,7 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            players.Add (new PlayerAI("Florent",Menu.TOKENS_COLOR[0]));
+            players.Add (new Player("Florent",Menu.TOKENS_COLOR[0]));
             players.Add (new Player("Solène", Menu.TOKENS_COLOR[1]));
         }
         foreach (Player p in players)

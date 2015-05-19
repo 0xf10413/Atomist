@@ -268,7 +268,7 @@ public class Player {
 
                 // On change le "12" par défaut en une taille dynamique
                 string reactionString = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
-                float fontSize = 8f*Mathf.Sqrt(Screen.height/232f);
+                int fontSize = (int)Mathf.Round(0.012f*Screen.height/playerScreen.GetComponent<RectTransform>().localScale.y);
                 reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
                 button.transform.Find ("Text").GetComponent<Text> ().text = reactionString;
                     
