@@ -29,7 +29,8 @@ public class Card {
 	}
 	
 	private GameObject cardImg; // L'image de la carte
-	private GameObject infosNb; // Le texte affichant le nombre de cartes de ce type
+	private GameObject infosNb;
+	private GameObject infosNbG, infosNbD; // Le texte affichant le nombre de cartes de ce type
 	private GameObject cardSelected; // Image affichée lorsque la carte est sélectionnée
 	private GameObject cardPreview; // La carte affichée en "grand" au survol de la souris
 	
@@ -88,9 +89,9 @@ public class Card {
                     (cardImg.GetComponent<RectTransform>().sizeDelta.x
                     , cardImg.GetComponent<RectTransform> ().sizeDelta.y); // Taille
 				cardSelected.GetComponent<RectTransform> ().localPosition = new Vector2 (0,0); // Position
-                cardSelected.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
-				infosNb.transform.SetParent(infosNb.transform.parent);
-                infosNb.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
+                cardSelected.GetComponent<RectTransform> ().localScale = new Vector2 (1,1);
+				infosNbG.transform.SetParent(infosNbG.transform.parent,false);
+				infosNbD.transform.SetParent(infosNbD.transform.parent,false);
             }
             if (leftClick) {
 				if (_nbSelected == N)
@@ -122,9 +123,14 @@ public class Card {
             deck.updatePositions();
             for (int i=0;i<deck.getNbCards();i++) {
                 Card iCard = deck.getCard(i);
-                    iCard.bringToFront();
-                if (iCard == this)
-                    break;
+                iCard.bringToFront();
+                if (iCard == this) {
+                    iCard.setCoeffPos(true);
+                    for (i++;i<deck.getNbCards();i++)
+                        deck.getCard(i).setCoeffPos(true);
+                }
+                else
+                    iCard.setCoeffPos(false);
             }
         });
         
@@ -134,20 +140,10 @@ public class Card {
 			Object.Destroy(cardPreview);
 			cardPreview = null;
         });
-
-		infosNb = new GameObject ();
-		infosNb.name = "Nb cards";
-		infosNb.AddComponent<Text> ();
-		infosNb.transform.SetParent(cardImg.gameObject.transform);
-		infosNb.GetComponent<Text> ().horizontalOverflow = HorizontalWrapMode.Overflow;
-		infosNb.GetComponent<Text> ().verticalOverflow = VerticalWrapMode.Overflow;
-		infosNb.GetComponent<RectTransform>().sizeDelta = new Vector2 (10,10); // Taille
-		infosNb.GetComponent<Text> ().font = (Font)Resources.GetBuiltinResource (typeof(Font), "Arial.ttf");
-		infosNb.GetComponent<Text> ().fontSize = 25;
-		infosNb.GetComponent<Text> ().fontStyle = FontStyle.Bold;
-		infosNb.GetComponent<Text> ().GetComponent<RectTransform> ().localPosition = new Vector2 (20f,-96f*Screen.height/Screen.width);
-		infosNb.GetComponent<Text> ().alignment = TextAnchor.MiddleCenter;
-        infosNb.GetComponent<RectTransform> ().localScale = new Vector2 (1, 1);
+        
+		infosNbG = cardImg.transform.Find("Nb Cards (G)").gameObject;
+		infosNbD = cardImg.transform.Find("Nb Cards (D)").gameObject;
+        infosNb = infosNbD;
 
 		element = nElement;
         nbCards = nb;
@@ -166,6 +162,19 @@ public class Card {
     /// </summary>
     public void bringToFront() {
         cardImg.transform.SetParent(cardImg.transform.parent);
+    }
+
+    /// <summary>
+    /// Modifie la position du texte affichant le nombre de cartes
+    /// </summary>
+    /// <param name="bottomRight">true pour le mettre en bas à droite, false pour en bas à gauche</param>
+    public void setCoeffPos(bool bottomRight) {
+        if (bottomRight)
+            infosNbG.GetComponent<Text>().text = "";
+        else
+            infosNbD.GetComponent<Text>().text = "";
+        infosNb = bottomRight ? infosNbD:infosNbG;
+        updateText();
     }
 
     /// <summary>

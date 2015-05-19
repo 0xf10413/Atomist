@@ -113,9 +113,14 @@ public class Deck {
 	public void updatePositions() {
 		for (int i=0; i<listCards.Count; i++)
 			updatePosition(listCards[i],i);
-		for (int i=listCards.Count-1; i>=0; i--)
+		for (int i=listCards.Count-1; i>=0; i--) {
+            listCards[i].setCoeffPos(true);
     		listCards[i].bringToFront();
+        }
 	}
+
+    public void bringCardInFrontOf(Card card) {
+    }
 	
 	/// <summary>
 	/// Replace automatiquement une carte dans la main du joueur
