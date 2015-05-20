@@ -369,6 +369,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 381137fcd5e9ed94880e0f7539e38cc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &326583385
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 102126, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 326583386}
+  - 222: {fileID: 326583388}
+  - 114: {fileID: 326583387}
+  m_Layer: 5
+  m_Name: Nb Cards (D)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &326583386
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22402126, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 326583385}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1261915638}
+  m_RootOrder: 1
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -50.4000015, y: 76.5999985}
+  m_SizeDelta: {x: 94.1999969, y: 159.800003}
+  m_Pivot: {x: .5, y: .5}
+--- !u!114 &326583387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11402126, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 326583385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 30
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 8
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: 
+--- !u!222 &326583388
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22202126, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 326583385}
 --- !u!1 &421979522
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,7 +1348,9 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 2052967340}
+  - {fileID: 326583386}
   m_Father: {fileID: 1865146238}
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: .5}
@@ -1678,7 +1749,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1407640189
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1688,7 +1759,7 @@ RectTransform:
   m_GameObject: {fileID: 1407640188}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 706461849}
   - {fileID: 1294135286}
@@ -2379,6 +2450,26 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 22454664, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22454664, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22454664, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 155806, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 154664, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
   m_RootGameObject: {fileID: 1407640188}
@@ -2582,6 +2673,75 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 1848941344}
   m_GameObject: {fileID: 2039606793}
+--- !u!1 &2052967339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 102128, guid: a212bdc78bb7c914e9b8a75c11d21289, type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 2052967340}
+  - 222: {fileID: 2052967342}
+  - 114: {fileID: 2052967341}
+  m_Layer: 5
+  m_Name: Nb Cards (G)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2052967340
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22402128, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 2052967339}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1261915638}
+  m_RootOrder: 0
+  m_AnchorMin: {x: .0411040187, y: 0}
+  m_AnchorMax: {x: .0411040187, y: 0}
+  m_AnchoredPosition: {x: 45.0040016, y: 76.5999985}
+  m_SizeDelta: {x: 97.9909973, y: 159.800003}
+  m_Pivot: {x: .5, y: .5}
+--- !u!114 &2052967341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11402128, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 2052967339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 30
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 6
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: 
+--- !u!222 &2052967342
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 22202128, guid: a212bdc78bb7c914e9b8a75c11d21289,
+    type: 2}
+  m_PrefabInternal: {fileID: 1848941344}
+  m_GameObject: {fileID: 2052967339}
 --- !u!1 &2075643055
 GameObject:
   m_ObjectHideFlags: 0

@@ -328,10 +328,11 @@ public class Main : MonoBehaviour {
         GameObject dialogBox = dialogContainer.transform.Find("PeriodicTableDialog").gameObject;
         setPeriodicTableMsg(dialogBox,cardsToGuess[idCard],(idCard < pickedCards.Count));
         dialogContainer.transform.SetParent(mask.transform);
-        float scaleFactor = (float) Math.Sqrt(Screen.height/232f);
+        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
+        float scalePS = mask.GetComponent<RectTransform>().localScale.y;
+        float scaleFactor = (float) Screen.height/(scalePS*232f);
         float scaleFactor2 = 1/scaleFactor;
         DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
-        mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
         dialogContainer.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
         dialogContainer.transform.localPosition = new Vector3(0, 0, 0);
 
