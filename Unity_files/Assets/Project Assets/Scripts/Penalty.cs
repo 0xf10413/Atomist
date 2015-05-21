@@ -10,9 +10,7 @@ public class Penalty {
     public delegate void Delete();
     
     private Effect effect; // Effet à chaque tour
-    private Delete delete; // Effet à chaque tour
-    
-    private GameObject penaltyToken;
+    private Delete delete; // Effet au moment où la pénalité est supprimée
 
     /// <summary>
     /// Constructeur de la pénalité

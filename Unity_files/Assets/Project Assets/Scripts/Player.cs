@@ -43,6 +43,8 @@ public class Player {
     public List<Element> cardsDiscovered {get;set;} // Cartes que le joueur a déjà récupérées, pas besoin pour lui de les deviner à nouveau
     public GameObject rooms { get; private set; } // Salles en 3D affichées à l'écran
 
+    public bool cpu {get; protected set;} // true, si c'est l'IA, false sinon
+
     /// <summary>
     /// Le constructeur usuel. Ajoute simplement le nom ; il faut initialiser le
     /// reste plus tard via init ().
@@ -54,6 +56,7 @@ public class Player {
         tokenColor = nColor;
         printName = name;
         isPlaying = true;
+        cpu = false;
     }
 
     /// <summary>
@@ -92,6 +95,9 @@ public class Player {
                 icon.GetComponent<Image>().sprite = localReactionType.iconH;
                 currentReactionSelected = rType;
                 updateReactionsList();
+
+                if ((Main.didacticialToShow(Main.TutorialState.ACID_REACTION) && (rType.name == "Acide")) || (Main.didacticialToShow(Main.TutorialState.POISON_REACTION) && (rType.name == "Poison")) || (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION) && (rType.name == "Feu")))
+                    Main.hideTutoDialog();
 			});
         }
 
@@ -103,24 +109,41 @@ public class Player {
             });
         });
         Main.addClickEvent (playerScreen.transform.Find ("Card Buttons/Discard cards").gameObject, delegate {
-            Main.confirmDialog("Jeter les cartes sélectionnées ?", delegate {
-                int energyToGain = 0;
-                int nbCardsToPick = 0;
-                for (int i=deck.getNbCards()-1;i>=0;i--) {
-                    Card c = deck.getCard(i);
-                    if (c.nbSelected > 0) {
-                        if (c.element.family == "Gaz Noble") {
-                            energyToGain += NOBLE_GAZ_ENERGY*c.nbSelected;
-                            nbCardsToPick += NOBLE_GAZ_CARDS*c.nbSelected;
-                        }
-                        deck.RemoveCards(c.element,c.nbSelected);
+            bool oneSelection = false;
+            for (int i=deck.getNbCards()-1;i>=0;i--) {
+                Card c = deck.getCard(i);
+                if (c.nbSelected > 0) {
+                    oneSelection = true;
+                    break;
+                }
+            }
+            if (oneSelection) {
+                if (Main.didacticialToShow(Main.TutorialState.THROW_NOBLE_GAZ)) {
+                    if (deck.getCard(0).nbSelected == 1) {
+                        Main.addTutoDialog("SelectBoth");
+                        return;
                     }
                 }
-                energy += energyToGain;
-                if (nbCardsToPick > 0)
-                    pickCards(nbCardsToPick, false);
-                deck.updatePositions();
-            });
+                Main.confirmDialog("Jeter les cartes sélectionnées ?", delegate {
+                    int energyToGain = 0;
+                    int nbCardsToPick = 0;
+                    for (int i=deck.getNbCards()-1;i>=0;i--) {
+                        Card c = deck.getCard(i);
+                        if (c.nbSelected > 0) {
+                            if (c.element.family == "Gaz Noble") {
+                                energyToGain += NOBLE_GAZ_ENERGY*c.nbSelected;
+                                nbCardsToPick += NOBLE_GAZ_CARDS*c.nbSelected;
+                            }
+                            deck.RemoveCards(c.element,c.nbSelected);
+                        }
+                    }
+                    energy += energyToGain;
+                    Main.hideTutoDialog();
+                    if (nbCardsToPick > 0)
+                        pickCards(nbCardsToPick, false);
+                    deck.updatePositions();
+                });
+            }
         });
         Main.addClickEvent(playerScreen.transform.Find ("Card Buttons/Unselect All").gameObject, delegate {
             for (int i=0;i<deck.getNbCards();i++)
@@ -215,9 +238,8 @@ public class Player {
             localVarRoomObstacle.transform.SetParent (localVarRoom.transform);
             localVarRoomObstacle.transform.position = localVarRoom.transform.Find ("Obstacle_Position").position;
 
-            if (previousRoom != null) {
+            if (previousRoom != null)
                 localVarRoom.transform.position = previousRoom.transform.Find ("Next_Room").position;
-            }
             previousRoom = localVarRoom;
             build_room++;
 
@@ -302,7 +324,13 @@ public class Player {
                             if (toMuchElement)
                                 Main.infoDialog("Vous avez sélectionné trop d'éléments pour cette réaction.");
                             else {
+                                if (Main.didacticiel && (r.reagents == "Cl + Cl")) { // Si le joueur est vraiment têtu
+                                    Main.addTutoDialog("DoNotAttack");
+                                    return;
+                                }
                                 Main.confirmDialog("Confirmer cette réaction ?", delegate {
+                                    if (Main.didacticialToShow(Main.TutorialState.REACTION_HCL))
+                                        Main.hideTutoDialog();
                                     r.effect(this);
                                 });
                             }
@@ -338,12 +366,53 @@ public class Player {
     /// <param name="message">Le message à afficher</param>
     public virtual void pickCards(int nbCards, string message, bool askInPeriodicTable) {
         List<Element> toPick = new List<Element>();
-        for (int i=0;i<nbCards;i++)
-            toPick.Add(Main.pickCard());
+        if (Main.didacticialToShow(Main.TutorialState.CARDS_POSITION)) {
+            toPick.Add(Main.getElementBySymbol("H"));
+            toPick.Add(Main.getElementBySymbol("Cl"));
+            toPick.Add(Main.getElementBySymbol("Cl"));
+            toPick.Add(Main.getElementBySymbol("H"));
+            hideButton(playerScreen.transform.Find("Card Buttons/Sort By").gameObject);
+            hideButton(playerScreen.transform.Find("Card Buttons/Unselect All").gameObject);
+            hideButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
+            hideButton(playerScreen.transform.Find("Card Buttons/Next turn").gameObject);
+        }
+        else if (Main.didacticialToShow(Main.TutorialState.FIND_IN_PT)) {
+            toPick.Add(Main.getElementBySymbol("He"));
+            toPick.Add(Main.getElementBySymbol("He"));
+        }
+        else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+            toPick.Add(Main.getElementBySymbol("O"));
+            toPick.Add(Main.getElementBySymbol("Cl"));
+            toPick.Add(Main.getElementBySymbol("Na"));
+            toPick.Add(Main.getElementBySymbol("C"));
+        }
+        else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
+            toPick.Add(Main.getElementBySymbol("Na"));
+            toPick.Add(Main.getElementBySymbol("Cl"));
+        }
+        else {
+            for (int i=0;i<nbCards;i++)
+                toPick.Add(Main.pickCard());
+        }
         if (askInPeriodicTable) {
             Main.postPickCardsDialog(toPick, cardsBuffer, message, pickedCards => {
                 foreach (Element card in pickedCards) {
                     addCardToPlayer(card);
+                }
+                if (Main.didacticialToShow(Main.TutorialState.THROW_NOBLE_GAZ)) {
+                    showButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
+                    Main.addTutoDialog("ThrowNobleGaz", delegate {
+                        hideButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
+                        Main.tutoState = Main.TutorialState.POISON_REACTION;
+                    });
+                }
+                else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
+                    Main.addTutoDialog("FireReaction", delegate {
+                        Main.tutoState = Main.TutorialState.REACTION_NACL;
+                        Main.addTutoDialog("NACLReaction");
+                    });
+                    if (currentReactionSelected.name == "Feu")
+                        Main.hideTutoDialog();
                 }
             });
         }
@@ -352,8 +421,54 @@ public class Player {
                 foreach (Element card in toPick) {
                     addCardToPlayer(card);
                 }
+                if (Main.didacticialToShow(Main.TutorialState.CARDS_POSITION)) {
+                    Main.addTutoDialog("CardsPosition", delegate {
+                        Main.addTutoDialog("BoardPosition", delegate {
+                            Main.addTutoDialog("ReactionsPosition", delegate {
+                                if (room == 0) {
+                                    Main.tutoState = Main.TutorialState.ACID_REACTION;
+                                    Main.addTutoDialog("AcidicReaction", delegate {
+                                        Main.tutoState = Main.TutorialState.REACTION_HCL;
+                                        Main.addTutoDialog("HCLReaction");
+                                    });
+                                    if (currentReactionSelected.name == "Acide")
+                                        Main.hideTutoDialog();
+                                }
+                                else
+                                    showEndTurn(Main.TutorialState.END_TURN,Main.TutorialState.FIND_IN_PT);
+                            });
+                        });
+                    });
+                }
+                else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+                    Main.addTutoDialog("PoisonReaction", delegate {
+                        Main.tutoState = Main.TutorialState.REACTION_CO;
+                        Main.addTutoDialog("COReaction", delegate {
+                            showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.FIRE_REACTION);
+                        });
+                    });
+                    if (currentReactionSelected.name == "Poison")
+                        Main.hideTutoDialog();
+                }
             });
         }
+    }
+    private void showEndTurn(Main.TutorialState statusID, Main.TutorialState nextID) {
+        showButton(playerScreen.transform.Find("Card Buttons/Next turn").gameObject);
+        Main.hideTutoDialog();
+        Main.addTutoDialog("EndTurn", delegate {
+            hideButton(playerScreen.transform.Find("Card Buttons/Next turn").gameObject);
+            Main.tutoState = nextID;
+        });
+        Main.tutoState = statusID;
+    }
+    private static void hideButton(GameObject button) {
+        button.GetComponent<Button>().interactable = false;
+        button.transform.Find("Text").gameObject.SetActive(false);
+    }
+    private static void showButton(GameObject button) {
+        button.GetComponent<Button>().interactable = true;
+        button.transform.Find("Text").gameObject.SetActive(true);
     }
 
     public void addCardToPlayer(Element card) {
@@ -384,7 +499,7 @@ public class Player {
 
         if (isTurn) {
             // On pioche 2 cartes
-            Main.infoDialog("Au tour de "+ name, delegate {
+            Main.infoDialog(Main.didacticiel ? (cpu ? "Au tour de l'IA":"À votre tour"):("Au tour de "+ name), delegate {
                 playerScreen.SetActive(true);
                 if (firstTurn) {
                     energy = ENERGY0;
@@ -418,11 +533,18 @@ public class Player {
     /// Fonction de fin de tour. Masque l'écran et les salles 3D.
     /// </summary>
     public void EndTurn() {
+        if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3))
+            Main.hideTutoDialog();
+        if (Main.didacticialToShow(Main.TutorialState.END_TUTO)) {
+            Main.addTutoDialog("EndTuto", delegate {
+                Application.LoadLevel("title-screen");
+            });
+            return;
+        }
+        
         playerScreen.SetActive(false);
-
         // Attention, on doit mettre sur pause le génrateur de particule (flammes)
         //rooms
-
         rooms.SetActive (false);
         isTurn = false;
         firstTurn = false;
@@ -479,6 +601,12 @@ public class Player {
             Main.postTask(delegate {
                 movePlayer(but);
             }, 0.05f);
+        }
+        else {
+            if (Main.didacticialToShow(Main.TutorialState.REACTION_HCL))
+                showEndTurn(Main.TutorialState.END_TURN,Main.TutorialState.FIND_IN_PT);
+            else if (Main.didacticialToShow(Main.TutorialState.REACTION_NACL))
+                showEndTurn(Main.TutorialState.END_TURN3,Main.TutorialState.END_TUTO);
         }
     }
 

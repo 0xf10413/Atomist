@@ -43,6 +43,8 @@ abstract public class DelayedReaction : Reaction {
                     Object.Destroy(dialog);
                     Object.Destroy(mask);
                     maker.consumeForReaction(this);
+                    if (Main.didacticialToShow(Main.TutorialState.REACTION_CO))
+                        Main.hideTutoDialog();
                     inflict(localVarP);
                 });
             }

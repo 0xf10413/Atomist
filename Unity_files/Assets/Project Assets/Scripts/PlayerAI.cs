@@ -35,6 +35,7 @@ public class PlayerAI : Player
             difficulty == 1 ? " ★★" :
             difficulty == 2 ? " ★★★" : "";
         printName = "IA-" + printName;
+        cpu = true;
     }
 
     /// <summary>
@@ -76,7 +77,10 @@ public class PlayerAI : Player
         int nbCardsActuallyPicked = 0;
         for (int i = 0; i < nbCards; i++) {
             if (getTheCard[i]) {
-                addCardToPlayer (Main.pickCard ());
+                if (Main.didacticiel)
+                    addCardToPlayer (Main.getElementBySymbol("H")); // On ne donne à l'IA que des hydrogènes, comme ça elle peut rien faire
+                else
+                    addCardToPlayer (Main.pickCard ());
                 nbCardsActuallyPicked++;
             }
         }

@@ -13,7 +13,6 @@ using UnityEngine.EventSystems;
 public class Main : MonoBehaviour {
 
     public const int MAX_NB_PLAYERS = 8;
-    private static bool waitingForNextTurn = false; // A-t-on verrouillé le passage au tour suivant, en cas d'actions restantes ?
 
     /// <summary>
     /// Pointeur vers l'unique instance de Main.
@@ -39,13 +38,17 @@ public class Main : MonoBehaviour {
 	
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
+    public static bool didacticiel {get; private set;} // true Ssi le jeu est en mode "didacticiel". Dans ce cas, des bulles d'aide s'affichent au fur et à mesure
+
+    public enum TutorialState {WELCOME, CARDS_POSITION, ACID_REACTION, REACTION_HCL, END_TURN, FIND_IN_PT, THROW_NOBLE_GAZ, POISON_REACTION, REACTION_CO, END_TURN2, FIRE_REACTION, REACTION_NACL, END_TURN3, END_TUTO};
+    public static TutorialState tutoState;
+
 	/**
 	 * Fonction appelée au démarrage de l'application
 	 * Disons que c'est l'équivalent du main() en C++
 	 **/
 	void Start () {
 		context = this;
-        waitingForNextTurn = false;
 
         // Génération de la liste des éléments et de la pioche
 		elements = new List<Element> ();
@@ -100,17 +103,26 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            players.Add (new Player("Florent",Menu.TOKENS_COLOR[0]));
-            players.Add (new Player("Solène", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new Player("aaa", Menu.TOKENS_COLOR[0]));
+            Main.players.Add(new PlayerAI("IA", Menu.TOKENS_COLOR[1]));
         }
+        backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
             p.init();
         Player.updateRanks ();
         foreach (Player p in players)
             p.updatePlayer ();
-        players[0].BeginTurn();
 
-        backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
+        if (didacticialToShow(TutorialState.WELCOME)) {
+            GameObject mask = AddMask(true);
+            Main.addTutoDialog("Welcome", delegate {
+                GameObject.Destroy(mask);
+                tutoState = TutorialState.CARDS_POSITION;
+                players[0].BeginTurn();
+            }, mask);
+        }
+        else
+            players[0].BeginTurn();
 
         /*int[] eltsNB = new int[elements.Count];
         foreach (Reaction r in reactions) {
@@ -329,33 +341,41 @@ public class Main : MonoBehaviour {
         setPeriodicTableMsg(dialogBox,cardsToGuess[idCard],(idCard < pickedCards.Count));
         dialogContainer.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
-        float scalePS = mask.GetComponent<RectTransform>().localScale.y;
-        float scaleFactor = (float) Screen.height/(scalePS*232f);
-        float scaleFactor2 = 1/scaleFactor;
-        DYKDialog.transform.localScale = new Vector3(scaleFactor2,scaleFactor2,scaleFactor2);
-        dialogContainer.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+        float scalePS = mask.GetComponent<RectTransform>().localScale.x;
+        float scaleFactor = (float) Screen.width/(scalePS*626f);
+        dialogBox.transform.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+        //Main.Write(dialogBox.GetComponent<RectTransform>().localPosition.x-dialogBox.GetComponent<RectTransform>().anchorMax.x);
+        dialogBox.GetComponent<RectTransform>().localPosition = new Vector3(dialogBox.GetComponent<RectTransform>().localPosition.x - 40*scaleFactor,dialogBox.GetComponent<RectTransform>().localPosition.y,dialogBox.GetComponent<RectTransform>().localPosition.z);
+        //Main.Write(dialogBox.GetComponent<RectTransform>().position.x);
         dialogContainer.transform.localPosition = new Vector3(0, 0, 0);
 
+        bool inDidacticiel = Main.didacticialToShow(Main.TutorialState.FIND_IN_PT);
+
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
-        Boolean guessing = true;
-        for (int i=0;i<masksContainer.childCount;i++) {
-            GameObject iMask = masksContainer.GetChild(i).gameObject;
+        List<GameObject> tableCovers = findChildsByName(masksContainer.gameObject, "TableCover");
+        bool guessing = true;
+        for (int i=0;i<tableCovers.Count;i++) {
+            GameObject iMask = tableCovers[i];
             Element eltPicked = iMask.GetComponent<TableCaseScript>().getElement();
             if (eltPicked != null) {
                 Main.addClickEvent(iMask, delegate { // Lorsque le joueur clique sur le masque...
+                    if (inDidacticiel && (eltPicked != cardsToGuess[idCard])) // Si le joueur est un boulet
+                        return;
                     if (guessing) {
                         guessing = false;
                         iMask.SetActive(false); // On retire le masque
                         if (eltPicked == cardsToGuess[idCard]) { // Si l'élément sélectionné est le bon...
                             setPeriodicTableMsg(dialogBox, "Félicitations, vous obtenez l'élément "+ eltPicked.name +" !");
                             toPick.Add(eltPicked);
+                            if (inDidacticiel)
+                                Main.hideTutoDialog();
                         }
                         else {
                             if (idCard < pickedCards.Count)
                                 cPlayer.cardsBuffer.Add(cardsToGuess[idCard]);
                             for (int j=0;j<masksContainer.childCount;j++) {
-                                if (masksContainer.GetChild(j).GetComponent<TableCaseScript>().atomicNumber == cardsToGuess[idCard].atomicNumber) {
-                                    masksContainer.GetChild(j).gameObject.SetActive(false); // On retire le masque du bon élément
+                                if (tableCovers[j].GetComponent<TableCaseScript>().atomicNumber == cardsToGuess[idCard].atomicNumber) {
+                                    tableCovers[j].SetActive(false); // On retire le masque du bon élément
                                     break;
                                 }
                             }
@@ -403,6 +423,10 @@ public class Main : MonoBehaviour {
                 });
             }
         });
+        if (inDidacticiel)
+            addTutoDialog("HeliumPosition", delegate {
+                tutoState = TutorialState.THROW_NOBLE_GAZ;
+            }, masksContainer.gameObject);
     }
     private static void updateMaskedElements(GameObject dialogBox) {
         updateMaskedElements(dialogBox, new List<Element>());
@@ -411,8 +435,9 @@ public class Main : MonoBehaviour {
         Player cPlayer = currentPlayer();
         
         Transform masksContainer = dialogBox.transform.Find("Periodic Table");
-        for (int i=0;i<masksContainer.childCount;i++) {
-            GameObject iMask = masksContainer.GetChild(i).gameObject;
+        List<GameObject> tableCovers = findChildsByName(masksContainer.gameObject, "TableCover");
+        for (int i=0;i<tableCovers.Count;i++) {
+            GameObject iMask = tableCovers[i];
             Element maskElt = iMask.GetComponent<TableCaseScript>().getElement();
             iMask.SetActive(!eltsRecovered.Contains(maskElt) && !cPlayer.cardsDiscovered.Contains(maskElt));
         }
@@ -426,7 +451,6 @@ public class Main : MonoBehaviour {
     private static void setPeriodicTableMsg(GameObject parent, string message) {
         parent.transform.Find("Message").GetComponent<Text>().text = message;
     }
-    
 
     /// <summary>
     /// Affiche une boîte de dialogue avec les cartes piochées
@@ -471,6 +495,58 @@ public class Main : MonoBehaviour {
         res.transform.localScale = new Vector3(1, 1, 1);
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
+    }
+
+    public static void setTutorialEnabled(bool enabled) {
+        didacticiel = enabled;
+        if (didacticiel) {
+            onHideDialog = null;
+            shownTutoDialogs = new List<GameObject>();
+        }
+    }
+    public static GameObject addTutoDialog(string prefabName) {
+        return addTutoDialog(prefabName, delegate {
+        });
+    }
+    private static Del onHideDialog;
+    private static List<GameObject> shownTutoDialogs = new List<GameObject>();
+    public static GameObject addTutoDialog(string prefabName, Del onClick) {
+        return addTutoDialog(prefabName, onClick, Main.currentPlayer().playerScreen);
+    }
+    public static GameObject addTutoDialog(string prefabName, Del onClick, GameObject parent) {
+        //GameObject mask = Main.AddMask(true);
+        GameObject tutoDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Tutorial/"+ prefabName));
+        tutoDialog.transform.SetParent(parent.transform,false);
+        List<GameObject> okButtons = Main.findChildsByName(tutoDialog, "Ok");
+        GameObject okButton = (okButtons.Count > 0) ? okButtons[0]:null;
+        if (okButton != null) {
+            Main.addClickEvent(Main.findChildsByName(tutoDialog, "Ok")[0], delegate {
+                GameObject.Destroy(tutoDialog);
+                shownTutoDialogs.Remove(tutoDialog);
+                onClick();
+            });
+        }
+        /*Main.addClickEvent(mask, delegate {
+            GameObject.Destroy(mask);
+            onClick();
+        });*/
+        
+        shownTutoDialogs.Add(tutoDialog);
+        if (okButton != null)
+            Main.autoFocus(Main.findChildsByName(tutoDialog, "Ok")[0]);
+        else
+            onHideDialog = onClick;
+        return tutoDialog;
+    }
+    public static void hideTutoDialog() {
+        foreach (GameObject tutoDialogs in shownTutoDialogs)
+            GameObject.Destroy(tutoDialogs);
+        shownTutoDialogs.Clear();
+        if (onHideDialog != null) {
+            Del callBack = onHideDialog;
+            onHideDialog = null;
+            callBack();
+        }
     }
 
     /// <summary>
@@ -580,6 +656,19 @@ public class Main : MonoBehaviour {
     public static Player currentPlayer() {
         return players[turnID];
     }
+    
+    /// <summary>
+    /// Vérifie si c'est le joueur 1 et si le didacticiel est activé
+    /// </summary>
+    public static bool didacticialToShow() {
+        return (didacticiel && (turnID == 0));
+    }
+    /// <summary>
+    /// Vérifie si c'est le joueur 1 et si le didacticiel est activé et si on est dans le bon état
+    /// </summary>
+    public static bool didacticialToShow(TutorialState state) {
+        return (didacticialToShow() && (tutoState == state));
+    }
 
     /// <summary>
     /// Fait passer au joueur actif suivant. Conclut s'il n'y en a plus.
@@ -587,43 +676,6 @@ public class Main : MonoBehaviour {
     /// </summary>
     public static void nextPlayer ()
     {
-        /*if (delayedTasks.Count > 1) {
-            if (delayedTasks.FindAll (t => Mathf.Abs(t.Value - 0.132f) < float.Epsilon).Count != 0) // Il reste un appel à nextPlayer, en trop
-            {
-                Main.Write ("Un appel en trop !");
-                delayedTasks.RemoveAll (t => Mathf.Abs(t.Value - 0.132f) < float.Epsilon);
-                nextPlayer ();
-            }
-            else {// Il reste des tâches non traitées, on revient plus tard
-                Main.Write ("Tâches non traitées : " + delayedTasks.Count);
-                foreach (KeyValuePair<Del, float> task in delayedTasks) {
-                    Main.Write ("En particulier, une qui dure " + task.Value);
-                }
-                postTask (delegate { nextPlayer (); }, 0.132f);
-            }
-            return;
-        }
-        Main.Write ("Ok ! On change de tour.");*/
-        /*if (waitingForNextTurn) {
-            if (delayedTasks.Count > 1) {
-                return;
-            }
-            else
-                waitingForNextTurn = false;
-            Main.Write ("Bonne sortie !");
-            nextPlayer (); // Sortie
-            return;
-        }
-        if (delayedTasks.Count > 1) {
-            Main.Write ("Passage au joueur suivant annulé !");
-            Main.postTask (delegate
-            {
-                Main.infoDialog ("Attendez ! Il reste des déplacements.\n"
-                    + "Appuyez sur \"Ok\" pour retenter", delegate { nextPlayer (); });
-            }, 0.5f);
-            waitingForNextTurn = true;
-            return;
-        }*/
         if (winners.Count == players.Count) // Le dernier joueur vient de gagner !
         {
             Main.infoDialog ("Victoire de tous les joueurs !", delegate {victoryPanel ();});

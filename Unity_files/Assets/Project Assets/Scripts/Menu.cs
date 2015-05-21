@@ -9,11 +9,16 @@ public class Menu : MonoBehaviour {
 	/// Fonction de démarrage.
 	/// </summary>
 	void Start () {
+        Main.players.Clear();
 	    setClickEvent(transform.Find("Screen/Play").gameObject, delegate {
+            Main.setTutorialEnabled(false);
             addPlayerDialog();
         });
 	    setClickEvent(transform.Find("Screen/How to play").gameObject, delegate {
-            addTutoDialog(5);
+            Main.setTutorialEnabled(true);
+            Main.players.Add(new Player("Default", TOKENS_COLOR[0]));
+            Main.players.Add(new PlayerAI("IA", TOKENS_COLOR[1]));
+            Application.LoadLevel ("florent-prefab");
         });
 	    setClickEvent(transform.Find("Screen/Quit").gameObject, delegate {
             Application.Quit(); // Ne fonctionne que sur l'exécutable
