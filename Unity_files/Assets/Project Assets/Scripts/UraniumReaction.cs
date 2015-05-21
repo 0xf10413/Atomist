@@ -19,7 +19,7 @@ public class UraniumReaction : DelayedReaction {
     /// <summary>
     /// Constructeur de la réaction
     /// </summary>
-    public UraniumReaction() : base("U", "Th", uraniumReagents(), uraniumReaction, 4, 5) {
+    public UraniumReaction() : base("U", "Th", uraniumReagents(), uraniumReaction, 4, 5, "À chaque tour, le joueur a une chance sur <b>"+ Mathf.Round(1f/PROBA_DESINTEGRATION) +"</b> de passer son tour, jusqu'au prochain changement de salle.", "Désintégration de l'uranium") {
     }
 
     public override void inflict(Player target)

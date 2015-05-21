@@ -134,13 +134,24 @@ public class PlayerAI : Player
         if (r != null) {
             if (r is DelayedReaction) {
                 consumeForReaction(r);
+
+                int[] permutation = new int[Main.players.Count];
+                for (int i=0;i<permutation.Length;i++)
+                    permutation[i] = i;
+                for (int i=0;i<permutation.Length;i++) {
+                    int j = Main.randomGenerator.Next(permutation.Length);
+                    int temp = permutation[i];
+                    permutation[i] = permutation[j];
+                    permutation[j] = temp;
+                }
                 Player cible = null;
-                foreach (Player p in Main.players) {
+                for (int i=0;i<Main.players.Count;i++) {
+                    Player p = Main.players[permutation[i]];
                     if (p != this) {
                         if (p.isPlaying) {
                             if (cible == null)
                                 cible = p;
-                            else if (cible.room > p.room) // Todo : shuffle
+                            else if (cible.room > p.room)
                                 cible = p;
                         }
                     }

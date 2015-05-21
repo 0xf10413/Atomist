@@ -289,14 +289,27 @@ public class Player {
                 button.transform.localScale = new Vector3(1,1,1);
 
                 // On change le "12" par défaut en une taille dynamique
-                string reactionString = reaction.reagents + " → "+ reaction.products +" (-"+ reaction.cost +",+"+ reaction.gain +")";
+                string reactionString = reaction.reagents + " → "+ reaction.products;
                 int fontSize = (int)Mathf.Round(0.011f*Screen.height/playerScreen.GetComponent<RectTransform>().localScale.y);
                 reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
                 button.transform.Find ("Text").GetComponent<Text> ().text = reactionString;
-                    
                 
 		        // Ajout d'un événement au clic de la souris
                 Reaction r = reaction;
+                GameObject reactionInfo = null;
+                Main.addEvent(button, EventTriggerType.PointerEnter, delegate {
+                    reactionInfo = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ReactionInfoDialog"));
+                    reactionInfo.transform.Find("Title").gameObject.GetComponent<Text>().text = reactionString;
+                    reactionInfo.transform.Find("Info").gameObject.GetComponent<Text>().text = r.infoTxt;
+                    reactionInfo.transform.Find("Description").gameObject.GetComponent<Text>().text = r.effectTxt;
+                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût de la réaction : "+ r.cost;
+                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain après réaction : "+ r.gain;
+                    reactionInfo.transform.SetParent(playerScreen.transform, false);
+                });
+                Main.addEvent(button, EventTriggerType.PointerExit, delegate {
+                    if (reactionInfo != null)
+                        GameObject.Destroy(reactionInfo);
+                });
                 Main.addClickEvent(button, delegate {
                     // On vérifie si la réaction est faisable avec les éléments sélectionnés
                     if (r.cost <= energy) {

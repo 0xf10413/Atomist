@@ -8,8 +8,8 @@ using UnityEngine.UI;
 public class PoisonReaction : DelayedReaction
 {
     public int nbOfTurns { get; private set; }
-    public PoisonReaction (string tReagents, string tProducts, List<KeyValuePair<Element, int>> lReagents, ReactionType nType, int cCost, int gGain, int nnbOfTurns)
-        : base (tReagents, tProducts, lReagents, nType, cCost, gGain)
+    public PoisonReaction (string tReagents, string tProducts, List<KeyValuePair<Element, int>> lReagents, ReactionType nType, int cCost, int gGain, int nnbOfTurns, string tInfo)
+        : base (tReagents, tProducts, lReagents, nType, cCost, gGain, "Au bout de <b>"+ nnbOfTurns +"</b> tours, si le joueur n'a pas changé de salle, il passe son tour.", tInfo)
     {
         nbOfTurns = nnbOfTurns;
     }

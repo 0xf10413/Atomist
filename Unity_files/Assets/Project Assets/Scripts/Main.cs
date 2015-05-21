@@ -43,6 +43,8 @@ public class Main : MonoBehaviour {
     public enum TutorialState {WELCOME, CARDS_POSITION, ACID_REACTION, REACTION_HCL, END_TURN, FIND_IN_PT, THROW_NOBLE_GAZ, POISON_REACTION, REACTION_CO, END_TURN2, FIRE_REACTION, REACTION_NACL, END_TURN3, END_TUTO};
     public static TutorialState tutoState;
 
+    private static DateTime timeSinceGameStart;
+
 	/**
 	 * Fonction appelée au démarrage de l'application
 	 * Disons que c'est l'équivalent du main() en C++
@@ -59,11 +61,26 @@ public class Main : MonoBehaviour {
             pick.Add(new KeyValuePair<Element,int>(nElement,elementInfos["nb_in_pick"].AsInt));
 		}
 
-        // Génération de la liste des réactions, ainsi que des types de réaction
-        reactions = new List<Reaction> ();
-
-        // Réactions de type obstacle
+        // Génération des types de réaction
         SimpleJSON.JSONArray obstacleReactionsInfos = loadJSONFile("obstacle_reactions").AsArray;
+        foreach (SimpleJSON.JSONNode r in obstacleReactionsInfos) {
+            ReactionType rt = reactionTypes.Find (n => n.name == r["type"].AsString);
+            if (null == rt) {
+                rt = new ReactionType (r["type"]);
+                reactionTypes.Add (rt);
+            }
+        }
+
+        // Génération de la liste des (types d') obstacles, ainsi que des jetons
+        obstacles = new List<Obstacle> ();
+        obstacles.Add (new Obstacle ("Débris", "debris", reactionTypes.Find (n => n.name == "Explosion")));
+        obstacles.Add (new Obstacle ("Flamme", "flamme", reactionTypes.Find (n => n.name == "Eau")));
+        obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
+        obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
+        
+        // Génération de la liste des réactions
+        reactions = new List<Reaction> ();
+        // Réactions de type obstacle
         foreach (SimpleJSON.JSONNode r in obstacleReactionsInfos) {
             List<KeyValuePair<Element, int>> rList = new List<KeyValuePair<Element, int>> ();
             foreach (SimpleJSON.JSONArray elt in r["reagents"].AsArray)
@@ -71,11 +88,7 @@ public class Main : MonoBehaviour {
                 rList.Add (new KeyValuePair<Element, int> (getElementBySymbol(elt[0].AsString), elt[1].AsInt));
             }
             ReactionType rt = reactionTypes.Find (n => n.name == r["type"].AsString);
-            if (null == rt) {
-                rt = new ReactionType (r["type"]);
-                reactionTypes.Add (rt);
-            }
-            reactions.Add (new ObstacleReaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt));
+            reactions.Add (new ObstacleReaction (r["reaction"], r["products"], rList, rt, r["cost"].AsInt, r["gain"].AsInt, r["infos"]));
         }
         
         // Réactions de type poison
@@ -89,22 +102,15 @@ public class Main : MonoBehaviour {
             {
                 rList.Add (new KeyValuePair<Element, int> (getElementBySymbol(elt[0].AsString), elt[1].AsInt));
             }
-            reactions.Add (new PoisonReaction (r["reaction"], r["products"], rList, poisonType, r["cost"].AsInt, r["gain"].AsInt, r["nbTurns"].AsInt));
+            reactions.Add (new PoisonReaction (r["reaction"], r["products"], rList, poisonType, r["cost"].AsInt, r["gain"].AsInt, r["nbTurns"].AsInt, r["infos"]));
         }
         reactions.Add(new UraniumReaction());
-
-        // Génération de la liste des (types d') obstacles, ainsi que des jetons
-        obstacles = new List<Obstacle> ();
-        obstacles.Add (new Obstacle ("Débris", "debris", reactionTypes.Find (n => n.name == "Explosion")));
-        obstacles.Add (new Obstacle ("Flamme", "flamme", reactionTypes.Find (n => n.name == "Eau")));
-        obstacles.Add (new Obstacle ("Glace", "glace", reactionTypes.Find (n => n.name == "Feu")));
-        obstacles.Add (new Obstacle ("Métal", "metal", reactionTypes.Find (n => n.name == "Acide")));
 
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new Player("aaa", Menu.TOKENS_COLOR[0]));
-            Main.players.Add(new PlayerAI("IA", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[0]));
+            Main.players.Add(new PlayerAI("Florent", Menu.TOKENS_COLOR[1]));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -121,8 +127,10 @@ public class Main : MonoBehaviour {
                 players[0].BeginTurn();
             }, mask);
         }
-        else
+        else {
+            timeSinceGameStart = DateTime.UtcNow;
             players[0].BeginTurn();
+        }
 
         /*int[] eltsNB = new int[elements.Count];
         foreach (Reaction r in reactions) {
@@ -676,9 +684,15 @@ public class Main : MonoBehaviour {
     /// </summary>
     public static void nextPlayer ()
     {
-        if (winners.Count == players.Count) // Le dernier joueur vient de gagner !
+        if (winners.Count >= (players.Count-1)) // Le dernier joueur vient de gagner !
         {
-            Main.infoDialog ("Victoire de tous les joueurs !", delegate {victoryPanel ();});
+            TimeSpan gameTime = DateTime.UtcNow-timeSinceGameStart;
+            TimeSpan displayedGameTime = new TimeSpan(gameTime.Hours,gameTime.Minutes,gameTime.Seconds);
+            foreach (Player p in players) {
+                if (p.isPlaying)
+                    winners.Add(p);
+            }
+            Main.infoDialog ("Partie terminée !\nDurée de la partie : "+ displayedGameTime, delegate {victoryPanel ();});
             return;
         }
 

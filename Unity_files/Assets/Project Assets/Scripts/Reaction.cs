@@ -14,6 +14,8 @@ public abstract class Reaction {
 	public ReactionType type { private set; get; } // Type de réaction (glace, feu, etc)
     public int cost { private set; get; }
     public int gain { private set; get; }
+    public string infoTxt {private set; get;}
+    public string effectTxt {private set; get;}
     
     /// <summary>
     /// Constructeur de la réaction
@@ -24,13 +26,17 @@ public abstract class Reaction {
     /// <param name="nType">Le type de réaction</param>
     /// <param name="cCost">Le coût de la réaction</param>
     /// <param name="gGain">Le gain d'énergie apporté par la réaction</param>
-	public Reaction(string tReagents, string tProducts, List<KeyValuePair<Element,int>> lReagents, ReactionType nType, int cCost, int gGain) {
+    /// <param name="tEffect">Un texte expliquant quel effet a la réaction</param>
+    /// <param name="nInfo">Des infos supplémentaires sur la réaction</param>
+	public Reaction(string tReagents, string tProducts, List<KeyValuePair<Element,int>> lReagents, ReactionType nType, int cCost, int gGain, string tEffect, string nInfo) {
 		reagents = convertLowerCase(tReagents);
 		products = convertLowerCase(tProducts);
 		reagentsList = lReagents;
 		type = nType;
         cost = cCost;
         gain = gGain;
+        effectTxt = tEffect;
+        infoTxt = nInfo;
 	}
 
     private static string convertLowerCase(string s) {

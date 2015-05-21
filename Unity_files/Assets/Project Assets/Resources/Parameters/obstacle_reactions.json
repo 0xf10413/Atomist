@@ -1,4 +1,4 @@
-[
+ï»¿[
 	{
 		"reagents" : [["H",4],["O",2]],
 		"reaction": "2H2 + O2",
@@ -57,7 +57,7 @@
 		"reagents" : [["Na",2],["Cl",2]],
 		"reaction" : "2Na + Cl2",
 		"products" : "2NaCl",
-		"infos" : "Réaction explosive avec flamme jaune-orangée et fumée blanche",
+		"infos" : "RÃ©action explosive avec flamme jaune-orangÃ©e et fumÃ©e blanche",
 		"type" : "Feu",
 		"cost" : 4,
 		"gain" : 5
@@ -66,7 +66,7 @@
 		"reagents" : [["O",2],["Mg",2]],
 		"reaction" : "2Mg + O2",
 		"products" : "2MgO",
-		"infos" : "Réaction utilisée en pyrotechnie : flash avec fumée blanche",
+		"infos" : "RÃ©action utilisÃ©e en pyrotechnie : flash avec fumÃ©e blanche",
 		"type" : "Feu",
 		"cost" : 4,
 		"gain" : 5
@@ -75,7 +75,7 @@
 		"reagents" : [["H",8],["N",2],["O",7],["Cr",2]],
 		"reaction" : "(NH4)2Cr2O7",
 		"products" : "N2 + 4 H2O + Cr2O3",
-		"infos" : "T=225°C, formation d’un volcan !",
+		"infos" : "T=225Â°C, formation dâ€™un volcan !",
 		"type" : "Feu",
 		"cost" : 4,
 		"gain" : 5
