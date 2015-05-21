@@ -25,23 +25,23 @@ public class Main : MonoBehaviour {
     public static List<Reaction> reactions { private set; get; } // Liste des réaction, fixée au démarrage
     public static List<Obstacle> obstacles { private set; get; } // Liste des obtacles, fixée au démarrage
 	
-	public static List<Player> players = new List<Player>(); // La liste des joueurs
-    public static List<Player> winners = new List<Player> (); // La liste des joueurs ayant gagné
+	public static List<Player> players { private set; get; } // La liste des joueurs
+    public static List<Player> winners { private set; get; } // La liste des joueurs ayant gagné
     
-    public static List<ReactionType> reactionTypes = new List<ReactionType> (); // liste des types de réaction
-    public static List<KeyValuePair<Element,int>> pick = new List<KeyValuePair<Element,int>>(); // La pioche : liste de paires (élément, nombre de fois où cet élément apparait dans la pioche)
-	public static int turnID = 0; // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
+    public static List<ReactionType> reactionTypes { private set; get; } // liste des types de réaction
+    public static List<KeyValuePair<Element,int>> pick { private set; get; } // La pioche : liste de paires (élément, nombre de fois où cet élément apparait dans la pioche)
+	public static int turnID { private set; get; } // L'ID du tour : 0 si c'est au tour du joueur 1, 1 si c'est au tour du joueur 2 etc
 
     public static System.Random randomGenerator = new System.Random(); // Générateur de nombre aléatoires
 
-    private static List<KeyValuePair<Del,float>> delayedTasks = new List<KeyValuePair<Del,float>>();
+    private static List<KeyValuePair<Del,float>> delayedTasks;
 	
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
     public static bool didacticiel {get; private set;} // true Ssi le jeu est en mode "didacticiel". Dans ce cas, des bulles d'aide s'affichent au fur et à mesure
 
     public enum TutorialState {WELCOME, CARDS_POSITION, ACID_REACTION, REACTION_HCL, END_TURN, FIND_IN_PT, THROW_NOBLE_GAZ, POISON_REACTION, REACTION_CO, END_TURN2, FIRE_REACTION, REACTION_NACL, END_TURN3, END_TUTO};
-    public static TutorialState tutoState;
+    public static TutorialState tutoState {get;set;}
 
     private static DateTime timeSinceGameStart;
 
@@ -51,6 +51,17 @@ public class Main : MonoBehaviour {
 	 **/
 	void Start () {
 		context = this;
+
+        if (players == null)
+            players = new List<Player>();
+        winners = new List<Player>();
+
+        reactionTypes = new List<ReactionType>();
+        pick = new List<KeyValuePair<Element,int>>();
+
+        delayedTasks = new List<KeyValuePair<Del,float>>();
+
+        turnID = 0;
 
         // Génération de la liste des éléments et de la pioche
 		elements = new List<Element> ();
@@ -141,6 +152,14 @@ public class Main : MonoBehaviour {
         for (int i=0;i<eltsNB.Length;i++)
             Write(elements[i].name +" : "+ eltsNB[i]);*/
 	}
+
+    /// <summary>
+    /// Initialise les variables globales
+    /// Fonction à appeler au démarrage de l'écran titre
+    /// </summary>
+    public static void init() {
+        players = new List<Player>();
+    }
     
     public delegate void Confirm();
     public delegate void Undo();
@@ -517,7 +536,7 @@ public class Main : MonoBehaviour {
         });
     }
     private static Del onHideDialog;
-    private static List<GameObject> shownTutoDialogs = new List<GameObject>();
+    private static List<GameObject> shownTutoDialogs;
     public static GameObject addTutoDialog(string prefabName, Del onClick) {
         return addTutoDialog(prefabName, onClick, Main.currentPlayer().playerScreen);
     }

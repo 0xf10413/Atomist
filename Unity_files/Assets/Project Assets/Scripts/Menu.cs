@@ -5,11 +5,13 @@ using System.Collections;
 
 public class Menu : MonoBehaviour {
 
+    private Main.Del onSubmit;
+
 	/// <summary>
 	/// Fonction de démarrage.
 	/// </summary>
 	void Start () {
-        Main.players.Clear();
+        Main.init();
 	    setClickEvent(transform.Find("Screen/Play").gameObject, delegate {
             Main.setTutorialEnabled(false);
             addPlayerDialog();
@@ -48,8 +50,8 @@ public class Menu : MonoBehaviour {
         new Color(1,0,1),                   // Magenta
         new Color(1,1,0),                   // Jaune
         new Color(0,1,1),                   // Cyan
-        new Color(1,0.5f,0),                //
-        new Color(0.6f,0.2f,0),             //
+        new Color(1,0.5f,0),                // Orange
+        new Color(0.6f,0.2f,0),             // Marron
     };
 
     /// <summary>
@@ -68,14 +70,15 @@ public class Menu : MonoBehaviour {
     
         dialog.transform.Find("Message").GetComponent<Text>().text = "Joueur "+ (Main.players.Count+1) +", entrez votre nom :";
         playerNameInput = dialog.transform.Find("Input").gameObject.GetComponent<InputField>();
-        setClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+        onSubmit = delegate {
             if (playerNameInput.text != "") {
                 Main.players.Add(new Player(playerNameInput.text,playerColorSelected));
                 GameObject.Destroy(dialog);
                 mask.SetActive(false);
                 showPlayerDialog();
             }
-        });
+        };
+        setClickEvent(dialog.transform.Find("Submit").gameObject, onSubmit);
 
         addColorChoices(dialog.transform.Find("Tokens Color"));
 
@@ -129,7 +132,7 @@ public class Menu : MonoBehaviour {
             mask.SetActive(false);
             GameObject.Destroy(dialog);
         });
-        setClickEvent(dialog.transform.Find("Submit").gameObject, delegate {
+        onSubmit = delegate {
             if (playerNameInput.text != "") {
                 for (int i=0;i<difficulties.Length;i++) {
                     if (dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).GetComponent<Toggle>().isOn) {
@@ -141,7 +144,8 @@ public class Menu : MonoBehaviour {
                     }
                 }
             }
-        });
+        };
+        setClickEvent(dialog.transform.Find("Submit").gameObject, onSubmit);
         for (int i=0;i<difficulties.Length;i++) {
             int diffID = i;
             setClickEvent(dialog.transform.Find("Difficulty Selector").Find(difficulties[i]).gameObject, delegate {
@@ -269,11 +273,8 @@ public class Menu : MonoBehaviour {
     /// Fonction appelée en cas d'évènement.
     /// </summary>
     void OnGUI() {
-        if ((playerNameInput != null) && playerNameInput.isFocused && (playerNameInput.text != "") && Input.GetKey(KeyCode.Return)) {
-            Main.players.Add(new Player(playerNameInput.text,playerColorSelected));
-            GameObject.Destroy(playerNameInput.transform.parent.gameObject);
-            showPlayerDialog();
-        }
+        if ((playerNameInput != null) && playerNameInput.isFocused && (playerNameInput.text != "") && Input.GetKey(KeyCode.Return))
+            onSubmit();
     }
 
     /// <summary>
