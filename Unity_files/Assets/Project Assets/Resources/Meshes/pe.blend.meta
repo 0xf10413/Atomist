@@ -19,6 +19,12 @@ ModelImporter:
     100026: D_bris_MeshPart1
     100028: Flamme
     100030: Next_Room
+    100032: Grosse_pierre
+    100034: Petite_pierre
+    100036: Plane
+    100038: Grosse_pierre_001
+    100040: Grosse_pierre_002
+    100042: Petite_pierre_001
     400000: Cylinder
     400002: Empty
     400004: //RootNode
@@ -35,6 +41,12 @@ ModelImporter:
     400026: D_bris_MeshPart1
     400028: Flamme
     400030: Next_Room
+    400032: Grosse_pierre
+    400034: Petite_pierre
+    400036: Plane
+    400038: Grosse_pierre_001
+    400040: Grosse_pierre_002
+    400042: Petite_pierre_001
     2300000: Cylinder
     2300002: Salle
     2300004: Metal
@@ -45,6 +57,12 @@ ModelImporter:
     2300014: D_bris_MeshPart1
     2300016: D_bris
     2300018: Flamme
+    2300020: Grosse_pierre
+    2300022: Petite_pierre
+    2300024: Plane
+    2300026: Grosse_pierre_001
+    2300028: Grosse_pierre_002
+    2300030: Petite_pierre_001
     3300000: Cylinder
     3300002: Salle
     3300004: Metal
@@ -55,6 +73,12 @@ ModelImporter:
     3300014: D_bris_MeshPart1
     3300016: D_bris
     3300018: Flamme
+    3300020: Grosse_pierre
+    3300022: Petite_pierre
+    3300024: Plane
+    3300026: Grosse_pierre_001
+    3300028: Grosse_pierre_002
+    3300030: Petite_pierre_001
     4300000: Cylinder
     4300002: Salle
     4300004: Metal
@@ -65,6 +89,12 @@ ModelImporter:
     4300014: D_bris_MeshPart1
     4300016: D_bris
     4300018: Flamme
+    4300020: Plane
+    4300022: Grosse_pierre
+    4300024: Petite_pierre
+    4300026: Grosse_pierre_002
+    4300028: Petite_pierre_001
+    4300030: Grosse_pierre_001
     7400000: Default Take
     9500000: //RootNode
   materials:

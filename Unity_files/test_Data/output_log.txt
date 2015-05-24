@@ -18,16 +18,22 @@ Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Da
 Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.079 seconds
+- Completed reload, in  0.050 seconds
 desktop: 3200x1800 60Hz; virtual: 3200x1800 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.dll (this message is harmless)
-UnloadTime: 2.795671 ms
-Unloading 5 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+UnloadTime: 2.805544 ms
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 158 unused Assets to reduce memory usage. Loaded Objects now: 303.
-Total: 0.977024 ms (FindLiveObjects: 0.032764 ms CreateObjectMapping: 0.015000 ms MarkObjects: 0.277514 ms  DeleteObjects: 0.087241 ms)
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 326.
+Total: 0.783594 ms (FindLiveObjects: 0.025659 ms CreateObjectMapping: 0.011842 ms MarkObjects: 0.215537 ms  DeleteObjects: 0.004737 ms)
 
 WARNING: Shader Unsupported: 'Reflective/VertexLit' - Pass '' shader state not supported
+UnloadTime: 1.570741 ms
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 1405 unused Assets to reduce memory usage. Loaded Objects now: 311.
+Total: 1.644561 ms (FindLiveObjects: 0.031580 ms CreateObjectMapping: 0.046976 ms MarkObjects: 0.326464 ms  DeleteObjects: 0.808069 ms)
+

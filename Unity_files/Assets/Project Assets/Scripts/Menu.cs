@@ -125,6 +125,7 @@ public class Menu : MonoBehaviour {
         mask.SetActive(true);
         dialog.transform.SetParent(transform.Find("Screen"));
         dialog.transform.localPosition = new Vector3(0,0,0);
+        dialog.transform.localScale = new Vector3 (1f, 1f, 1f);
         dialog.transform.Find("Message").GetComponent<Text>().text = "Entrez le nom de l'IA :";
         playerNameInput = dialog.transform.Find("Input").gameObject.GetComponent<InputField>();
         string[] difficulties = {"Easy","Medium","Difficult"};

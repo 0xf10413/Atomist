@@ -553,10 +553,6 @@ public class Main : MonoBehaviour {
                 onClick();
             });
         }
-        /*Main.addClickEvent(mask, delegate {
-            GameObject.Destroy(mask);
-            onClick();
-        });*/
         
         shownTutoDialogs.Add(tutoDialog);
         if (okButton != null)

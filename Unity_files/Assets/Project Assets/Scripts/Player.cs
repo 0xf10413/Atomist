@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 200; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -85,7 +85,7 @@ public class Player {
             icon.name = reactionType.name;
             icon.GetComponent<Image>().sprite = (currentReactionSelected == reactionType) ? reactionType.iconH:reactionType.icon;
 
-            reactionObjects.Add(new KeyValuePair<ReactionType,GameObject>(reactionType,icon));
+            reactionObjects.Add (new KeyValuePair<ReactionType, GameObject> (reactionType, icon));
 
 		    // Ajout d'un événement au clic de la souris
             ReactionType rType = reactionType; // On rend la variable locale pour le delegate, sinon ça fait de la merde
@@ -99,6 +99,27 @@ public class Player {
                 if ((Main.didacticialToShow(Main.TutorialState.ACID_REACTION) && (rType.name == "Acide")) || (Main.didacticialToShow(Main.TutorialState.POISON_REACTION) && (rType.name == "Poison")) || (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION) && (rType.name == "Feu")))
                     Main.hideTutoDialog();
 			});
+
+            // Ajout d'un événement de prévisualisation au survol de la souris
+            Main.addEvent (icon, EventTriggerType.PointerEnter, delegate
+            {
+                GameObject infos = (GameObject)GameObject.Instantiate (Resources.Load ("Prefabs/ReactionTypeInfoDialog"));
+                infos.transform.Find("Type").GetComponent<Text> ().text = "Type " + rType.name;
+                infos.transform.Find ("Icon").GetComponent<Image> ().sprite = localReactionType.icon;
+                infos.transform.SetParent (playerScreen.transform);
+                infos.name = "ReactionTypeInfoDialog_"+rType.name;
+
+                infos.GetComponent<RectTransform> ().sizeDelta = new Vector2 (0, 0);
+                infos.GetComponent<RectTransform>().localScale = new Vector3 (1, 1);
+                infos.GetComponent<RectTransform>().localPosition = new Vector2 (0, 0);
+                infos.GetComponent<RectTransform> ().anchoredPosition = new Vector2 (0, 0);
+            });
+
+            // Ajout d'un événement de déprévisualisation à la sortie de la souris
+            Main.addEvent (icon, EventTriggerType.PointerExit, delegate
+            {
+                GameObject.Destroy (playerScreen.transform.Find ("ReactionTypeInfoDialog_" + rType.name).gameObject);
+            });
         }
 
         updateReactionsList();
@@ -138,7 +159,8 @@ public class Player {
                         }
                     }
                     energy += energyToGain;
-                    Main.hideTutoDialog();
+                    if (Main.didacticiel)
+                        Main.hideTutoDialog();
                     if (nbCardsToPick > 0)
                         pickCards(nbCardsToPick, false);
                     deck.updatePositions();

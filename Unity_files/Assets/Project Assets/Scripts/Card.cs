@@ -125,12 +125,12 @@ public class Card {
                 Card iCard = deck.getCard(i);
                 iCard.bringToFront();
                 if (iCard == this) {
-                    iCard.setCoeffPos(true);
-                    for (i++;i<deck.getNbCards();i++)
-                        deck.getCard(i).setCoeffPos(true);
+                    iCard.setCoeffPos(deck.overflow);
+                    for (i++;i<deck.getNbCards();i++) // Argh...
+                        deck.getCard(i).setCoeffPos(deck.overflow);
                 }
                 else
-                    iCard.setCoeffPos(false);
+                    iCard.setCoeffPos(!deck.overflow);
             }
         });
         
@@ -150,11 +150,8 @@ public class Card {
 	}
 	
 	public void updateX(float posX) {
-        /* On déplace les ancres, puis on réinitialise */
         RectTransform rect = cardImg.GetComponent<RectTransform>();
         rect.localPosition = new Vector2 (posX, rect.localPosition.y);
-        //Main.Write ("Carte centrée en (" + rect.position.x + "," +
-         //   rect.position.y + ")");
 	}
 
     /// <summary>

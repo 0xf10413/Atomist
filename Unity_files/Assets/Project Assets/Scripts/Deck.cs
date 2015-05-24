@@ -27,6 +27,11 @@ public class Deck {
     /// </summary>
     private System.Comparison<Element> sortFunction;
 
+    /// <summary>
+    /// Les cartes débordent-elles ?
+    /// </summary>
+    public bool overflow { get; private set; }
+
 	/// <summary>
 	/// Le constructeur usuel.
 	/// </summary>
@@ -36,6 +41,7 @@ public class Deck {
 		listCards = new List<Card> ();
         referenceCard = deck.transform.Find("First Card").gameObject;
         sortFunction = (a,b) => a.symbole.CompareTo(b.symbole);
+        overflow = false;
 	}
 	
 	/// <summary>
@@ -141,9 +147,9 @@ public class Deck {
         
         float maxDeltaX = ((length-wCard) / (listCards.Count-1)) / scalePS;
         //Main.Write(length*scalePS+","+wCard+","+scalePS);
-        if (deltaX > maxDeltaX)
+        if (overflow = (deltaX > maxDeltaX)) {
             deltaX = maxDeltaX;
-        
+        }
         card.updateX (x1 + deltaX * position);
 	}
 }

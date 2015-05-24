@@ -145,7 +145,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Vous pouvez faire une r\xE9action \"poison\" pour attaquer l'adversarie.
+  m_Text: "Vous pouvez faire une r\xE9action \"poison\" pour attaquer l'adversaire.
     Cliquez sur cette ic\xF4ne pour la faire."
 --- !u!222 &22275026
 CanvasRenderer:
@@ -181,8 +181,8 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: .751187146, y: .554271579}
   m_AnchorMax: {x: .98875016, y: .85616827}
-  m_AnchoredPosition: {x: -1.2255249, y: 2.28207397}
-  m_SizeDelta: {x: -2.45090008, y: -3.05180001e-05}
+  m_AnchoredPosition: {x: -16.1427498, y: -4.13031435}
+  m_SizeDelta: {x: -247.066238, y: -161.121735}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22475026
 RectTransform:
