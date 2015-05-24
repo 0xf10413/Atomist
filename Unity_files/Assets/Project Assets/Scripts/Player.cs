@@ -11,12 +11,12 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 100; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 200; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
 
-    public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
+    private bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
     public bool isPlaying { get; set; } // Le joueur est-il encore en course ?
 	
 	public Deck deck {get; protected set;} // Liste des cartes du joueur
@@ -544,7 +544,6 @@ public class Player {
         camera.transform.LookAt (rooms.transform.Find ("Salle " + room + "/Camera_Target").transform);
         rooms.SetActive (true);
 
-
         for (int i=0; i<penalties.Count; i++) {
             if (penalties[i].setOff()) {
                 penalties.Remove (penalties[i]);
@@ -601,8 +600,10 @@ public class Player {
         // Attention, on doit mettre sur pause le génrateur de particule (flammes)
         //rooms
         rooms.SetActive (false);
-        isTurn = false;
-        firstTurn = false;
+        if (isTurn) {
+            isTurn = false;
+            firstTurn = false;
+        }
         Main.nextPlayer ();
     }
 

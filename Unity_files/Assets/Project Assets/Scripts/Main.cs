@@ -120,14 +120,8 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[0]));
             Main.players.Add(new Player("Florent", Menu.TOKENS_COLOR[1]));
-            Main.players.Add(new Player("Solèhe", Menu.TOKENS_COLOR[2]));
-            Main.players.Add(new PlayerAI("Florient", Menu.TOKENS_COLOR[3]));
-            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[4]));
-            Main.players.Add(new PlayerAI("Florent", Menu.TOKENS_COLOR[5]));
-            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[6]));
-            Main.players.Add(new PlayerAI("Florent", Menu.TOKENS_COLOR[7]));
+            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[2]));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
