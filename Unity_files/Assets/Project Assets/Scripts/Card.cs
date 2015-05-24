@@ -125,9 +125,9 @@ public class Card {
                 Card iCard = deck.getCard(i);
                 iCard.bringToFront();
                 if (iCard == this) {
-                    iCard.setCoeffPos(deck.overflow);
+                    iCard.setCoeffPos(true);
                     for (i++;i<deck.getNbCards();i++) // Argh...
-                        deck.getCard(i).setCoeffPos(deck.overflow);
+                        deck.getCard(i).setCoeffPos(true);
                 }
                 else
                     iCard.setCoeffPos(!deck.overflow);
