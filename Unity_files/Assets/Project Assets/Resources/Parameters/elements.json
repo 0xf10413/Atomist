@@ -158,8 +158,8 @@
 		"atomicNumber" : 92,
 		"family" : "Actinide",
 		"file" : "uranium",
-		"did_you_know" : "En France 80% de l’électricité produite est d’origine nucléaire, l’énergie est obtenue à partir de la fission de l’uranium."
 		"nb_in_pick" : 1,
+		"did_you_know" : "En France 80% de l’électricité produite est d’origine nucléaire, l’énergie est obtenue à partir de la fission de l’uranium."
 	},
 	{
 		"name" : "Xénon",

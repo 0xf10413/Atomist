@@ -243,6 +243,7 @@ public class Player {
         rooms.SetActive (false);
         GameObject previousRoom = null;
         int build_room = 0; // Variable utile à la construction des salles 3D
+        bool double_room = false; // La salle précédente rencontrée était-elle double ?
 
         List<GameObject> obstacleTokens = Main.findChildsByName(playerScreen,"ObstacleToken");
         foreach (GameObject obstacleToken in obstacleTokens) {
@@ -251,19 +252,35 @@ public class Player {
             obstacles.Add(new ObstacleToken(obstacleAssociated,obstacleToken));
             GameObject localVarObstacle = obstacleToken;
             
-            // Création de la salle et de l'obstacle
-            GameObject localVarRoom = (GameObject) GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/PlayerRoom1")) ;
-            localVarRoom.transform.SetParent (rooms.transform);
-            localVarRoom.name = "Salle " + build_room;
-            GameObject localVarRoomObstacle = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/Obstacle" + obstacleName));
-            localVarRoomObstacle.name = "Obstacle";
-            localVarRoomObstacle.transform.SetParent (localVarRoom.transform);
-            localVarRoomObstacle.transform.position = localVarRoom.transform.Find ("Obstacle_Position").position;
+            // Création de la salle et de l'obstacle, si la salle précédente n'est pas double
+            if (!double_room) {
+                double_room = null != obstacleToken.transform.Find ("Double_room");
+                GameObject localVarRoom = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/PlayerRoom" + (double_room ? 2 : 1)));
+                localVarRoom.transform.SetParent (rooms.transform);
+                localVarRoom.name = "Salle " + build_room;
+                GameObject localVarRoomObstacle = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/Obstacle" + obstacleName));
+                localVarRoomObstacle.name = "Obstacle";
+                localVarRoomObstacle.transform.SetParent (localVarRoom.transform);
+                localVarRoomObstacle.transform.position = localVarRoom.transform.Find ("Obstacle_Position" + (double_room ? "1" : "")).position;
 
-            if (previousRoom != null)
-                localVarRoom.transform.position = previousRoom.transform.Find ("Next_Room").position;
-            previousRoom = localVarRoom;
-            build_room++;
+
+                // Branchement à la salle précédente
+                if (previousRoom != null)
+                    localVarRoom.transform.position = previousRoom.transform.Find ("Next_Room").position;
+                previousRoom = localVarRoom;
+                build_room++;
+
+            }
+            // Ajout de l'obstacle dans une salle double
+            else {
+                double_room = false;
+
+                GameObject localVarRoom = rooms.transform.Find ("Salle " + (build_room - 1)).gameObject;
+                GameObject localVarRoomObstacle = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/Obstacle" + obstacleName));
+                localVarRoomObstacle.name = "Obstacle2";
+                localVarRoomObstacle.transform.SetParent (localVarRoom.transform);
+                localVarRoomObstacle.transform.position = localVarRoom.transform.Find ("Obstacle_Position2").position;
+            }
 
             // Affichage d'informations au survol
             GameObject obstacleInfoDialog = null;
@@ -282,6 +299,13 @@ public class Player {
                     GameObject.Destroy(obstacleInfoDialog);
             });
         }
+
+        /* Ajout de la salle finale */
+        GameObject lastRoom = (GameObject)GameObject.Instantiate (Resources.Load<GameObject> ("Prefabs/PlayerRoomLast"));
+        lastRoom.transform.SetParent (rooms.transform);
+        lastRoom.name = "Salle " + build_room;
+        // Branchement à la salle précédente
+        lastRoom.transform.position = previousRoom.transform.Find ("Next_Room").position;
 	}
 
     public int compareFamilies(Element a, Element b) {
@@ -568,6 +592,13 @@ public class Player {
     /// Fonction de fin de tour. Masque l'écran et les salles 3D.
     /// </summary>
     public void EndTurn() {
+        // Verrouillage en cas de mouvement
+        if (Main.moveLock) {
+            Main.postTask (delegate { EndTurn (); }, 0.1f);
+            return;
+        }
+
+
         if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3))
             Main.hideTutoDialog();
         if (Main.didacticialToShow(Main.TutorialState.END_TUTO)) {
@@ -578,8 +609,9 @@ public class Player {
         }
         
         playerScreen.SetActive(false);
-        // Attention, on doit mettre sur pause le génrateur de particule (flammes)
+        // Attention, on doit mettre sur pause le générateur de particule (flammes)
         //rooms
+
         rooms.SetActive (false);
         isTurn = false;
         firstTurn = false;
@@ -589,8 +621,15 @@ public class Player {
     /// <summary>
     /// Déplace le joueur vers la salle d'après, supprime ses pénalités, et affiche un message si c'est gagné.
     /// </summary>
-    public virtual void moveToNextRoom() {
-        rooms.transform.Find ("Salle " + room + "/Obstacle").gameObject.SetActive (false);
+    /// <param name="side">Le côté par lequel sortir. 1 pour gauche, 2 pour droite, 0 s'il n'y en a qu'un.</param>
+    public virtual void moveToNextRoom(int side = 0) {
+        // Cas rare où le joueur cumule deux déplacements : on ne bouge pas tout de suite
+        if (Main.moveLock) {
+            Main.postTask (delegate { moveToNextRoom (side); }, 0.1f);
+            return;
+        }
+
+        rooms.transform.Find ("Salle " + room + "/Obstacle" + (side == 2 ? "2" : "")).gameObject.SetActive (false);
         room++;
         updateRanks ();
         foreach (Penalty p in penalties)
@@ -600,12 +639,14 @@ public class Player {
             Main.infoDialog("Vous avez passé les "+ room +" obstacles !\nFélicitations, vous remportez la partie !", delegate {
                 isPlaying = false;
                 Main.winners.Add (this);
-                progressMoveToNextRoom();
+                progressMoveToNextRoom(side);
+                Main.moveLock = true;
             });
         }
         else {
             Main.infoDialog("Vous pouvez accéder à la salle suivante.", delegate {
-                progressMoveToNextRoom();
+                progressMoveToNextRoom(side);
+                Main.moveLock = true;
             });
         }
     }
@@ -613,13 +654,14 @@ public class Player {
     /// <summary>
     /// Déplacement vers la salle suivante, avec animation.
     /// </summary>
-    public void progressMoveToNextRoom() {
+    /// <param name="side">Le côté par lequel passer. 1 à gauche, 2 à droite, 0 s'il n'y en a qu'un.</param>
+    public void progressMoveToNextRoom(int side) {
         Vector3 tokenPos1 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition1").localPosition;
         Vector3 tokenPos2 = playerScreen.transform.Find("Board Container/BoardGame/PlayerTokenContainer/PlayerPosition2").localPosition;
 
         Vector3 playerTargetPos = rooms.transform.Find ("Salle " + room + "/Camera_Position").position;
         movePlayer(tokenPos1 + (tokenPos2-tokenPos1)*room);
-        movePlayer3D (playerTargetPos);
+        movePlayer3D (playerTargetPos, side);
     }
 
     /// <summary>
@@ -633,7 +675,7 @@ public class Player {
             nextX = but.x;
         playerToken.transform.localPosition = new Vector3(nextX, but.y,but.z);
         if (nextX < but.x) {
-            Main.postTask(delegate {
+            Main.postMove(delegate {
                 movePlayer(but);
             }, 0.05f);
         }
@@ -649,7 +691,8 @@ public class Player {
     /// Déplacement avec animation de la position actuelle de la caméra vers une position cible.
     /// </summary>
     /// <param name="target">Position cible d'arrivée</param>
-    private void movePlayer3D (Vector3 target)
+    /// <param name="side">Le côté par lequel passer. 1 à gauche, 2 à droite, 0 s'il n'y en a qu'un.</param>
+    private void movePlayer3D (Vector3 target, int side)
     {
         GameObject camera = rooms.transform.root.Find ("Camera").gameObject;
         float nextX = camera.transform.localPosition.x - 0.6f;
@@ -658,16 +701,23 @@ public class Player {
             0.1f*Mathf.Sin (3* (2*Mathf.PI) *(camera.transform.position.x-startX)
             / (startX - target.x));
         if (float.IsNaN (nextY)) // Grosse rustine, en cas de changement trop rapide de joueur (fragile, race condition ?)
-            nextY = target.y; 
+            nextY = target.y;
+        float nextZ = target.z;
+
+        if (side != 0) {
+            nextZ += (side == 2 ? -1 : 1) * Mathf.Sin (Mathf.PI * (camera.transform.position.x - startX) / (startX - target.x));
+        }
+        if (float.IsNaN (nextZ)) // Grosse rustine, en cas de changement trop rapide de joueur (fragile, race condition ?)
+            nextZ = target.z;
 
         if (nextX < target.x)
             nextX = target.x;
         
-        camera.transform.localPosition = new Vector3 (nextX, nextY, target.z);
+        camera.transform.localPosition = new Vector3 (nextX, nextY, nextZ);
         if (nextX > target.x) {
-            Main.postTask (delegate
+            Main.postMove (delegate
             {
-                movePlayer3D (target);
+                movePlayer3D (target, side);
             }, 0.05f);
         }
     }

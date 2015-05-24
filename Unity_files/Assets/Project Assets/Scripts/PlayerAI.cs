@@ -252,16 +252,21 @@ public class PlayerAI : Player
         return reaction;
     }
 
-    public override void moveToNextRoom () {
-        rooms.transform.Find ("Salle " + room + "/Obstacle").gameObject.SetActive (false);
-        
+    public override void moveToNextRoom (int side = 0) {
+        if (Main.moveLock) {
+            Main.postTask (delegate { moveToNextRoom (side); }, 0.1f);
+            return;
+        }
+        rooms.transform.Find ("Salle " + room + "/Obstacle" + (side == 2 ? "2" : "")).gameObject.SetActive (false);
+
         room++;
         updateRanks ();
         
         foreach (Penalty p in penalties)
             p.Remove ();
         penalties.Clear ();
-        progressMoveToNextRoom ();
+        progressMoveToNextRoom (side);
+        Main.moveLock = true;
 
         if (room >= NB_ROOMS)
             Main.infoDialog (name + " lance une réaction ... et gagne !",
@@ -269,12 +274,23 @@ public class PlayerAI : Player
                 {
                     isPlaying = false;
                     Main.winners.Add (this);
-                    think (); // Pour conclure les dernières actions
+                    thinkLater (); // Pour conclure les dernières actions
                 });
 
         else
             Main.infoDialog (name + " lance une réaction... et passe à la salle"
                 + " suivante !",
                 delegate {  think (); });
+    }
+
+    /// <summary>
+    /// Simple fonction qui retarde la reflexion jusqu'à la fin de tout mouvement.
+    /// </summary>
+    private void thinkLater ()
+    {
+        if (Main.moveLock)
+            Main.postTask (delegate { thinkLater (); }, 0.1f);
+        else
+            think ();
     }
 }

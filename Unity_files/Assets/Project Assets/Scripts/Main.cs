@@ -35,6 +35,8 @@ public class Main : MonoBehaviour {
     public static System.Random randomGenerator = new System.Random(); // Générateur de nombre aléatoires
 
     private static List<KeyValuePair<Del,float>> delayedTasks;
+    public static bool moveLock = false; // Verrouille-t-on les tâches de déplacement en attente ?
+    private static List<KeyValuePair<Del, float>> moveTasks; // Tâches de déplacement en attente
 	
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
@@ -60,6 +62,7 @@ public class Main : MonoBehaviour {
         pick = new List<KeyValuePair<Element,int>>();
 
         delayedTasks = new List<KeyValuePair<Del,float>>();
+        moveTasks = new List<KeyValuePair<Del, float>> ();
 
         turnID = 0;
 
@@ -120,8 +123,14 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new Player("Timothé", Menu.TOKENS_COLOR[0]));
-            Main.players.Add(new PlayerAI("Florent", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new PlayerAI ("Timothé", Menu.TOKENS_COLOR[0], 0));
+            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1]));
+            Main.players.Add (new PlayerAI ("Marwane", Menu.TOKENS_COLOR[2]));
+            Main.players.Add (new PlayerAI ("Thomas", Menu.TOKENS_COLOR[3]));
+            Main.players.Add (new PlayerAI ("Guillaume", Menu.TOKENS_COLOR[4]));
+            Main.players.Add (new PlayerAI ("Emanuelle", Menu.TOKENS_COLOR[5]));
+            Main.players.Add (new PlayerAI ("François", Menu.TOKENS_COLOR[6]));
+            Main.players.Add (new PlayerAI ("Solène", Menu.TOKENS_COLOR[7]));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -636,15 +645,26 @@ public class Main : MonoBehaviour {
 	 * Fonction appelée à chaque frame, environ 60 fois par seconde
 	 **/
 	void Update () {
-        for (int i=delayedTasks.Count-1;i>=0;i--) {
-            KeyValuePair<Del,float> task = delayedTasks[i];
+        for (int i = delayedTasks.Count - 1; i >= 0; i--) {
+            KeyValuePair<Del, float> task = delayedTasks[i];
             if (task.Value <= Time.deltaTime) {
-                task.Key();
-                delayedTasks.Remove(task);
+                task.Key ();
+                delayedTasks.Remove (task);
             }
             else
-                delayedTasks[i] = new KeyValuePair<Del,float>(task.Key,task.Value-Time.deltaTime);
+                delayedTasks[i] = new KeyValuePair<Del, float> (task.Key, task.Value - Time.deltaTime);
         }
+        for (int i = moveTasks.Count - 1; i >= 0; i--) {
+            KeyValuePair<Del, float> task = moveTasks[i];
+            if (task.Value <= Time.deltaTime) {
+                task.Key ();
+                moveTasks.Remove (task);
+            }
+            else
+                moveTasks[i] = new KeyValuePair<Del, float> (task.Key, task.Value - Time.deltaTime);
+        }
+        if (moveLock)
+            moveLock = moveTasks.Count != 0;
 	}
 
     /// <summary>
@@ -652,8 +672,20 @@ public class Main : MonoBehaviour {
     /// </summary>
     /// <param name="task">Un delegate contenant la tâche à exécuter</param>
     /// <param name="delay">Le temps au bout de laquelle on exécute la tâche, en secondes</param>
-    public static void postTask(Del task, float delay) {
+    public static void postTask (Del task, float delay)
+    {
         delayedTasks.Add(new KeyValuePair<Del,float>(task,delay));
+    }
+
+    /// <summary>
+    /// Exécute une action au bout d'un certain temps. Identique à postTask, mais dans le 
+    /// but de gérer les mouvements.
+    /// </summary>
+    /// <param name="task">Un delegate contenant la tâche à exécuter</param>
+    /// <param name="delay">Le temps au bout de laquelle on exécute la tâche, en secondes</param>
+    public static void postMove (Del task, float delay)
+    {
+        moveTasks.Add (new KeyValuePair<Del, float> (task, delay));
     }
 
 	/// <summary>
