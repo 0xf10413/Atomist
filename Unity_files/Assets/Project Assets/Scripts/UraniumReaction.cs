@@ -25,7 +25,7 @@ public class UraniumReaction : DelayedReaction {
     public override void inflict(Player target)
     {
         GameObject penaltyToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PenaltyToken"));
-        penaltyToken.transform.SetParent(target.playerScreen.transform.Find("BoardGame/PenaltyTokensContainer"+ target.room));
+        penaltyToken.transform.SetParent(target.playerScreen.transform.Find("Board Container/BoardGame/PenaltyTokensContainer"+ target.room));
         target.penalties.Add (new Penalty (delegate {
             if (Main.randomGenerator.NextDouble() < PROBA_DESINTEGRATION) {
                 if (target.hisTurn()) { // Si on n'a pas déjà sauté le tour du joueur

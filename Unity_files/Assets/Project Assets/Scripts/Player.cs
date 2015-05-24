@@ -16,7 +16,7 @@ public class Player {
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
 
-    public bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
+    private bool firstTurn = true; // Vaut true Ssi c'est le 1er tour du joueur
     public bool isPlaying { get; set; } // Le joueur est-il encore en course ?
 	
 	public Deck deck {get; protected set;} // Liste des cartes du joueur
@@ -198,10 +198,30 @@ public class Player {
                 });
             }
         });
+        GameObject opponentsTokensContainer = null;
         Main.addEvent(playerScreen.transform.Find ("Board Container").gameObject, EventTriggerType.PointerEnter, delegate {
-            playerScreen.transform.Find("Board Preview").gameObject.SetActive(true);
+            GameObject boardPreview = playerScreen.transform.Find("Board Preview").gameObject;
+            boardPreview.SetActive(true);
+            opponentsTokensContainer = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/TokensContainer"));
+            opponentsTokensContainer.transform.SetParent(boardPreview.transform, false);
+            int[] nbInRoom = new int[NB_ROOMS+1];
+            foreach (Player p in Main.players) {
+                GameObject opponentToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/OpponentToken"));
+                opponentToken.GetComponent<Image>().color = p.tokenColor;
+                opponentToken.transform.SetParent(opponentsTokensContainer.transform,false);
+                Vector3 e0 = opponentsTokensContainer.transform.Find("TokenE0").gameObject.GetComponent<RectTransform>().localPosition;
+                Vector3 e1 = opponentsTokensContainer.transform.Find("TokenE1").gameObject.GetComponent<RectTransform>().localPosition;
+                Vector3 e2 = opponentsTokensContainer.transform.Find("TokenE2").gameObject.GetComponent<RectTransform>().localPosition;
+                int xRel = nbInRoom[p.room]/2, yRel = nbInRoom[p.room]%2;
+                opponentToken.GetComponent<RectTransform>().localPosition = xRel*e0 + yRel*e1 + p.room*e2;
+                nbInRoom[p.room]++;
+            }
         });
         Main.addEvent(playerScreen.transform.Find ("Board Container").gameObject, EventTriggerType.PointerExit, delegate {
+            if (opponentsTokensContainer != null) {
+                GameObject.Destroy(opponentsTokensContainer);
+                opponentsTokensContainer = null;
+            }
             playerScreen.transform.Find("Board Preview").gameObject.SetActive(false);
         });
         Main.addClickEvent(playerScreen.transform.Find("System Buttons/Table").gameObject, delegate {
@@ -548,7 +568,6 @@ public class Player {
         camera.transform.LookAt (rooms.transform.Find ("Salle " + room + "/Camera_Target").transform);
         rooms.SetActive (true);
 
-
         for (int i=0; i<penalties.Count; i++) {
             if (penalties[i].setOff()) {
                 penalties.Remove (penalties[i]);
@@ -613,8 +632,10 @@ public class Player {
         //rooms
 
         rooms.SetActive (false);
-        isTurn = false;
-        firstTurn = false;
+        if (isTurn) {
+            isTurn = false;
+            firstTurn = false;
+        }
         Main.nextPlayer ();
     }
 
@@ -800,6 +821,28 @@ public class Player {
 
             rank.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
             name.GetComponent<RectTransform> ().localScale = new Vector3 (1, 1, 1);
+
+            Player localVarPlayer = p;
+            GameObject boardPreview = null;
+            GameObject[] ranksObjects = {rank, name};
+            for (int i=0;i<ranksObjects.Length;i++) {
+                Main.addEvent(ranksObjects[i], EventTriggerType.PointerEnter, delegate {
+                    if (boardPreview != null) {
+                        GameObject.Destroy(boardPreview);
+                        boardPreview = null;
+                    }
+                    boardPreview = (GameObject) GameObject.Instantiate(localVarPlayer.playerScreen.transform.Find("Board Container").gameObject);
+                    boardPreview.transform.SetParent(playerScreen.transform, false);
+                    boardPreview.transform.localPosition = new Vector3(0,0,0);
+                    boardPreview.transform.localScale = new Vector3(2,2,2);
+                });
+                Main.addEvent(ranksObjects[i], EventTriggerType.PointerExit, delegate {
+                    if (boardPreview != null) {
+                        GameObject.Destroy(boardPreview);
+                        boardPreview = null;
+                    }
+                });
+            }
         }
     }
 }

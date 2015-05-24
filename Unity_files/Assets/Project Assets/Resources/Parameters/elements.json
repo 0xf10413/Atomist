@@ -42,7 +42,7 @@
 		"family" : "Halogène",
 		"file" : "chlore",
 		"nb_in_pick" : 14,
-		"did_you_know" : "Le dichlore Cl₂ a été un des premiers gaz utilisé pendant la première guerre mondiale en tant que gaz de combat."
+		"did_you_know" : "Le dichlore Cl₂ a été un des premiers gaz utilisés pendant la première guerre mondiale en tant que gaz de combat."
 	},
 	{
 		"name" : "Chrome",
@@ -140,7 +140,7 @@
 		"atomicNumber" : 11,
 		"family" : "Métal Alcalin",
 		"file" : "sodium",
-		"nb_in_pick" : 4,
+		"nb_in_pick" : 8,
 		"did_you_know" : " Le sodium est présent dans de très nombreux composés chimiques parmi lesquels le sel de table (NaCl), la soude (NaOH) ou encore l’eau de Javel."
 	},
 	{
