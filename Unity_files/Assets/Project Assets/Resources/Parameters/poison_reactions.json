@@ -1,20 +1,38 @@
 ï»¿[
 	{
-		"reagents" : [["C",1],["O",1]],
-		"reaction": "C + O",
-		"products" : "CO",
-		"infos" : "Monoxyde de carbone",
-		"cost" : 4,
-		"gain" : 5,
+		"reagents" : [["H",4],["O",2],["Na",2],["Cl",2]],
+		"reaction": "2(Na+,Cl-) + 2H2O",
+		"products" : "2NaOH + Cl2 + H2",
+		"infos" : "",
+		"cost" : 6,
+		"gain" : 9,
 		"nbTurns" : 3
 	},
 	{
-		"reagents" : [["Cl",2]],
-		"reaction": "Cl + Cl",
-		"products" : "Cl2",
-		"infos" : "Dichlore",
-		"cost" : 4,
-		"gain" : 5,
+		"reagents" : [["H",2],["C",1],["O",1]],
+		"reaction": "C + H2O",
+		"products" : "CO + H2",
+		"infos" : "",
+		"cost" : 3,
+		"gain" : 1,
+		"nbTurns" : 2
+	},
+	{
+		"reagents" : [["H",6],["C",1],["O",1]],
+		"reaction": "CO + 3H2",
+		"products" : "H2O + CH4",
+		"infos" : "",
+		"cost" : 1,
+		"gain" : 4,
+		"nbTurns" : 2
+	},
+	{
+		"reagents" : [["C",1],["O",1],["Cl",2]],
+		"reaction": "CO + Cl2",
+		"products" : "COCl2",
+		"infos" : "phosgène = gaz très toxique (arme chimique et gaz de combat suffoquant)",
+		"cost" : 1,
+		"gain" : 2,
 		"nbTurns" : 2
 	}
 ]
