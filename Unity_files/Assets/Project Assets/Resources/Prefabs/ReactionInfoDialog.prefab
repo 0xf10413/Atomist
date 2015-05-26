@@ -127,7 +127,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "R\xE9action de combustion du carbone"
+  m_Text: Eau (H2O)
 --- !u!114 &11441884
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -148,12 +148,12 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 2
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Gain :'
+  m_Text: 'Gain: 5'
 --- !u!114 &11441886
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -179,7 +179,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Co\xFBt :"
+  m_Text: "Co\xFBt : 0"
 --- !u!114 &11448588
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -205,7 +205,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "D\xE9truit les obstacles de type \"D\xE9bris\"."
+  m_Text: "D\xE9truit les obstacles de type \"Flamme\""
 --- !u!114 &11448592
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -231,7 +231,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: C+O2 -> CO2
+  m_Text: "2H<size=7>2</size> + O<size=7>2</size> \u2192 2H<size=7>2</size>O"
 --- !u!114 &11448594
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -320,7 +320,7 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 66.9000015, y: -35.2000008}
+  m_AnchoredPosition: {x: 68.1999969, y: -31.5}
   m_SizeDelta: {x: 133.899994, y: 17.7000008}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22441886
@@ -337,7 +337,7 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -73.4000015, y: -35.2000008}
+  m_AnchoredPosition: {x: -75.1999969, y: -30.7999992}
   m_SizeDelta: {x: 126.900002, y: 17.7000008}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22448588

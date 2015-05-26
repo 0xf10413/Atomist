@@ -124,7 +124,7 @@ public class Main : MonoBehaviour {
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
             Main.players.Add(new Player ("Timothé", Menu.TOKENS_COLOR[0]));
-            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1], 0));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -190,6 +190,24 @@ public class Main : MonoBehaviour {
     public static void addClickEvent(GameObject go, Del onClick) {
         addEvent(go, EventTriggerType.PointerClick, onClick);
         addEvent(go, EventTriggerType.Submit, onClick);
+    }
+    /// <summary>
+    /// Plays a sound
+    /// </summary>
+    /// <param name="fileName">The name of the file, without the extension</param>
+    public static void playSound(string fileName) {
+        AudioSource audioSource = context.gameObject.AddComponent<AudioSource>();
+        audioSource.clip = (AudioClip) Resources.Load("Audio/"+ fileName);
+        audioSource.Play();
+        checkIfPlaying(audioSource);
+    }
+    private static void checkIfPlaying(AudioSource audioSource) {
+        Main.postTask(delegate {
+            if (audioSource.isPlaying)
+                checkIfPlaying(audioSource);
+            else
+                GameObject.Destroy(audioSource);
+        }, 5);
     }
     
     public static GameObject AddMask() {
@@ -489,7 +507,7 @@ public class Main : MonoBehaviour {
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject pickCardsDialog(List<Element> pickedCards, Del onValid) {
-        return pickCardsDialog(pickedCards, "Vous piochez "+ pickedCards.Count +" carte"+ ((pickedCards.Count >= 2) ? "s":""), onValid);
+        return pickCardsDialog(pickedCards, "Vous avez pioché "+ pickedCards.Count +" carte"+ ((pickedCards.Count >= 2) ? "s":""), onValid);
     }
 
     /// <summary>

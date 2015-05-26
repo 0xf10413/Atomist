@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 2; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -537,6 +537,7 @@ public class Player {
                     showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.POISON_REACTION);
             });
         }
+        playCardsSound(nbCards);
     }
     private void showEndTurn(Main.TutorialState statusID, Main.TutorialState nextID) {
         showButton(playerScreen.transform.Find("Card Buttons/Next turn").gameObject);
@@ -554,6 +555,18 @@ public class Player {
     private static void showButton(GameObject button) {
         button.GetComponent<Button>().interactable = true;
         button.transform.Find("Text").gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// Joue le son de piochage d'une carte autant de fois qu'il n'ya de cartes
+    /// </summary>
+    public void playCardsSound(int nbCards) {
+        if (nbCards == 0)
+            return;
+        Main.playSound("card pick");
+        Main.postTask(delegate {
+            playCardsSound(nbCards-1);
+        }, 0.5f);
     }
 
     public void addCardToPlayer(Element card) {

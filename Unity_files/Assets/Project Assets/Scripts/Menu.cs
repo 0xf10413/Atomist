@@ -218,7 +218,7 @@ public class Menu : MonoBehaviour {
             GameObject playerAdded = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAdded"));
             playerAdded.transform.Find("Name").GetComponent<Text>().text = player.printName;
             playerAdded.transform.Find ("Name").GetComponent<Text> ().color = player.tokenColor;
-            setClickEvent(playerAdded, delegate {
+            setClickEvent(playerAdded.transform.Find("Remove").gameObject, delegate {
                 Main.players.Remove(player);
                 showPlayerDialog();
             });
