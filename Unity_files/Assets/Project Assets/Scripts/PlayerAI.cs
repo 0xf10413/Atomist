@@ -56,6 +56,12 @@ public class PlayerAI : Player
     public override void pickCards (int nbCards, string message, bool askInPeriodicTable) {
         bool[] getTheCard = new bool[nbCards];
         Element[] cardsPicked = new Element[nbCards];
+        for (int i = 0; i < nbCards; i++) {
+            if (Main.didacticiel)
+                cardsPicked[i] = Main.getElementBySymbol("H"); // On ne donne à l'IA que des hydrogènes, comme ça elle peut rien faire
+            else
+                cardsPicked[i] = Main.pickCard ();
+        }
         double probToFind = 0;
         switch (difficulty) {
             case 0 :
@@ -69,19 +75,31 @@ public class PlayerAI : Player
                 break;
         }
         for (int i=0;i<nbCards;i++) {
-            if (!askInPeriodicTable || cardsDiscovered.Contains(cardsPicked[i]))
+            if (!askInPeriodicTable || cardsDiscovered.Contains(cardsPicked[i]) || cardsBuffer.Contains(cardsPicked[i]))
                 getTheCard[i] = true;
             else
                 getTheCard[i] = (Main.randomGenerator.NextDouble() < probToFind);
         }
         int nbCardsActuallyPicked = 0;
+        List<Element> newInBuffer = new List<Element>();
         for (int i = 0; i < nbCards; i++) {
             if (getTheCard[i]) {
-                if (Main.didacticiel)
-                    addCardToPlayer (Main.getElementBySymbol("H")); // On ne donne à l'IA que des hydrogènes, comme ça elle peut rien faire
-                else
-                    addCardToPlayer (Main.pickCard ());
+                addCardToPlayer (cardsPicked[i]);
+                newInBuffer.Add(cardsPicked[i]);
                 nbCardsActuallyPicked++;
+            }
+            else if (!cardsBuffer.Contains(cardsPicked[i])) {
+                cardsBuffer.Add(cardsPicked[i]);
+                newInBuffer.Add(cardsPicked[i]);
+            }
+        }
+        if (askInPeriodicTable) {
+            for (int i=0;i<cardsBuffer.Count;i++) {
+                if (!newInBuffer.Contains(cardsBuffer[i])) {
+                    addCardToPlayer (cardsBuffer[i]);
+                    nbCardsActuallyPicked++;
+                    i--;
+                }
             }
         }
 

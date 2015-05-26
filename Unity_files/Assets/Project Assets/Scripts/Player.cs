@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 400; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 2; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -368,8 +368,8 @@ public class Player {
                     reactionInfo.transform.Find("Title").gameObject.GetComponent<Text>().text = reactionString;
                     reactionInfo.transform.Find("Info").gameObject.GetComponent<Text>().text = r.infoTxt;
                     reactionInfo.transform.Find("Description").gameObject.GetComponent<Text>().text = r.effectTxt;
-                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût : "+ r.cost;
-                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain : "+ r.gain;
+                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût de la réaction : "+ r.cost;
+                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain après réaction : "+ r.gain;
                     reactionInfo.transform.SetParent(playerScreen.transform, false);
                 });
                 Main.addEvent(button, EventTriggerType.PointerExit, delegate {
@@ -459,11 +459,15 @@ public class Player {
             toPick.Add(Main.getElementBySymbol("He"));
             toPick.Add(Main.getElementBySymbol("He"));
         }
-        else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+        else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ)) {
             toPick.Add(Main.getElementBySymbol("O"));
             toPick.Add(Main.getElementBySymbol("Cl"));
             toPick.Add(Main.getElementBySymbol("Na"));
             toPick.Add(Main.getElementBySymbol("C"));
+        }
+        else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+            toPick.Add(Main.getElementBySymbol("H"));
+            toPick.Add(Main.getElementBySymbol("H"));
         }
         else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
             toPick.Add(Main.getElementBySymbol("Na"));
@@ -482,8 +486,18 @@ public class Player {
                     showButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
                     Main.addTutoDialog("ThrowNobleGaz", delegate {
                         hideButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
-                        Main.tutoState = Main.TutorialState.POISON_REACTION;
+                        Main.tutoState = Main.TutorialState.GAIN_FROM_NOBLE_GAZ;
                     });
+                }
+                else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+                    Main.addTutoDialog("PoisonReaction", delegate {
+                        Main.tutoState = Main.TutorialState.REACTION_CO;
+                        Main.addTutoDialog("COReaction", delegate {
+                            showEndTurn(Main.TutorialState.END_TURN3,Main.TutorialState.FIRE_REACTION);
+                        });
+                    });
+                    if (currentReactionSelected.name == "Poison")
+                        Main.hideTutoDialog();
                 }
                 else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
                     Main.addTutoDialog("FireReaction", delegate {
@@ -519,16 +533,8 @@ public class Player {
                         });
                     });
                 }
-                else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
-                    Main.addTutoDialog("PoisonReaction", delegate {
-                        Main.tutoState = Main.TutorialState.REACTION_CO;
-                        Main.addTutoDialog("COReaction", delegate {
-                            showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.FIRE_REACTION);
-                        });
-                    });
-                    if (currentReactionSelected.name == "Poison")
-                        Main.hideTutoDialog();
-                }
+                else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ))
+                    showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.POISON_REACTION);
             });
         }
     }
@@ -618,7 +624,7 @@ public class Player {
         }
 
 
-        if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3))
+        if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3) || Main.didacticialToShow(Main.TutorialState.END_TURN4))
             Main.hideTutoDialog();
         if (Main.didacticialToShow(Main.TutorialState.END_TUTO)) {
             Main.addTutoDialog("EndTuto", delegate {
@@ -726,7 +732,7 @@ public class Player {
         float nextZ = target.z;
 
         if (side != 0) {
-            nextZ += (side == 2 ? -1 : 1) * 2.5f*Mathf.Sin (Mathf.PI * (camera.transform.position.x - startX) / (startX - target.x));
+            nextZ += (side == 2 ? -1 : 1) * Mathf.Sin (Mathf.PI * (camera.transform.position.x - startX) / (startX - target.x));
         }
         if (float.IsNaN (nextZ)) // Grosse rustine, en cas de changement trop rapide de joueur (fragile, race condition ?)
             nextZ = target.z;

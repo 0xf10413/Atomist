@@ -5,7 +5,7 @@
 		"products" : "2H2O",
 		"infos" : "Eau (H2O)",
 		"type" : "Eau",
-		"cost" : 4,
+		"cost" : 0,
 		"gain" : 5
 	},
 	{
@@ -14,8 +14,8 @@
 		"products" : "2NaOH + H2",
 		"infos" : "Alliage de sodium et d'eau, violent +",
 		"type" : "Explosion",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 6,
+		"gain" : 9
 	},
 	{
 		"reagents" : [["H",4],["O",2],["K",2]],
@@ -23,8 +23,8 @@
 		"products" : "2KOH + H2",
 		"infos" : "Alliage de potassium et d'eau, violent ++",
 		"type" : "Explosion",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 6,
+		"gain" : 9
 	},
 	{
 		"reagents" : [["H",4],["O",2],["Rb",2]],
@@ -32,8 +32,8 @@
 		"products" : "2RbOH + H2",
 		"infos" : "Alliage de rubidium et d'eau, violent +++",
 		"type" : "Explosion",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 6,
+		"gain" : 8
 	},
 	{
 		"reagents" : [["H",6],["Al",2],["Cl",6]],
@@ -41,8 +41,8 @@
 		"products" : "2AlCl3 + 3H2",
 		"infos" : "",
 		"type" : "Explosion",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 6,
+		"gain" : 14
 	},
 	{
 		"reagents" : [["Al",2],["H",12],["O",6]],
@@ -50,8 +50,8 @@
 		"products" : "2Al(OH)3 + 3H2",
 		"infos" : "",
 		"type" : "Explosion",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 17,
+		"gain" : 26
 	},
 	{
 		"reagents" : [["Na",2],["Cl",2]],
@@ -59,8 +59,8 @@
 		"products" : "2NaCl",
 		"infos" : "Réaction explosive avec flamme jaune-orangée et fumée blanche",
 		"type" : "Feu",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 0,
+		"gain" : 8
 	},
 	{
 		"reagents" : [["O",2],["Mg",2]],
@@ -68,8 +68,8 @@
 		"products" : "2MgO",
 		"infos" : "Réaction utilisée en pyrotechnie : flash avec fumée blanche",
 		"type" : "Feu",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 0,
+		"gain" : 12
 	},
 	{
 		"reagents" : [["H",8],["N",2],["O",7],["Cr",2]],
@@ -77,8 +77,8 @@
 		"products" : "N2 + 4 H2O + Cr2O3",
 		"infos" : "T=225°C, formation d’un volcan !",
 		"type" : "Feu",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 20,
+		"gain" : 23
 	},
 	{
 		"reagents" : [["H",2],["Cl",2]],
@@ -86,8 +86,8 @@
 		"products" : "2HCl",
 		"infos" : "",
 		"type" : "Acide",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 0,
+		"gain" : 2
 	},
 	{
 		"reagents" : [["Al",2],["Cl",6]],
@@ -95,8 +95,8 @@
 		"products" : "2AlCl3",
 		"infos" : "Acide puissant qui attaque acier inox et caoutchouc",
 		"type" : "Acide",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 0,
+		"gain" : 14
 	},
 	{
 		"reagents" : [["H",2],["N",3],["O",7]],
@@ -104,8 +104,8 @@
 		"products" : "2HNO3 + NO",
 		"infos" : "",
 		"type" : "Acide",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 2,
+		"gain" : 3
 	},
 	{
 		"reagents" : [["H",2],["O",4],["S",1]],
@@ -113,7 +113,7 @@
 		"products" : "H2SO4",
 		"infos" : "",
 		"type" : "Acide",
-		"cost" : 4,
-		"gain" : 5
+		"cost" : 7,
+		"gain" : 8
 	}
 ]

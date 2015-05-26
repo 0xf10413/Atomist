@@ -145,8 +145,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Vous pouvez faire la r\xE9action\n\"C+O \u2192 CO\". S\xE9lectionnez les
-    cartes correspondantes et cliquez sur le bouton pour l'effectuer."
+  m_Text: "Vous pouvez faire la r\xE9action\n\"C+H\u2082O \u2192 CO+H\u2082\". S\xE9lectionnez
+    les cartes correspondantes et cliquez sur le bouton pour l'effectuer."
 --- !u!222 &22253584
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -181,7 +181,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: .751187146, y: .554271579}
   m_AnchorMax: {x: .98875016, y: .85616827}
-  m_AnchoredPosition: {x: -145.600006, y: -32.5629997}
+  m_AnchoredPosition: {x: -143, y: -53}
   m_SizeDelta: {x: -2.45090008, y: -3.05180001e-05}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22453584
