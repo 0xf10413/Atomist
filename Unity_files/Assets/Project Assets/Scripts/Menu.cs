@@ -39,7 +39,7 @@ public class Menu : MonoBehaviour {
     private Color playerColorSelected;
 
     /// <summary>
-    /// Le GamzObject contenant le masque
+    /// Le GameObject contenant le masque
     /// </summary>
     private GameObject mask;
 
@@ -203,6 +203,9 @@ public class Menu : MonoBehaviour {
     {
         GameObject dialog = transform.Find ("Screen/PlayerNameDialog").gameObject;
         transform.Find ("Screen/PlayerNameDialog").gameObject.SetActive (true);
+        dialog.transform.Find ("Add AI").gameObject.SetActive (true);
+        dialog.transform.Find ("Add Player").gameObject.SetActive (true);
+
         dialog.transform.Find ("Start Game").GetComponent<Button> ().enabled = (Main.players.Count > 1);
         GameObject playersList = dialog.transform.Find("PlayersList").gameObject;
         Main.removeAllChilds(playersList);
@@ -214,11 +217,16 @@ public class Menu : MonoBehaviour {
             Player player = p;
             GameObject playerAdded = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PlayerAdded"));
             playerAdded.transform.Find("Name").GetComponent<Text>().text = player.printName;
+            playerAdded.transform.Find ("Name").GetComponent<Text> ().color = player.tokenColor;
             setClickEvent(playerAdded, delegate {
                 Main.players.Remove(player);
                 showPlayerDialog();
             });
             playerAdded.transform.SetParent(playersList.transform,false);
+        }
+        if (Main.players.Count == Main.MAX_NB_PLAYERS) {
+            dialog.transform.Find ("Add AI").gameObject.SetActive (false);
+            dialog.transform.Find ("Add Player").gameObject.SetActive (false);
         }
     }
 

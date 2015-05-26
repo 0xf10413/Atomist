@@ -18,22 +18,29 @@ Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Da
 Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\Assembly-UnityScript.dll into Unity Child Domain
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.050 seconds
+- Completed reload, in  1.133 seconds
 desktop: 3200x1800 60Hz; virtual: 3200x1800 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Florent\Documents\GitHub\Atomist\Unity_files\test_Data\Managed\System.dll (this message is harmless)
-UnloadTime: 2.805544 ms
-Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+UnloadTime: 2.199192 ms
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 326.
-Total: 0.783594 ms (FindLiveObjects: 0.025659 ms CreateObjectMapping: 0.011842 ms MarkObjects: 0.215537 ms  DeleteObjects: 0.004737 ms)
+Unloading 68 unused Assets to reduce memory usage. Loaded Objects now: 356.
+Total: 0.928469 ms (FindLiveObjects: 0.030396 ms CreateObjectMapping: 0.036317 ms MarkObjects: 0.210405 ms  DeleteObjects: 0.037501 ms)
 
 WARNING: Shader Unsupported: 'Reflective/VertexLit' - Pass '' shader state not supported
-UnloadTime: 1.570741 ms
-Unloading 3 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+UnloadTime: 4.003233 ms
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 1405 unused Assets to reduce memory usage. Loaded Objects now: 311.
-Total: 1.644561 ms (FindLiveObjects: 0.031580 ms CreateObjectMapping: 0.046976 ms MarkObjects: 0.326464 ms  DeleteObjects: 0.808069 ms)
+Unloading 593 unused Assets to reduce memory usage. Loaded Objects now: 313.
+Total: 1.716404 ms (FindLiveObjects: 0.043028 ms CreateObjectMapping: 0.028027 ms MarkObjects: 0.445286 ms  DeleteObjects: 0.697536 ms)
 
+UnloadTime: 0.791883 ms
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
+
+Unloading 69 unused Assets to reduce memory usage. Loaded Objects now: 426.
+Total: 0.755170 ms (FindLiveObjects: 0.013421 ms CreateObjectMapping: 0.009079 ms MarkObjects: 0.269224 ms  DeleteObjects: 0.034343 ms)
+
+WARNING: Shader Unsupported: 'Reflective/VertexLit' - Pass '' shader state not supported

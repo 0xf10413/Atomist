@@ -123,7 +123,7 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new PlayerAI ("Timothé", Menu.TOKENS_COLOR[0], 0));
+            Main.players.Add(new PlayerAI ("Timothé", Menu.TOKENS_COLOR[0]));
             Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1]));
             Main.players.Add (new PlayerAI ("Marwane", Menu.TOKENS_COLOR[2]));
             Main.players.Add (new PlayerAI ("Thomas", Menu.TOKENS_COLOR[3]));

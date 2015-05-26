@@ -11,7 +11,7 @@ public class Player {
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 200; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 400; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -368,8 +368,8 @@ public class Player {
                     reactionInfo.transform.Find("Title").gameObject.GetComponent<Text>().text = reactionString;
                     reactionInfo.transform.Find("Info").gameObject.GetComponent<Text>().text = r.infoTxt;
                     reactionInfo.transform.Find("Description").gameObject.GetComponent<Text>().text = r.effectTxt;
-                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût de la réaction : "+ r.cost;
-                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain après réaction : "+ r.gain;
+                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût : "+ r.cost;
+                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain : "+ r.gain;
                     reactionInfo.transform.SetParent(playerScreen.transform, false);
                 });
                 Main.addEvent(button, EventTriggerType.PointerExit, delegate {
@@ -726,7 +726,7 @@ public class Player {
         float nextZ = target.z;
 
         if (side != 0) {
-            nextZ += (side == 2 ? -1 : 1) * Mathf.Sin (Mathf.PI * (camera.transform.position.x - startX) / (startX - target.x));
+            nextZ += (side == 2 ? -1 : 1) * 2.5f*Mathf.Sin (Mathf.PI * (camera.transform.position.x - startX) / (startX - target.x));
         }
         if (float.IsNaN (nextZ)) // Grosse rustine, en cas de changement trop rapide de joueur (fragile, race condition ?)
             nextZ = target.z;
