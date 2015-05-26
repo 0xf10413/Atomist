@@ -459,11 +459,15 @@ public class Player {
             toPick.Add(Main.getElementBySymbol("He"));
             toPick.Add(Main.getElementBySymbol("He"));
         }
-        else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+        else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ)) {
             toPick.Add(Main.getElementBySymbol("O"));
             toPick.Add(Main.getElementBySymbol("Cl"));
             toPick.Add(Main.getElementBySymbol("Na"));
             toPick.Add(Main.getElementBySymbol("C"));
+        }
+        else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+            toPick.Add(Main.getElementBySymbol("H"));
+            toPick.Add(Main.getElementBySymbol("H"));
         }
         else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
             toPick.Add(Main.getElementBySymbol("Na"));
@@ -482,8 +486,18 @@ public class Player {
                     showButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
                     Main.addTutoDialog("ThrowNobleGaz", delegate {
                         hideButton(playerScreen.transform.Find("Card Buttons/Discard cards").gameObject);
-                        Main.tutoState = Main.TutorialState.POISON_REACTION;
+                        Main.tutoState = Main.TutorialState.GAIN_FROM_NOBLE_GAZ;
                     });
+                }
+                else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
+                    Main.addTutoDialog("PoisonReaction", delegate {
+                        Main.tutoState = Main.TutorialState.REACTION_CO;
+                        Main.addTutoDialog("COReaction", delegate {
+                            showEndTurn(Main.TutorialState.END_TURN3,Main.TutorialState.FIRE_REACTION);
+                        });
+                    });
+                    if (currentReactionSelected.name == "Poison")
+                        Main.hideTutoDialog();
                 }
                 else if (Main.didacticialToShow(Main.TutorialState.FIRE_REACTION)) {
                     Main.addTutoDialog("FireReaction", delegate {
@@ -519,16 +533,8 @@ public class Player {
                         });
                     });
                 }
-                else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
-                    Main.addTutoDialog("PoisonReaction", delegate {
-                        Main.tutoState = Main.TutorialState.REACTION_CO;
-                        Main.addTutoDialog("COReaction", delegate {
-                            showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.FIRE_REACTION);
-                        });
-                    });
-                    if (currentReactionSelected.name == "Poison")
-                        Main.hideTutoDialog();
-                }
+                else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ))
+                    showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.POISON_REACTION);
             });
         }
     }
@@ -618,7 +624,7 @@ public class Player {
         }
 
 
-        if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3))
+        if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3) || Main.didacticialToShow(Main.TutorialState.END_TURN4))
             Main.hideTutoDialog();
         if (Main.didacticialToShow(Main.TutorialState.END_TUTO)) {
             Main.addTutoDialog("EndTuto", delegate {
