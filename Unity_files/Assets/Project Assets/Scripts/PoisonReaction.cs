@@ -22,11 +22,10 @@ public class PoisonReaction : DelayedReaction
 
         int remainingTurns = nbOfTurns;
 
-        target.penalties.Add (new Penalty (delegate {
+        target.penalties.Add (new Penalty (p => {
             if (remainingTurns > 0) {
                 penaltyToken.transform.Find("RemainingTurns").GetComponent<Text>().text = remainingTurns.ToString();
                 remainingTurns--;
-                return false;
             }
             else {
                 if (target.hisTurn()) { // Si on n'a pas déjà sauté le tour du joueur (avec une autre pénalité)
@@ -35,8 +34,9 @@ public class PoisonReaction : DelayedReaction
                         target.EndTurn();
                     });
                 }
-                return true;
+                p.Remove();
             }
+            return true;
         }, delegate {
             GameObject.Destroy(penaltyToken);
         }));

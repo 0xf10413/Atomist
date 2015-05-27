@@ -34,7 +34,7 @@ public class Main : MonoBehaviour {
 
     public static System.Random randomGenerator = new System.Random(); // Générateur de nombre aléatoires
 
-    private static List<KeyValuePair<Del,float>> delayedTasks;
+    private static List<KeyValuePair<Del,float>> delayedTasks = new List<KeyValuePair<Del,float>>();
     public static bool moveLock = false; // Verrouille-t-on les tâches de déplacement en attente ?
     private static List<KeyValuePair<Del, float>> moveTasks; // Tâches de déplacement en attente
 	
@@ -61,7 +61,7 @@ public class Main : MonoBehaviour {
         reactionTypes = new List<ReactionType>();
         pick = new List<KeyValuePair<Element,int>>();
 
-        delayedTasks = new List<KeyValuePair<Del,float>>();
+        delayedTasks.Clear();
         moveTasks = new List<KeyValuePair<Del, float>> ();
 
         turnID = 0;
@@ -123,8 +123,8 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
+            Main.players.Add(new Player ("Florent", Menu.TOKENS_COLOR[1]));
             Main.players.Add(new Player ("Timothé", Menu.TOKENS_COLOR[0]));
-            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1], 0));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -521,11 +521,21 @@ public class Main : MonoBehaviour {
         GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/NewCardsDialog"));
-        foreach (Element pickedCard in pickedCards) {
+        List<GameObject> cardImgs = new List<GameObject>();
+        for (int i=0;i<pickedCards.Count;i++) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
-            cardImg.GetComponent<Image>().sprite = pickedCard.cardRessource;
+            cardImg.GetComponent<Image>().sprite = backCardRessource;
             cardImg.transform.SetParent(res.transform.Find("Cards List"));
             cardImg.transform.localPosition = new Vector3(0,0,0);
+            cardImgs.Add(cardImg);
+        }
+        if (pickedCards.Count < 10)
+            progressPick(pickedCards,cardImgs);
+        else {
+            foreach (Element pickedCard in pickedCards) {
+                GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
+                cardImg.GetComponent<Image>().sprite = pickedCard.cardRessource;
+            }
         }
         res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
@@ -543,6 +553,22 @@ public class Main : MonoBehaviour {
         res.transform.localScale = new Vector3(1, 1, 1);
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
+    }
+    private static void progressPick(List<Element> cards, List<GameObject> cardImgs) {
+        progressPick(cards,cardImgs,0);
+    }
+    private static void progressPick(List<Element> cards, List<GameObject> cardImgs, int id) {
+        if (id == cards.Count)
+            return;
+        Main.postTask(delegate {
+            playSound("card pick");
+            try {
+                cardImgs[id].GetComponent<Image>().sprite = cards[id].cardRessource;
+                progressPick(cards,cardImgs,id+1);
+            }
+            catch (MissingReferenceException e) { // Si le joueur a cliqué sur "Ok" avant la fin de l'animation
+            }
+        }, 0.4f);
     }
 
     public static void setTutorialEnabled(bool enabled) {

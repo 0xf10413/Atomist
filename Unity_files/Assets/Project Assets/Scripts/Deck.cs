@@ -97,10 +97,21 @@ public class Deck {
     public Card getCard(Element elt) {
         return listCards.Find(c => c.element == elt);
     }
-	// Retourne le nombre de types de cartes possédées par le joueur
+	/// <summary>
+	/// Retourne le nombre de types de cartes possédées par le joueur
+	/// </summary>
 	public int getNbCards() {
 		return listCards.Count;
 	}
+    /// <summary>
+    /// Retourne le nombre total de cartes du joueur
+    /// </summary>
+    public int getTotalNbCards() {
+        int res = 0;
+        foreach (Card c in listCards)
+            res += c.nbCards;
+        return res;
+    }
 
     /// <summary>
     /// Spécifie la façon dont sont triées les cartes

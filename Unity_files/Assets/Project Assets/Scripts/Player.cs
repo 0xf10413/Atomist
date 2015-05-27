@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 public class Player {
 
     public const int ENERGY0 = 4; // Energie initiale du joueur
-    public const int TURN_ENERGY_GAIN = 3; // Gain d'énergie au début de chaque tour
+    public const int TURN_ENERGY_GAIN = 1; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
     public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
@@ -393,11 +393,13 @@ public class Player {
                         }
                         if (possibleReaction) {
                             bool toMuchElement = false;
-                            foreach (KeyValuePair<Element,int> reagents in r.reagentsList) {
-                                Card eltCard = deck.getCard(reagents.Key);
-                                if (eltCard.nbSelected > reagents.Value) {
-                                    toMuchElement = true;
-                                    break;
+                            for (int i=0;i<deck.getNbCards();i++) {
+                                if (deck.getCard(i).nbSelected > 0) {
+                                    KeyValuePair<Element,int> eltInReaction = r.reagentsList.Find(pair => pair.Key==deck.getCard(i).element);
+                                    if ((eltInReaction.Value < deck.getCard(i).nbSelected)) {
+                                        toMuchElement = true;
+                                        break;
+                                    }
                                 }
                             }
                             if (toMuchElement)
@@ -435,7 +437,7 @@ public class Player {
     /// </summary>
     /// <param name="nbCards">Le nombre de carte à piocher</param>
     public void pickCards(int nbCards, bool askInPeriodicTable) {
-        pickCards(nbCards, "Vous piochez "+ nbCards +" cartes", askInPeriodicTable);
+        pickCards(nbCards, "Vous avez pioché "+ nbCards +" cartes", askInPeriodicTable);
     }
 
     /// <summary>
@@ -563,10 +565,6 @@ public class Player {
     public void playCardsSound(int nbCards) {
         if (nbCards == 0)
             return;
-        Main.playSound("card pick");
-        Main.postTask(delegate {
-            playCardsSound(nbCards-1);
-        }, 0.5f);
     }
 
     public void addCardToPlayer(Element card) {
@@ -595,18 +593,21 @@ public class Player {
         }
 
         if (isTurn) {
-            // On pioche 2 cartes
             Main.infoDialog(Main.didacticiel ? (cpu ? "Au tour de l'IA":"À votre tour"):("Au tour de "+ name), delegate {
-                playerScreen.SetActive(true);
-                if (firstTurn) {
-                    energy = ENERGY0;
-                    pickCards(NBCARDS0, false);
-                }
-                else {
-                    energy += TURN_ENERGY_GAIN;
-                    pickCards(CARDS_PICKED_TURN, true);
-                }
+                startTurn();
             });
+        }
+    }
+
+    public void startTurn() {
+        playerScreen.SetActive(true);
+        if (firstTurn) {
+            energy = ENERGY0;
+            pickCards(NBCARDS0, false);
+        }
+        else {
+            energy += TURN_ENERGY_GAIN;
+            pickCards(CARDS_PICKED_TURN, true);
         }
     }
 
@@ -636,7 +637,6 @@ public class Player {
             return;
         }
 
-
         if (Main.didacticialToShow(Main.TutorialState.END_TURN) || Main.didacticialToShow(Main.TutorialState.END_TURN2) || Main.didacticialToShow(Main.TutorialState.END_TURN3) || Main.didacticialToShow(Main.TutorialState.END_TURN4))
             Main.hideTutoDialog();
         if (Main.didacticialToShow(Main.TutorialState.END_TUTO)) {
@@ -647,6 +647,8 @@ public class Player {
         }
         
         playerScreen.SetActive(false);
+        foreach (Penalty p in penalties)
+            p.reset();
         // Attention, on doit mettre sur pause le générateur de particule (flammes)
         //rooms
 
@@ -681,6 +683,7 @@ public class Player {
                 Main.winners.Add (this);
                 progressMoveToNextRoom(side);
                 Main.moveLock = true;
+                EndTurn();
             });
         }
         else {

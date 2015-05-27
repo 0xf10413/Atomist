@@ -36,6 +36,8 @@ public class ObstacleReaction : Reaction {
                 potential_obstacles[0].destroy (maker);
                 maker.moveToNextRoom ();
             }
+            else
+                displayNoEffect();
             
         /* Sinon, il y en a deux, et il faut savoir de quel côté aller */
         if (potential_obstacles.Count == 2) 
@@ -47,8 +49,14 @@ public class ObstacleReaction : Reaction {
                 potential_obstacles[1].destroy (maker);
                 maker.moveToNextRoom (2);
             }
+            else
+                displayNoEffect();
 
         maker.consumeForReaction(this);
         Main.playSound("Reactions/"+ type.name);
+    }
+
+    public static void displayNoEffect() {
+        Main.infoDialog("La réaction n'a aucun effet sur l'obstacle.");
     }
 }

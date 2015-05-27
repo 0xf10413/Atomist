@@ -169,13 +169,14 @@ public class PlayerAI : Player
                         if (p.isPlaying) {
                             if (cible == null)
                                 cible = p;
-                            else if (cible.room > p.room)
+                            else if ((cible.room > p.room) || ((difficulty == 2) && (cible.room == p.room) && (cible.deck.getTotalNbCards() < (p.deck.getTotalNbCards()+5))))
+                                // On choisit le joueur le plus avancé. En cas d'égalité, l'IA difficile choisit le joueur qui a le moins de cartes, s'il y a un différentiel suffisament important (pour laisser un peu d'aléatoire)
                                 cible = p;
                         }
                     }
                 }
                 if (cible != null) {
-                    Main.infoDialog(name + " effectue la réaction \""+ r.reagents+"->"+r.products +"\" sur "+ cible.name, delegate {
+                    Main.infoDialog(name + " effectue la réaction \""+ r.reagents+" → "+r.products +"\" sur "+ cible.name, delegate {
                         think();
                     });
                     ((DelayedReaction) r).inflict(cible);
@@ -244,17 +245,20 @@ public class PlayerAI : Player
             if (difficulty == 0)
                 return null; // Le joueur facile n'attaque pas
             else {
-                double[] choiceValues = new double[penalties.Count];
-                for (int i=0;i<choiceValues.Length;i++) {
+                double[] nbTurnsBeforeEffect = new double[penalties.Count];
+                double[] usedEnergy = new double[penalties.Count];
+                for (int i=0;i<nbTurnsBeforeEffect.Length;i++) {
                     Reaction r = penalties[i];
                     if (r.type.name == "Poison")
-                        choiceValues[i] = ((PoisonReaction) r).nbOfTurns;
+                        nbTurnsBeforeEffect[i] = ((PoisonReaction) r).nbOfTurns;
                     else if (r.type.name == "Radioactif")
-                        choiceValues[i] = 1/UraniumReaction.PROBA_DESINTEGRATION;
+                        nbTurnsBeforeEffect[i] = UraniumReaction.NB_EDGES;
+                    usedEnergy[i] = r.cost-r.gain;
                 }
                 int idChoix = 0;
-                for (int i=1;i<choiceValues.Length;i++) {
-                    if (choiceValues[i] < choiceValues[idChoix])
+                // On choisit la réaction qui a un effet le plus tôt possible, et en cas d'égalité, la moins coûteuse en NRJ
+                for (int i=1;i<nbTurnsBeforeEffect.Length;i++) {
+                    if ((nbTurnsBeforeEffect[i] < nbTurnsBeforeEffect[idChoix]) || ((nbTurnsBeforeEffect[i] == nbTurnsBeforeEffect[idChoix]) && (usedEnergy[i] < usedEnergy[idChoix])))
                         idChoix = i;
                 }
                 return penalties[idChoix];
@@ -309,6 +313,6 @@ public class PlayerAI : Player
         if (Main.moveLock)
             Main.postTask (delegate { thinkLater (); }, 0.1f);
         else
-            think ();
+            EndTurn ();
     }
 }
