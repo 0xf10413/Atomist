@@ -219,7 +219,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Ok
+  m_Text: Continuer
 --- !u!114 &11481200
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -314,10 +314,10 @@ RectTransform:
   - {fileID: 22481198}
   m_Father: {fileID: 22481192}
   m_RootOrder: 2
-  m_AnchorMin: {x: .386666715, y: .17534177}
-  m_AnchorMax: {x: .623333335, y: .242780611}
-  m_AnchoredPosition: {x: 2.20000458, y: -6}
-  m_SizeDelta: {x: 4.40000916, y: 12}
+  m_AnchorMin: {x: .376894712, y: .162416309}
+  m_AnchorMax: {x: .616772056, y: .264167368}
+  m_AnchoredPosition: {x: -1.5, y: -2}
+  m_SizeDelta: {x: 3.40000916, y: 4}
   m_Pivot: {x: .5, y: .5}
 --- !u!224 &22481198
 RectTransform:

@@ -320,6 +320,29 @@ public class Main : MonoBehaviour {
     /// <param name="onValid">Un delegate appelé lorsque l'utilisateur clique sur "ok"</param>
     /// <returns>Retourne le GameObject représentant la boîte de dialogue</returns>
     public static GameObject postPickCardsDialog(List<Element> pickedCards, List<Element> cardsBuffer, string message, PickCardsCallback onValid) {
+        Player cPlayer = currentPlayer();
+        bool ownAllElements = true;
+        List<Element> cardsToGuess = new List<Element>();
+        foreach (Element elt in pickedCards)
+            cardsToGuess.Add(elt);
+        foreach (Element elt in cardsBuffer) {
+            if (!pickedCards.Contains(elt))
+                cardsToGuess.Add(elt);
+        }
+        
+        foreach (Element elt in cardsToGuess) {
+            if (!cPlayer.cardsDiscovered.Contains(elt)) {
+                ownAllElements = false;
+                break;
+            }
+        }
+        if (ownAllElements) {
+            pickCardsDialog(cardsToGuess, delegate {
+                onValid(cardsToGuess);
+            });
+            return null;
+        }
+
         GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque temporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject dialogBox = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UnknownCardsDialog"));
@@ -510,6 +533,8 @@ public class Main : MonoBehaviour {
         return pickCardsDialog(pickedCards, "Vous avez pioché "+ pickedCards.Count +" carte"+ ((pickedCards.Count >= 2) ? "s":""), onValid);
     }
 
+    private static int idReturnedCard;
+    private static bool returnedCardAnimFinished;
     /// <summary>
     /// Affiche une boîte de dialogue avec les cartes piochées
     /// </summary>
@@ -529,18 +554,34 @@ public class Main : MonoBehaviour {
             cardImg.transform.localPosition = new Vector3(0,0,0);
             cardImgs.Add(cardImg);
         }
-        if (pickedCards.Count < 10)
-            progressPick(pickedCards,cardImgs);
-        else {
+        res.transform.Find("Message").GetComponent<Text>().text = message;
+        idReturnedCard = -1;
+        if (pickedCards.Count >= 10) {
             foreach (Element pickedCard in pickedCards) {
                 GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
                 cardImg.GetComponent<Image>().sprite = pickedCard.cardRessource;
             }
+            idReturnedCard += pickedCards.Count;
+            returnedCardAnimFinished = true;
         }
-        res.transform.Find("Message").GetComponent<Text>().text = message;
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
-            GameObject.Destroy(mask);
-            onValid();
+            if (!returnedCardAnimFinished) {
+                if (idReturnedCard != -1) {
+                    cardImgs[idReturnedCard].GetComponent<Image>().sprite = pickedCards[idReturnedCard].cardRessource;
+                    cardImgs[idReturnedCard].transform.localScale = new Vector3(1,1,1);
+                }
+            }
+            idReturnedCard++;
+            if (idReturnedCard == pickedCards.Count) {
+                if (returnedCardAnimFinished) {
+                    GameObject.Destroy(mask);
+                    onValid();
+                }
+                else
+                    returnedCardAnimFinished = true;
+            }
+            else
+                progressTurn(pickedCards,cardImgs,idReturnedCard);
         });
         addClickEvent(res, delegate {
         });
@@ -554,21 +595,31 @@ public class Main : MonoBehaviour {
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
     }
-    private static void progressPick(List<Element> cards, List<GameObject> cardImgs) {
-        progressPick(cards,cardImgs,0);
+    private static void progressTurn(List<Element> cards, List<GameObject> cardImgs, int id) {
+        returnedCardAnimFinished = false;
+        playSound("card pick");
+        progressTurn(cards,cardImgs,id,0);
     }
-    private static void progressPick(List<Element> cards, List<GameObject> cardImgs, int id) {
-        if (id == cards.Count)
+    private static void progressTurn(List<Element> cards, List<GameObject> cardImgs, int id, float angle) {
+        if (idReturnedCard != id)
             return;
-        Main.postTask(delegate {
-            playSound("card pick");
-            try {
+        float nAngle = angle+Mathf.PI/6;
+        try {
+            if ((nAngle >= Math.PI/2) && (angle < Math.PI/2))
                 cardImgs[id].GetComponent<Image>().sprite = cards[id].cardRessource;
-                progressPick(cards,cardImgs,id+1);
+            if (nAngle >= Math.PI) {
+                cardImgs[id].transform.localScale = new Vector3(1,1,1);
+                returnedCardAnimFinished = true;
+                return;
             }
-            catch (MissingReferenceException e) { // Si le joueur a cliqué sur "Ok" avant la fin de l'animation
-            }
-        }, 0.4f);
+            cardImgs[id].transform.localScale = new Vector3(Mathf.Abs(Mathf.Cos(angle)),1,1);
+        }
+        catch (MissingReferenceException) { // Si le joueur a cliqué sur "Ok" avant la fin de l'animation
+            return;
+        }
+        Main.postTask(delegate {
+            progressTurn(cards,cardImgs,id,nAngle);
+        }, 0.03f);
     }
 
     public static void setTutorialEnabled(bool enabled) {
