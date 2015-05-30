@@ -22,7 +22,7 @@ public class UraniumReaction : DelayedReaction {
     /// <summary>
     /// Constructeur de la réaction
     /// </summary>
-    public UraniumReaction() : base("U", "Th", uraniumReagents(), uraniumReaction, 4, 5, "À chaque tour, le joueur a une chance sur <b>"+ NB_EDGES +"</b> de passer son tour, jusqu'au prochain changement de salle.", "Désintégration de l'uranium") {
+    public UraniumReaction() : base("U", "Th", uraniumReagents(), uraniumReaction, 4, 5, "À chaque tour, et jusqu'au prochain changement de salle, un dé est lancé. Si le dé tombe sur "+ NB_EDGES +", le joueur passe son tour.", "Désintégration de l'uranium") {
         if (diceRessources == null) {
             diceRessources = new Sprite[NB_EDGES];
             for (int i=0;i<NB_EDGES;i++)
@@ -36,7 +36,7 @@ public class UraniumReaction : DelayedReaction {
     {
         GameObject penaltyToken = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PenaltyToken"));
         penaltyToken.transform.SetParent(target.playerScreen.transform.Find("Board Container/BoardGame/PenaltyTokensContainer"+ target.room));
-        target.penalties.Add (new Penalty(p => {
+        target.penalties.Insert (0, new Penalty(p => {
             if (target.hisTurn()) {
                 target.undoTurn ();
                 GameObject mask = Main.AddMask();

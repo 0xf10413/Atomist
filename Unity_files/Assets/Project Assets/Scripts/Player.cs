@@ -7,7 +7,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 
 public class Player {
-
+    
     public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 1; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
@@ -225,25 +225,42 @@ public class Player {
             playerScreen.transform.Find("Board Preview").gameObject.SetActive(false);
         });
         Main.addClickEvent(playerScreen.transform.Find("System Buttons/Table").gameObject, delegate {
-            GameObject mask = Main.AddMask();
+            GameObject mask = Main.AddMask(true);
             GameObject tableDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PeriodicTable"));
             mask.SetActive(false);
             tableDialog.transform.SetParent(mask.transform,false);
             mask.SetActive(true);
-            Main.addClickEvent(mask, delegate {
-                GameObject.Destroy(mask);
-            });
-            Main.addClickEvent(tableDialog, delegate {
-            });
             Main.addClickEvent(tableDialog.transform.Find("Button").gameObject, delegate {
                 GameObject.Destroy(mask);
             });
+            Main.autoFocus(tableDialog.transform.Find("Button").gameObject);
         });
+        addTitle(playerScreen.transform.Find("System Buttons/Table").gameObject, "Voir le tableau périodique");
+        Main.addClickEvent(playerScreen.transform.Find("System Buttons/Sounds").gameObject, delegate {
+            GameObject mask = Main.AddMask(true);
+            GameObject tableDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/SoundsOptions"));
+            mask.SetActive(false);
+            tableDialog.transform.SetParent(mask.transform,false);
+            mask.SetActive(true);
+            tableDialog.transform.Find("Enable Music").GetComponent<Toggle>().isOn = Main.isMusicEnabled();
+            Main.addClickEvent(tableDialog.transform.Find("Enable Music").gameObject, delegate {
+                Main.setMusicEnabled(tableDialog.transform.Find("Enable Music").GetComponent<Toggle>().isOn);
+            });
+            tableDialog.transform.Find("Enable Sound Effects").GetComponent<Toggle>().isOn = Main.areSoundsEnabled();
+            Main.addClickEvent(tableDialog.transform.Find("Enable Sound Effects").gameObject, delegate {
+                Main.setSoundsEnabled(tableDialog.transform.Find("Enable Sound Effects").GetComponent<Toggle>().isOn);
+            });
+            Main.addClickEvent(tableDialog.transform.Find("Submit").gameObject, delegate {
+                GameObject.Destroy(mask);
+            });
+        });
+        addTitle(playerScreen.transform.Find("System Buttons/Sounds").gameObject, "Paramètres sonores");
         Main.addClickEvent(playerScreen.transform.Find("System Buttons/Quit").gameObject, delegate {
             Main.confirmDialog("Quitter le jeu et revenir à l'écran titre ?", delegate {
                 Application.LoadLevel ("title-screen");
             });
         });
+        addTitle(playerScreen.transform.Find("System Buttons/Quit").gameObject, "Quitter le jeu");
 
         GameObject boardGame = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/BoardGame/BoardGame"+ Main.players.IndexOf(this)));
         boardGame.name = "BoardGame";
@@ -368,8 +385,8 @@ public class Player {
                     reactionInfo.transform.Find("Title").gameObject.GetComponent<Text>().text = reactionString;
                     reactionInfo.transform.Find("Info").gameObject.GetComponent<Text>().text = r.infoTxt;
                     reactionInfo.transform.Find("Description").gameObject.GetComponent<Text>().text = r.effectTxt;
-                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût de la réaction : "+ r.cost;
-                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain après réaction : "+ r.gain;
+                    reactionInfo.transform.Find("Reaction Cost").gameObject.GetComponent<Text>().text = "Coût : "+ r.cost;
+                    reactionInfo.transform.Find("Reaction Gain").gameObject.GetComponent<Text>().text = "Gain : "+ r.gain;
                     reactionInfo.transform.SetParent(playerScreen.transform, false);
                 });
                 Main.addEvent(button, EventTriggerType.PointerExit, delegate {
@@ -430,6 +447,26 @@ public class Player {
         energy += r.gain-r.cost;
         foreach (KeyValuePair<Element,int> reagents in r.reagentsList)
             deck.RemoveCards(reagents.Key,reagents.Value);
+    }
+
+    /// <summary>
+    /// Ajoute une bulle-info à un bouton système quand on passe la souris dessus
+    /// </summary>
+    /// <param name="parent">Le bouton système</param>
+    /// <param name="msg">Le message</param>
+    private void addTitle(GameObject parent, string msg) {
+        GameObject bubbleInfo = null;
+        Main.addEvent(parent, EventTriggerType.PointerEnter, delegate {
+            bubbleInfo = (GameObject)Object.Instantiate (Resources.Load<GameObject>("Prefabs/SystemButtonInfo"));
+            bubbleInfo.transform.SetParent(parent.transform,false);
+            bubbleInfo.transform.Find("Text").GetComponent<Text>().text = msg;
+        });
+        Main.addEvent(parent, EventTriggerType.PointerExit, delegate {
+            if (bubbleInfo != null) {
+                GameObject.Destroy(bubbleInfo);
+                bubbleInfo = null;
+            }
+        });
     }
     
     /// <summary>
@@ -585,11 +622,9 @@ public class Player {
         camera.transform.LookAt (rooms.transform.Find ("Salle " + room + "/Camera_Target").transform);
         rooms.SetActive (true);
 
-        for (int i=0; i<penalties.Count; i++) {
-            if (penalties[i].setOff()) {
+        for (int i=penalties.Count-1; i>=0; i--) {
+            if (penalties[i].setOff())
                 penalties.Remove (penalties[i]);
-                i--;
-            }
         }
 
         if (isTurn) {

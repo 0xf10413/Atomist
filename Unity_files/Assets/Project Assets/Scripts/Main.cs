@@ -47,6 +47,8 @@ public class Main : MonoBehaviour {
 
     private static DateTime timeSinceGameStart;
 
+    private static bool musicEnabled/* = true*/, soundsEnabled = true;
+
 	/**
 	 * Fonction appelée au démarrage de l'application
 	 * Disons que c'est l'équivalent du main() en C++
@@ -123,8 +125,8 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new Player ("Florent", Menu.TOKENS_COLOR[1]));
             Main.players.Add(new Player ("Timothé", Menu.TOKENS_COLOR[0]));
+            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1]));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -154,6 +156,8 @@ public class Main : MonoBehaviour {
         }
         for (int i=0;i<eltsNB.Length;i++)
             Write(elements[i].name +" : "+ eltsNB[i]);*/
+        
+        context.gameObject.GetComponent<AudioSource>().mute = !musicEnabled;
 	}
 
     /// <summary>
@@ -196,10 +200,25 @@ public class Main : MonoBehaviour {
     /// </summary>
     /// <param name="fileName">The name of the file, without the extension</param>
     public static void playSound(string fileName) {
-        AudioSource audioSource = context.gameObject.AddComponent<AudioSource>();
-        audioSource.clip = (AudioClip) Resources.Load("Audio/"+ fileName);
-        audioSource.Play();
-        checkIfPlaying(audioSource);
+        if (soundsEnabled) {
+            AudioSource audioSource = context.gameObject.AddComponent<AudioSource>();
+            audioSource.clip = (AudioClip) Resources.Load("Audio/"+ fileName);
+            audioSource.Play();
+            checkIfPlaying(audioSource);
+        }
+    }
+    public static bool isMusicEnabled() {
+        return musicEnabled;
+    }
+    public static bool areSoundsEnabled() {
+        return soundsEnabled;
+    }
+    public static void setSoundsEnabled(bool value) {
+        soundsEnabled = value;
+    }
+    public static void setMusicEnabled(bool value) {
+        musicEnabled = value;
+        context.gameObject.GetComponent<AudioSource>().mute = !musicEnabled;
     }
     private static void checkIfPlaying(AudioSource audioSource) {
         Main.postTask(delegate {
@@ -566,13 +585,13 @@ public class Main : MonoBehaviour {
         }
         addClickEvent(res.transform.Find("Ok Button").gameObject, delegate {
             if (!returnedCardAnimFinished) {
-                if (idReturnedCard != -1) {
+                if ((idReturnedCard > 0) && (idReturnedCard < pickedCards.Count)) {
                     cardImgs[idReturnedCard].GetComponent<Image>().sprite = pickedCards[idReturnedCard].cardRessource;
                     cardImgs[idReturnedCard].transform.localScale = new Vector3(1,1,1);
                 }
             }
             idReturnedCard++;
-            if (idReturnedCard == pickedCards.Count) {
+            if (idReturnedCard >= pickedCards.Count) {
                 if (returnedCardAnimFinished) {
                     GameObject.Destroy(mask);
                     onValid();
@@ -849,7 +868,7 @@ public class Main : MonoBehaviour {
         if (position == winners.Count - 1) {
             Main.infoDialog ("Et, enfin, #" + (position + 1) + ", "
                 + winners[position].name,
-                delegate { Application.Quit (); });
+                delegate { Application.LoadLevel ("title-screen"); });
             return;
         }
         Main.infoDialog ("#" + (position + 1) + ", " + winners[position].name,
