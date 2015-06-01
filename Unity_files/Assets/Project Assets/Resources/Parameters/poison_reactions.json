@@ -30,7 +30,7 @@
 		"reagents" : [["C",1],["O",1],["Cl",2]],
 		"reaction": "CO + Cl2",
 		"products" : "COCl2",
-		"infos" : "phosgène = gaz très toxique (arme chimique et gaz de combat suffoquant)",
+		"infos" : "phosgÃ¨ne = gaz trÃ¨s toxique (arme chimique et gaz de combat suffoquant)",
 		"cost" : 1,
 		"gain" : 2,
 		"nbTurns" : 2
