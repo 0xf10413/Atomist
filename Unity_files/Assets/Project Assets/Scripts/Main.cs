@@ -36,8 +36,7 @@ public class Main : MonoBehaviour {
 
     private static List<KeyValuePair<Del,float>> delayedTasks = new List<KeyValuePair<Del,float>>();
     public static bool moveLock = false; // Verrouille-t-on les tâches de déplacement en attente ?
-    private static List<KeyValuePair<Del, float>> moveTasks; // Tâches de déplacement en attente
-	
+    
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
     public static bool didacticiel {get; private set;} // true Ssi le jeu est en mode "didacticiel". Dans ce cas, des bulles d'aide s'affichent au fur et à mesure
@@ -64,7 +63,6 @@ public class Main : MonoBehaviour {
         pick = new List<KeyValuePair<Element,int>>();
 
         delayedTasks.Clear();
-        moveTasks = new List<KeyValuePair<Del, float>> ();
 
         turnID = 0;
 
@@ -125,8 +123,8 @@ public class Main : MonoBehaviour {
         // Test : ajout de joueurs
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
-            Main.players.Add(new Player ("Timothé", Menu.TOKENS_COLOR[0]));
-            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new Player ("Timothé", Menu.TOKENS_COLOR[1]));
+            Main.players.Add(new PlayerAI ("Florent", Menu.TOKENS_COLOR[2]));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -762,17 +760,6 @@ public class Main : MonoBehaviour {
             else
                 delayedTasks[i] = new KeyValuePair<Del, float> (task.Key, task.Value - Time.deltaTime);
         }
-        for (int i = moveTasks.Count - 1; i >= 0; i--) {
-            KeyValuePair<Del, float> task = moveTasks[i];
-            if (task.Value <= Time.deltaTime) {
-                task.Key ();
-                moveTasks.Remove (task);
-            }
-            else
-                moveTasks[i] = new KeyValuePair<Del, float> (task.Key, task.Value - Time.deltaTime);
-        }
-        if (moveLock)
-            moveLock = moveTasks.Count != 0;
 	}
 
     /// <summary>
@@ -785,16 +772,6 @@ public class Main : MonoBehaviour {
         delayedTasks.Add(new KeyValuePair<Del,float>(task,delay));
     }
 
-    /// <summary>
-    /// Exécute une action au bout d'un certain temps. Identique à postTask, mais dans le 
-    /// but de gérer les mouvements.
-    /// </summary>
-    /// <param name="task">Un delegate contenant la tâche à exécuter</param>
-    /// <param name="delay">Le temps au bout de laquelle on exécute la tâche, en secondes</param>
-    public static void postMove (Del task, float delay)
-    {
-        moveTasks.Add (new KeyValuePair<Del, float> (task, delay));
-    }
 
 	/// <summary>
 	/// Retourne un object JSON contenu dans un fichier
@@ -839,14 +816,11 @@ public class Main : MonoBehaviour {
     /// </summary>
     public static void nextPlayer ()
     {
-        if (winners.Count >= (players.Count-1)) // Le dernier joueur vient de gagner !
+        if ((winners.Count >= (players.Count-1)) || !humanPlayersLeft()) // L'avant-dernier joueur vient de gagner !
         {
+            rankAIs();
             TimeSpan gameTime = DateTime.UtcNow-timeSinceGameStart;
             TimeSpan displayedGameTime = new TimeSpan(gameTime.Hours,gameTime.Minutes,gameTime.Seconds);
-            foreach (Player p in players) {
-                if (p.isPlaying)
-                    winners.Add(p);
-            }
             Main.infoDialog ("Partie terminée !\nDurée de la partie : "+ displayedGameTime, delegate {victoryPanel ();});
             return;
         }
@@ -859,6 +833,30 @@ public class Main : MonoBehaviour {
     }
 
     /// <summary>
+    /// Vérifie s'il reste des humains en jeu
+    /// </summary>
+    /// <returns>true s'il en reste, false sinon</returns>
+    private static bool humanPlayersLeft() {
+        foreach (Player p in players) {
+            if (!p.cpu && p.isPlaying)
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Classe automatiquement les IAs qui n'ont pas encore gagné et éventuellement le dernier joueur humain
+    /// </summary>
+    private static void rankAIs() {
+        List<Player> rankedPlayers = new List<Player>(players);
+        rankedPlayers.Sort((a,b) => (-a.room + b.room));
+        foreach (Player p in rankedPlayers) {
+            if (p.isPlaying)
+                winners.Add(p);
+        }
+    }
+
+    /// <summary>
     /// Affiche la table des victoires, puis renvoie à l'écran titre.
     /// </summary>
     /// <param name="position">L'indice du joueur actuel dans la liste des 
@@ -868,7 +866,14 @@ public class Main : MonoBehaviour {
         if (position == winners.Count - 1) {
             Main.infoDialog ("Et, enfin, #" + (position + 1) + ", "
                 + winners[position].name,
-                delegate { Application.LoadLevel ("title-screen"); });
+                delegate {
+                    Main.confirmDialog("Rejouer ?", delegate {
+                        init();
+                        Application.LoadLevel ("game");
+                    }, delegate {
+                        Application.LoadLevel ("title-screen");
+                    });
+                });
             return;
         }
         Main.infoDialog ("#" + (position + 1) + ", " + winners[position].name,

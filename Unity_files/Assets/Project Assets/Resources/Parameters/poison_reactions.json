@@ -1,7 +1,7 @@
 ﻿[
 	{
 		"reagents" : [["H",4],["O",2],["Na",2],["Cl",2]],
-		"reaction": "2(Na+,Cl-) + 2H2O",
+		"reaction": "2NaCl + 2H2O",
 		"products" : "2NaOH + Cl2 + H2",
 		"infos" : "",
 		"cost" : 6,

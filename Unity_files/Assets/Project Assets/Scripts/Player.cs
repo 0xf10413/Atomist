@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 
 public class Player {
     
-    public const int ENERGY0 = 4; // Energie initiale du joueur
+    public const int ENERGY0 = 40; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 1; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
-    public const int NBCARDS0 = 4; // Nombre de cartes au début du jeu
+    public const int NBCARDS0 = 400; // Nombre de cartes au début du jeu
     public const int CARDS_PICKED_TURN = 2; // Nombre de cartes piochées à chaque tour
     public const int NOBLE_GAZ_CARDS = 2; // Nombre de cartes piochées après d'une défausse de carte "Gaz noble"
     public const int NB_ROOMS = 4; // Le nombre de salles dans le jeu
@@ -373,7 +373,7 @@ public class Player {
 
                 // On change le "12" par défaut en une taille dynamique
                 string reactionString = reaction.reagents + " → "+ reaction.products;
-                int fontSize = (int)Mathf.Round(0.011f*Screen.height/playerScreen.GetComponent<RectTransform>().localScale.y);
+                int fontSize = (int)Mathf.Round(0.005f*Screen.width/playerScreen.GetComponent<RectTransform>().localScale.x);
                 reactionString = new Regex (@"(<size=[0-9]*>)([0-9]*)").Replace (reactionString, "<size="+fontSize+">$2").ToString ();
                 button.transform.Find ("Text").GetComponent<Text> ().text = reactionString;
                 
@@ -753,7 +753,7 @@ public class Player {
             nextX = but.x;
         playerToken.transform.localPosition = new Vector3(nextX, but.y,but.z);
         if (nextX < but.x) {
-            Main.postMove(delegate {
+            Main.postTask(delegate {
                 movePlayer(but);
             }, 0.05f);
         }
@@ -793,11 +793,13 @@ public class Player {
         
         camera.transform.localPosition = new Vector3 (nextX, nextY, nextZ);
         if (nextX > target.x) {
-            Main.postMove (delegate
+            Main.postTask (delegate
             {
                 movePlayer3D (target, side);
             }, 0.05f);
         }
+        else
+            Main.moveLock = false;
     }
 
     /// <summary>

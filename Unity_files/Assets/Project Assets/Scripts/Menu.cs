@@ -18,9 +18,10 @@ public class Menu : MonoBehaviour {
         });
 	    setClickEvent(transform.Find("Screen/How to play").gameObject, delegate {
             Main.setTutorialEnabled(true);
+            Main.players.Clear();
             Main.players.Add(new Player("Default", TOKENS_COLOR[0]));
             Main.players.Add(new PlayerAI("IA", TOKENS_COLOR[1]));
-            Application.LoadLevel ("florent-prefab");
+            Application.LoadLevel ("game");
         });
 	    setClickEvent(transform.Find("Screen/Quit").gameObject, delegate {
             Application.Quit(); // Ne fonctionne que sur l'exécutable
@@ -190,7 +191,7 @@ public class Menu : MonoBehaviour {
         {
             int players = Main.players.Count;
             if (players > 1)
-                Application.LoadLevel ("florent-prefab");
+                Application.LoadLevel ("game");
         });
         
         dialog.transform.Find("Start Game").GetComponent<Button>().enabled = false;
@@ -228,6 +229,7 @@ public class Menu : MonoBehaviour {
             dialog.transform.Find ("Add AI").gameObject.SetActive (false);
             dialog.transform.Find ("Add Player").gameObject.SetActive (false);
         }
+        mask.SetActive(true);
     }
 
     void addSettingsDialog() {

@@ -169,7 +169,7 @@ public class PlayerAI : Player
                         if (p.isPlaying) {
                             if (cible == null)
                                 cible = p;
-                            else if ((cible.room > p.room) || ((difficulty == 2) && (cible.room == p.room) && (cible.deck.getTotalNbCards() < (p.deck.getTotalNbCards()+5))))
+                            else if ((cible.room < p.room) || ((difficulty == 2) && (cible.room == p.room) && (cible.deck.getTotalNbCards() < (p.deck.getTotalNbCards()+5))))
                                 // On choisit le joueur le plus avancé. En cas d'égalité, l'IA difficile choisit le joueur qui a le moins de cartes, s'il y a un différentiel suffisament important (pour laisser un peu d'aléatoire)
                                 cible = p;
                         }
@@ -256,7 +256,7 @@ public class PlayerAI : Player
                     usedEnergy[i] = r.cost-r.gain;
                 }
                 int idChoix = 0;
-                // On choisit la réaction qui a un effet le plus tôt possible, et en cas d'égalité, la moins coûteuse en NRJ
+                // On choisit la réaction qui a un effet le plus tôt possible, et en cas d'égalité, la moins coûteuse en énergie
                 for (int i=1;i<nbTurnsBeforeEffect.Length;i++) {
                     if ((nbTurnsBeforeEffect[i] < nbTurnsBeforeEffect[idChoix]) || ((nbTurnsBeforeEffect[i] == nbTurnsBeforeEffect[idChoix]) && (usedEnergy[i] < usedEnergy[idChoix])))
                         idChoix = i;
