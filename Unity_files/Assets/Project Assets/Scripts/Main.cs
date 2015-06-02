@@ -612,6 +612,12 @@ public class Main : MonoBehaviour {
         autoFocus(res.transform.Find("Ok Button").gameObject);
         return res;
     }
+    /// <summary>
+    /// Tourne progressivement la carte qu'un joueur a pioché
+    /// </summary>
+    /// <param name="cards">La liste des cartes piochées</param>
+    /// <param name="cardImgs">La liste des images des images des cartes affichées à l'écran</param>
+    /// <param name="id">L'ID de la carte piochée</param>
     private static void progressTurn(List<Element> cards, List<GameObject> cardImgs, int id) {
         returnedCardAnimFinished = false;
         playSound("card pick");
@@ -868,7 +874,6 @@ public class Main : MonoBehaviour {
                 + winners[position].name,
                 delegate {
                     Main.confirmDialog("Rejouer ?", delegate {
-                        init();
                         Application.LoadLevel ("game");
                     }, delegate {
                         Application.LoadLevel ("title-screen");

@@ -576,7 +576,6 @@ public class Player {
                     showEndTurn(Main.TutorialState.END_TURN2,Main.TutorialState.POISON_REACTION);
             });
         }
-        playCardsSound(nbCards);
     }
     private void showEndTurn(Main.TutorialState statusID, Main.TutorialState nextID) {
         showButton(playerScreen.transform.Find("Card Buttons/Next turn").gameObject);
@@ -594,14 +593,6 @@ public class Player {
     private static void showButton(GameObject button) {
         button.GetComponent<Button>().interactable = true;
         button.transform.Find("Text").gameObject.SetActive(true);
-    }
-
-    /// <summary>
-    /// Joue le son de piochage d'une carte autant de fois qu'il n'ya de cartes
-    /// </summary>
-    public void playCardsSound(int nbCards) {
-        if (nbCards == 0)
-            return;
     }
 
     public void addCardToPlayer(Element card) {
