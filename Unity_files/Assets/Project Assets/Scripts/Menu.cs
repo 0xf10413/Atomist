@@ -45,14 +45,14 @@ public class Menu : MonoBehaviour {
     private GameObject mask;
 
     public static Color[] TOKENS_COLOR = new Color[] {
-        new Color(1,0,0),                   // Rouge
+        new Color(1,0.25f,0.25f),           // Rouge
         new Color(0,1,0),                   // Vert
-        new Color(0,0,1),                   // Bleu
-        new Color(1,0,1),                   // Magenta
         new Color(1,1,0),                   // Jaune
         new Color(0,1,1),                   // Cyan
         new Color(1,0.5f,0),                // Orange
-        new Color(0.6f,0.2f,0),             // Marron
+        new Color(1f,1f,1f),                // Blanc
+        new Color(1,1,0.5f),                // Beige
+        new Color(1,0,1)                    // Magenta
     };
 
     /// <summary>
