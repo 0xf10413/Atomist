@@ -165,6 +165,19 @@ public class Main : MonoBehaviour {
     public static void init() {
         players = new List<Player>();
     }
+
+    /// <summary>
+    /// Réinitialise la partie.
+    /// Fonction à appeler au redémarrage d'une partie
+    /// </summary>
+    public static void reinit ()
+    {
+        for (int i = 0; i < players.Count; i++) {
+            players[i] = players[i].cpu ?
+                new PlayerAI (players[i].name, players[i].tokenColor, ((PlayerAI)players[i]).difficulty)
+                : new Player (players[i].name, players[i].tokenColor);
+        }
+    }
     
     public delegate void Confirm();
     public delegate void Undo();
@@ -873,6 +886,7 @@ public class Main : MonoBehaviour {
                 + winners[position].name,
                 delegate {
                     Main.confirmDialog("Rejouer ?", delegate {
+                        reinit();
                         Application.LoadLevel ("game");
                     }, delegate {
                         Application.LoadLevel ("title-screen");
