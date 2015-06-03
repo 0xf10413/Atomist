@@ -379,7 +379,7 @@ public class Main : MonoBehaviour {
         for (int i=0;i<pickedCards.Count;i++) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
             cardImg.GetComponent<Image>().sprite = backCardRessource;
-            cardImg.transform.SetParent(cPlayer.playerScreen.transform.Find("Cards List"));
+            cardImg.transform.SetParent(dialogBox.transform.Find("Cards List"));
             cardImg.transform.localPosition = new Vector3(0,0,0);
         }
         dialogBox.transform.Find("Message").GetComponent<Text>().text = message;
