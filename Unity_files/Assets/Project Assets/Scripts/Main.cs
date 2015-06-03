@@ -19,7 +19,7 @@ public class Main : MonoBehaviour {
     /// </summary>
 	public static Main context;
 
-    public static String[] families = {"Non-Métal","Métal Alcalin","Alcalino-terreux","Métaloïde","Non-métai","Métal de transition","Métal Pauvre","Halogène","Gaz Noble","Actinide"};
+    public static String[] families = {"Non-Métal","Métal Alcalin","Alcalino-terreux","Métaloïde","Métal de transition","Métal Pauvre","Halogène","Gaz Noble","Actinide"};
 
     public static List<Element> elements { private set; get; }   // Liste des éléments, fixée au démarrage
     public static List<Reaction> reactions { private set; get; } // Liste des réaction, fixée au démarrage
@@ -366,7 +366,7 @@ public class Main : MonoBehaviour {
         for (int i=0;i<pickedCards.Count;i++) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
             cardImg.GetComponent<Image>().sprite = backCardRessource;
-            cardImg.transform.SetParent(dialogBox.transform.Find("Cards List"));
+            cardImg.transform.SetParent(cPlayer.playerScreen.transform.Find("Cards List"));
             cardImg.transform.localPosition = new Vector3(0,0,0);
         }
         dialogBox.transform.Find("Message").GetComponent<Text>().text = message;
@@ -563,6 +563,7 @@ public class Main : MonoBehaviour {
         GameObject mask = AddMask(true);
         mask.SetActive(false); // On cache le masque tamporairement sinon la fenêtre de dialogue est affichée subitement au mauvais endroit
         GameObject res = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/NewCardsDialog"));
+        res.transform.SetParent(mask.transform);
         List<GameObject> cardImgs = new List<GameObject>();
         for (int i=0;i<pickedCards.Count;i++) {
             GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
@@ -574,10 +575,8 @@ public class Main : MonoBehaviour {
         res.transform.Find("Message").GetComponent<Text>().text = message;
         idReturnedCard = -1;
         if (pickedCards.Count >= 10) {
-            foreach (Element pickedCard in pickedCards) {
-                GameObject cardImg = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/PickedCard"));
-                cardImg.GetComponent<Image>().sprite = pickedCard.cardRessource;
-            }
+            for (int i=0;i<pickedCards.Count;i++)
+                cardImgs[i].GetComponent<Image>().sprite = pickedCards[i].cardRessource;
             idReturnedCard += pickedCards.Count;
             returnedCardAnimFinished = true;
         }
@@ -606,7 +605,6 @@ public class Main : MonoBehaviour {
             GameObject.Destroy(mask);
             onValid();
         });
-        res.transform.SetParent(mask.transform);
         mask.SetActive(true); // On réaffiche le masque maintenant que le cadre est bien placé
         res.transform.localScale = new Vector3(1, 1, 1);
         autoFocus(res.transform.Find("Ok Button").gameObject);
@@ -650,6 +648,7 @@ public class Main : MonoBehaviour {
         if (didacticiel) {
             onHideDialog = null;
             shownTutoDialogs = new List<GameObject>();
+            tutoState = TutorialState.WELCOME;
         }
     }
     public static GameObject addTutoDialog(string prefabName) {

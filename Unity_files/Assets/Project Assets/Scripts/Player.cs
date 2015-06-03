@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 public class Player {
     
-    public const int ENERGY0 = 40; // Energie initiale du joueur
+    public const int ENERGY0 = 4; // Energie initiale du joueur
     public const int TURN_ENERGY_GAIN = 1; // Gain d'énergie au début de chaque tour
     public const int NOBLE_GAZ_ENERGY = 1; // Gain d'énergie après d'une défausse de carte "Gaz noble"
     public const int NBCARDS0 = 400; // Nombre de cartes au début du jeu
