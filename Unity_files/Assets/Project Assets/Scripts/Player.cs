@@ -857,14 +857,6 @@ public class Player {
             name.name = p.name;
             name.GetComponent<Text> ().color = p.tokenColor;
             rank.GetComponent<Text> ().color = p.tokenColor;
-            if (p == this) { // Ce code marche pas
-                Color whateverColor = new Color (1, 0, 0, 1);
-
-                Material newMaterial = new Material (Shader.Find ("Sprites/Default"));
-
-                newMaterial.color = whateverColor;
-                rank.GetComponent<Text>().material = newMaterial;
-            }
 
             rank.transform.SetParent (playerScreen.transform.Find ("Players/Ranks"));
             name.transform.SetParent (playerScreen.transform.Find ("Players/Names"));
