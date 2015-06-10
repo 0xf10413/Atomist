@@ -587,12 +587,16 @@ public class Player {
         Main.tutoState = statusID;
     }
     private static void hideButton(GameObject button) {
-        button.GetComponent<Button>().interactable = false;
-        button.transform.Find("Text").gameObject.SetActive(false);
+        if (!Main.mute) {
+            button.GetComponent<Button>().interactable = false;
+            button.transform.Find("Text").gameObject.SetActive(false);
+        }
     }
     private static void showButton(GameObject button) {
-        button.GetComponent<Button>().interactable = true;
-        button.transform.Find("Text").gameObject.SetActive(true);
+        if (!Main.mute) {
+            button.GetComponent<Button>().interactable = true;
+            button.transform.Find("Text").gameObject.SetActive(true);
+        }
     }
 
     public void addCardToPlayer(Element card) {

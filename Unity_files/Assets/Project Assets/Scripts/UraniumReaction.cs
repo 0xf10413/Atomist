@@ -42,12 +42,12 @@ public class UraniumReaction : DelayedReaction {
                 GameObject mask = Main.AddMask();
                 GameObject uraniumDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UraniumDialog"));
                 GameObject msg = uraniumDialog.transform.Find("Message").gameObject;
-                msg.GetComponent<Text>().text = "Au tour de "+ Main.currentPlayer().name +".\nL'uranium va-t'il se désintégrer ?";
+                msg.GetComponent<Text>().text = (Main.didacticiel ? "À votre tour":("Au tour de "+ Main.currentPlayer().name)) + ".\nL'uranium va-t'il se désintégrer ?";
                 GameObject ok = uraniumDialog.transform.Find("Ok Button").gameObject;
                 GameObject dice = uraniumDialog.transform.Find("Dice").gameObject;
                 Main.addClickEvent(ok, delegate {
                     diceRollSkipped = true;
-                    int rand = Main.randomGenerator.Next(NB_EDGES);
+                    int rand = Main.randomGenerator.Next(Main.mute ? NB_EDGES-1:NB_EDGES);
                     dice.GetComponent<Image>().sprite = diceRessources[rand];
                     onFinishRoll(rand, mask, uraniumDialog, p);
                 });
@@ -72,7 +72,7 @@ public class UraniumReaction : DelayedReaction {
         GameObject dice = dialog.transform.Find("Dice").gameObject;
         int rand;
         do {
-            rand = Main.randomGenerator.Next(NB_EDGES);
+            rand = Main.randomGenerator.Next(Main.mute ? NB_EDGES-1:NB_EDGES);
         } while (dice.GetComponent<Image>().sprite == diceRessources[rand]);
         dice.GetComponent<Image>().sprite = diceRessources[rand];
         if (nbFrames == 0)

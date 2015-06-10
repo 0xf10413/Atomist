@@ -40,6 +40,7 @@ public class Main : MonoBehaviour {
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
     public static bool didacticiel {get; private set;} // true Ssi le jeu est en mode "didacticiel". Dans ce cas, des bulles d'aide s'affichent au fur et à mesure
+    public static bool mute = true;
 
     public enum TutorialState {WELCOME, CARDS_POSITION, ACID_REACTION, REACTION_HCL, END_TURN, FIND_IN_PT, THROW_NOBLE_GAZ, END_TURN2, GAIN_FROM_NOBLE_GAZ, POISON_REACTION, REACTION_CO, END_TURN3, FIRE_REACTION, REACTION_NACL, END_TURN4, END_TUTO};
     public static TutorialState tutoState {get;set;}
@@ -682,10 +683,13 @@ public class Main : MonoBehaviour {
     public static GameObject addTutoDialog(string prefabName, Del onClick, GameObject parent) {
         //GameObject mask = Main.AddMask(true);
         GameObject tutoDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Tutorial/"+ prefabName));
-        tutoDialog.transform.SetParent(parent.transform,false);
+        if (mute)
+            tutoDialog.SetActive(false);
+        else
+            tutoDialog.transform.SetParent(parent.transform,false);
         List<GameObject> okButtons = Main.findChildsByName(tutoDialog, "Ok");
         GameObject okButton = (okButtons.Count > 0) ? okButtons[0]:null;
-        if (okButton != null) {
+        if ((okButton != null) && !mute) {
             Main.addClickEvent(Main.findChildsByName(tutoDialog, "Ok")[0], delegate {
                 GameObject.Destroy(tutoDialog);
                 shownTutoDialogs.Remove(tutoDialog);
@@ -693,11 +697,17 @@ public class Main : MonoBehaviour {
             });
         }
         
-        shownTutoDialogs.Add(tutoDialog);
-        if (okButton != null)
-            Main.autoFocus(Main.findChildsByName(tutoDialog, "Ok")[0]);
+        if (!mute)
+            shownTutoDialogs.Add(tutoDialog);
+        if (okButton != null) {
+            if (mute)
+                onClick();
+            else
+                Main.autoFocus(Main.findChildsByName(tutoDialog, "Ok")[0]);
+        }
         else
             onHideDialog = onClick;
+        GameObject.Destroy(tutoDialog);
         return tutoDialog;
     }
     public static void hideTutoDialog() {
