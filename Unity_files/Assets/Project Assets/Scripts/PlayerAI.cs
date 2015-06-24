@@ -58,7 +58,7 @@ public class PlayerAI : Player
         Element[] cardsPicked = new Element[nbCards];
         for (int i = 0; i < nbCards; i++) {
             if (Main.didacticiel) {
-                if (!Main.mute || (Main.tutoState != Main.TutorialState.FIRE_REACTION) || (i!=0))
+                if (!Main.mute || (Main.tutoState != Main.TutorialState.FIND_IN_PT) || (i!=0))
                     cardsPicked[i] = Main.getElementBySymbol("H"); // On ne donne à l'IA que des hydrogènes, comme ça elle peut rien faire
                 else
                     cardsPicked[i] = Main.getElementBySymbol("U");

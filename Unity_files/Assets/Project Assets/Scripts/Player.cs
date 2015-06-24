@@ -499,10 +499,18 @@ public class Player {
             toPick.Add(Main.getElementBySymbol("He"));
         }
         else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ)) {
-            toPick.Add(Main.getElementBySymbol("O"));
-            toPick.Add(Main.getElementBySymbol("Cl"));
-            toPick.Add(Main.getElementBySymbol("Na"));
-            toPick.Add(Main.getElementBySymbol("C"));
+            if (Main.mute) {
+                toPick.Add(Main.getElementBySymbol("O"));
+                toPick.Add(Main.getElementBySymbol("H"));
+                toPick.Add(Main.getElementBySymbol("H"));
+                toPick.Add(Main.getElementBySymbol("C"));
+            }
+            else {
+                toPick.Add(Main.getElementBySymbol("O"));
+                toPick.Add(Main.getElementBySymbol("Cl"));
+                toPick.Add(Main.getElementBySymbol("Na"));
+                toPick.Add(Main.getElementBySymbol("C"));
+            }
         }
         else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
             toPick.Add(Main.getElementBySymbol("H"));

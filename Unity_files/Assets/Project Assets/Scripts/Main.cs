@@ -54,6 +54,8 @@ public class Main : MonoBehaviour {
 	 * Disons que c'est l'équivalent du main() en C++
 	 **/
 	void Start () {
+        setTutorialEnabled(true);
+
 		context = this;
 
         if (players == null)
@@ -125,13 +127,7 @@ public class Main : MonoBehaviour {
         if (players.Count == 0) {
             Main.Write ("Warning: ajout de joueurs de test !");
             Main.players.Add (new Player ("Timothé", Menu.TOKENS_COLOR[0]));
-            Main.players.Add (new PlayerAI ("Florent", Menu.TOKENS_COLOR[1], 2));
-            Main.players.Add (new PlayerAI ("Marwane", Menu.TOKENS_COLOR[2], 1));
-            Main.players.Add (new PlayerAI ("Thomas", Menu.TOKENS_COLOR[3], 0));
-            Main.players.Add (new PlayerAI ("Guillaume", Menu.TOKENS_COLOR[4], 1));
-            Main.players.Add (new PlayerAI ("François", Menu.TOKENS_COLOR[5], 2));
-            Main.players.Add (new PlayerAI ("Emmanuelle", Menu.TOKENS_COLOR[6], 0));
-            Main.players.Add (new PlayerAI ("Solène", Menu.TOKENS_COLOR[7], 1));
+            Main.players.Add (new PlayerAI ("T-800", Menu.TOKENS_COLOR[1], 2));
         }
         backCardRessource = Resources.Load<Sprite>("Images/Cards/verso");
         foreach (Player p in players)
@@ -163,7 +159,23 @@ public class Main : MonoBehaviour {
             Write(elements[i].name +" : "+ eltsNB[i]);*/
         
         context.gameObject.GetComponent<AudioSource>().mute = !musicEnabled;
+        context.gameObject.GetComponent<AudioSource>().Play();
+
+        if (Main.mute) {
+            Main.postTask(delegate {
+                fadeOut(15,0.8f);
+            }, 3);
+        }
 	}
+
+    private void fadeOut(int n, float ratio) {
+        if (n == 0)
+            return;
+        context.gameObject.GetComponent<AudioSource>().volume *= ratio;
+        Main.postTask(delegate {
+            fadeOut(n-1,ratio);
+        }, 0.1f);
+    }
 
     /// <summary>
     /// Initialise les variables globales
@@ -221,6 +233,7 @@ public class Main : MonoBehaviour {
         if (soundsEnabled) {
             AudioSource audioSource = context.gameObject.AddComponent<AudioSource>();
             audioSource.clip = (AudioClip) Resources.Load("Audio/"+ fileName);
+            audioSource.volume = 0.1f;
             audioSource.Play();
             checkIfPlaying(audioSource);
         }
