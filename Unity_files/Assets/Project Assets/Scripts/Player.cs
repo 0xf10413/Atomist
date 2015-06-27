@@ -104,7 +104,7 @@ public class Player {
             Main.addEvent (icon, EventTriggerType.PointerEnter, delegate
             {
                 GameObject infos = (GameObject)GameObject.Instantiate (Resources.Load ("Prefabs/ReactionTypeInfoDialog"));
-                infos.transform.Find("Type").GetComponent<Text> ().text = "Type " + rType.name;
+                infos.transform.Find("Type").GetComponent<Text> ().text = "Type\n" + rType.name;
                 infos.transform.Find ("Icon").GetComponent<Image> ().sprite = localReactionType.icon;
                 infos.transform.SetParent (playerScreen.transform);
                 infos.name = "ReactionTypeInfoDialog_"+rType.name;
@@ -499,18 +499,10 @@ public class Player {
             toPick.Add(Main.getElementBySymbol("He"));
         }
         else if (Main.didacticialToShow(Main.TutorialState.GAIN_FROM_NOBLE_GAZ)) {
-            if (Main.mute) {
-                toPick.Add(Main.getElementBySymbol("O"));
-                toPick.Add(Main.getElementBySymbol("H"));
-                toPick.Add(Main.getElementBySymbol("H"));
-                toPick.Add(Main.getElementBySymbol("C"));
-            }
-            else {
-                toPick.Add(Main.getElementBySymbol("O"));
-                toPick.Add(Main.getElementBySymbol("Cl"));
-                toPick.Add(Main.getElementBySymbol("Na"));
-                toPick.Add(Main.getElementBySymbol("C"));
-            }
+            toPick.Add(Main.getElementBySymbol("O"));
+            toPick.Add(Main.getElementBySymbol("Cl"));
+            toPick.Add(Main.getElementBySymbol("Na"));
+            toPick.Add(Main.getElementBySymbol("C"));
         }
         else if (Main.didacticialToShow(Main.TutorialState.POISON_REACTION)) {
             toPick.Add(Main.getElementBySymbol("H"));
@@ -595,16 +587,12 @@ public class Player {
         Main.tutoState = statusID;
     }
     private static void hideButton(GameObject button) {
-        if (!Main.mute) {
-            button.GetComponent<Button>().interactable = false;
-            button.transform.Find("Text").gameObject.SetActive(false);
-        }
+        button.GetComponent<Button>().interactable = false;
+        button.transform.Find("Text").gameObject.SetActive(false);
     }
     private static void showButton(GameObject button) {
-        if (!Main.mute) {
-            button.GetComponent<Button>().interactable = true;
-            button.transform.Find("Text").gameObject.SetActive(true);
-        }
+        button.GetComponent<Button>().interactable = true;
+        button.transform.Find("Text").gameObject.SetActive(true);
     }
 
     public void addCardToPlayer(Element card) {

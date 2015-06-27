@@ -40,22 +40,19 @@ public class Main : MonoBehaviour {
     private static Sprite backCardRessource; // La ressource du verso des cartes élément
 
     public static bool didacticiel {get; private set;} // true Ssi le jeu est en mode "didacticiel". Dans ce cas, des bulles d'aide s'affichent au fur et à mesure
-    public static bool mute = true;
 
     public enum TutorialState {WELCOME, CARDS_POSITION, ACID_REACTION, REACTION_HCL, END_TURN, FIND_IN_PT, THROW_NOBLE_GAZ, END_TURN2, GAIN_FROM_NOBLE_GAZ, POISON_REACTION, REACTION_CO, END_TURN3, FIRE_REACTION, REACTION_NACL, END_TURN4, END_TUTO};
     public static TutorialState tutoState {get;set;}
 
     private static DateTime timeSinceGameStart;
 
-    private static bool musicEnabled/* = true*/, soundsEnabled = true;
+    private static bool musicEnabled = true, soundsEnabled = true;
 
 	/**
 	 * Fonction appelée au démarrage de l'application
 	 * Disons que c'est l'équivalent du main() en C++
 	 **/
 	void Start () {
-        setTutorialEnabled(true);
-
 		context = this;
 
         if (players == null)
@@ -138,6 +135,7 @@ public class Main : MonoBehaviour {
 
         if (didacticialToShow(TutorialState.WELCOME)) {
             GameObject mask = AddMask(true);
+            Main.Write("aaa");
             Main.addTutoDialog("Welcome", delegate {
                 GameObject.Destroy(mask);
                 tutoState = TutorialState.CARDS_POSITION;
@@ -160,22 +158,7 @@ public class Main : MonoBehaviour {
         
         context.gameObject.GetComponent<AudioSource>().mute = !musicEnabled;
         context.gameObject.GetComponent<AudioSource>().Play();
-
-        if (Main.mute) {
-            Main.postTask(delegate {
-                fadeOut(15,0.8f);
-            }, 3);
-        }
 	}
-
-    private void fadeOut(int n, float ratio) {
-        if (n == 0)
-            return;
-        context.gameObject.GetComponent<AudioSource>().volume *= ratio;
-        Main.postTask(delegate {
-            fadeOut(n-1,ratio);
-        }, 0.1f);
-    }
 
     /// <summary>
     /// Initialise les variables globales
@@ -233,7 +216,6 @@ public class Main : MonoBehaviour {
         if (soundsEnabled) {
             AudioSource audioSource = context.gameObject.AddComponent<AudioSource>();
             audioSource.clip = (AudioClip) Resources.Load("Audio/"+ fileName);
-            audioSource.volume = 0.1f;
             audioSource.Play();
             checkIfPlaying(audioSource);
         }
@@ -696,13 +678,10 @@ public class Main : MonoBehaviour {
     public static GameObject addTutoDialog(string prefabName, Del onClick, GameObject parent) {
         //GameObject mask = Main.AddMask(true);
         GameObject tutoDialog = (GameObject) GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/Tutorial/"+ prefabName));
-        if (mute)
-            tutoDialog.SetActive(false);
-        else
-            tutoDialog.transform.SetParent(parent.transform,false);
+        tutoDialog.transform.SetParent(parent.transform,false);
         List<GameObject> okButtons = Main.findChildsByName(tutoDialog, "Ok");
         GameObject okButton = (okButtons.Count > 0) ? okButtons[0]:null;
-        if ((okButton != null) && !mute) {
+        if (okButton != null) {
             Main.addClickEvent(Main.findChildsByName(tutoDialog, "Ok")[0], delegate {
                 GameObject.Destroy(tutoDialog);
                 shownTutoDialogs.Remove(tutoDialog);
@@ -710,17 +689,11 @@ public class Main : MonoBehaviour {
             });
         }
         
-        if (!mute)
-            shownTutoDialogs.Add(tutoDialog);
-        if (okButton != null) {
-            if (mute)
-                onClick();
-            else
-                Main.autoFocus(Main.findChildsByName(tutoDialog, "Ok")[0]);
-        }
+        shownTutoDialogs.Add(tutoDialog);
+        if (okButton != null)
+            Main.autoFocus(Main.findChildsByName(tutoDialog, "Ok")[0]);
         else
             onHideDialog = onClick;
-        GameObject.Destroy(tutoDialog);
         return tutoDialog;
     }
     public static void hideTutoDialog() {

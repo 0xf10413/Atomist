@@ -50,7 +50,7 @@ public class Menu : MonoBehaviour {
         new Color(1,1,0),                   // Jaune
         new Color(0,1,1),                   // Cyan
         new Color(1,0.5f,0),                // Orange
-        new Color(1f,1f,1f),                // Blanc
+        new Color(0.8f,0.8f,0.8f),          // Gris
         new Color(1,1,0.5f),                // Beige
         new Color(1,0,1)                    // Magenta
     };
